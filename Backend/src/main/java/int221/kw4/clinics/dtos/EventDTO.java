@@ -18,7 +18,7 @@ public class EventDTO {
     private Integer id;
     private String bookingName;
     private String bookingEmail;
-    private String eventCategoryname;
+    private String eventCategoryName;
     private Instant eventStartTime;
     private String eventNotes;
     private Integer eventDuration;
