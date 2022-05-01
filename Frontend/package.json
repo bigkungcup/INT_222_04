@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "backend": "npx json-server --watch ./data/db.json --port 5000"
+    "preview": "vite preview"
   },
   "dependencies": {
     "json-server": "^0.17.0",
