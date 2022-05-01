@@ -9,7 +9,7 @@
       </div>
       <div class="grid place-items-center text-xl">
         <router-link :to="{ name: 'Schedule' }"
-          ><img src="../assets/images/logo.png" width="150"
+          ><img src="../assets/images/logo.png" width="130" class="animate-bounce mt-3"
         /></router-link>
       </div>
       <div class="grid grid-cols-3 gap-4 place-items-center text-xl">

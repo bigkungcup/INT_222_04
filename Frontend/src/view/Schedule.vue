@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onBeforeMount, onMounted } from "vue";
 import EventList from "../components/EventList.vue";
+import EventEmptyList from "../components/EventEmptyList.vue";
 
 //GET
 const lists = ref([]);
@@ -17,11 +18,19 @@ const currentEvent = ref({});
 onBeforeMount(async () => {
   await getEventLists();
 });
+
+
+
 </script>
 
 <template>
-  <div class="grid">
+  <div>
+  <div class="grid" v-show="!(lists.length===0)">
     <EventList :currentEvent="lists" />
+  </div>
+  <div class="grid" v-show="lists.length===0">
+    <EventEmptyList />
+  </div>
   </div>
 </template>
 

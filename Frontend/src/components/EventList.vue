@@ -8,7 +8,6 @@ defineProps({
   },
 });
 
-const color = ref()
 </script>
 
 <template>
@@ -18,7 +17,7 @@ const color = ref()
     <div class="grid grid-cols-3 place-items-center gap-3 py-3">
       <div
         v-for="list in currentEvent"
-        :class="[`grid w-auto h-auto text-white p-5 justify-center`, list.eventCategoryName == 'Project Management Clinic' ? `pmc`
+        :class="[`grid w-auto h-auto text-white p-5 justify-center drop-shadow-xl shadow-lg`, list.eventCategoryName == 'Project Management Clinic' ? `pmc`
         :list.eventCategoryName == 'DevOps/Infra Clinic'? `dic` : list.eventCategoryName == 'Database Clinic' ? `dc` 
         : list.eventCategoryName == 'Client-side Clinic' ? `cc`:`sc`]" 
       >
