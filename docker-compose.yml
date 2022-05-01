@@ -1,6 +1,5 @@
-version: 3
-service:
-  mysql:
+services:
+  db:
     container_name: clinic
     image: mysql
     ports:
@@ -11,14 +10,14 @@ service:
     environment:
       - MYSQL_ROOT_PASSWORD=KW04
 
-  backend:
+  backendclinic:
     build: ./Backend
     image: backend
     container_name: backendClinic
     ports:
       - 8080:8080
     links:
-      - clinic
+      - db
 
 
 
