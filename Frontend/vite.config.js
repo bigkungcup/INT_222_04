@@ -12,8 +12,9 @@ export default defineConfig({
         secure: false,
         transpileDependencies: true
         // rewrite: (path) => path.replace(/^\/api/,'') 
-      }
-    }
+      },
+    },
+    port: 80,
   }
 })
 
