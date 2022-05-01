@@ -6,7 +6,7 @@ services:
       - 3306:3306
     volumes:
       - ./Database/clinicData.sql:/docker-entrypoint-initdb.d/clinic.sql
-      - ./mysql-data:/var/lib/mysql
+      - ./Database/mysql-data:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=KW04
 
