@@ -7,8 +7,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api' : {
-        // target: 'http://backendclinic',
-        target: 'http://10.4.84.58:8080',
+        target: 'http://backendclinic:8080',
+        // target: 'http://10.4.84.58:8080',
         changeOrigin: true,
         secure: false,
         // transpileDependencies: true
