@@ -1,0 +1,28 @@
+version: 3
+service:
+  mysql:
+    container_name: clinic
+    image: mysql
+    ports:
+      - 3306:3306
+    volumes:
+      - ./Database/clinicData.sql:/docker-entrypoint-initdb.d/clinic.sql
+      - ./mysql-data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=KW04
+
+  backend:
+    build: ./Backend
+    image: backend
+    container_name: backendClinic
+    ports:
+      - 8080:8080
+    links:
+      - clinic
+
+
+
+
+      
+
+
