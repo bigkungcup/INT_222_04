@@ -4,17 +4,17 @@ import vue from '@vitejs/plugin-vue'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
-  devserver: {
+  server: {
     proxy: {
       '/api' : {
-        target: 'http://backendclinic',
+        // target: 'http://backendclinic',
+        target: 'http://10.4.84.58:8080',
         changeOrigin: true,
         secure: false,
-        transpileDependencies: true
+        // transpileDependencies: true
         // rewrite: (path) => path.replace(/^\/api/,'') 
-      },
-    },
-    port: 80,
+      }
+    }
   }
 })
 
