@@ -1,12 +1,10 @@
 package int221.kw4.clinics.controllers;
 
 import int221.kw4.clinics.dtos.EventCategoryDTO;
+import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.services.EventCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,5 +19,10 @@ public class EventCategoryController {
     @GetMapping("")
     public List<EventCategoryDTO> getAllEventCategory(){
         return service.getAll();
+    }
+
+    @PostMapping("")
+    public EventCategory create(@RequestBody EventCategory newEventCategory){
+        return  service.addCategory(newEventCategory);
     }
 }

@@ -28,4 +28,8 @@ public class EventCategoryService {
         List<EventCategory> eventCategoryList = repository.findAll();
         return listMapper.mapList(eventCategoryList, EventCategoryDTO.class, modelMapper);
     }
+
+    public EventCategory addCategory(EventCategory newEventCategory){
+        return repository.saveAndFlush(newEventCategory);
+    }
 }

@@ -4,12 +4,14 @@ services:
     container_name: clinic
     image: mysql
     ports:
-      - 3306:3306
+      - 3307:3306
     volumes:
       - ./Database/clinicData.sql:/docker-entrypoint-initdb.d/clinic.sql
       - ./Database/mysql-data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8 --collation-server=utf8_general_ci
     environment:
       - MYSQL_ROOT_PASSWORD=KW04
+      - LANG=C.UTF-8
     restart: always
 
   backendclinic:
@@ -24,16 +26,10 @@ services:
       
   frontendclinic:
     build: ./Frontend
+    image: frontend
     container_name: frontendClinic
     ports:
       - 80:80
     links:
       - backendclinic
     restart: always
-
-
-
-
-      
-
-

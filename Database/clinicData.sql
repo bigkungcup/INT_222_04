@@ -54,36 +54,3 @@ ENGINE = InnoDB;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
-select * from event;
-select * from eventCategory;
-delete from event where eventId = 1;
-
-Insert into eventCategory
-value (1,"Project Management Clinic","ตารางนัดหมายนี้ใช้สำหรับนัดหมาย project management clinic ในวิชา INT221 integrated project I ให้นักศึกษาเตรียมเอกสารที่เกี่ยวข้องเพื่อแสดงระหว่างขอคำปรึกษา",30);
-
-Insert into eventCategory
-value (2,"DevOps/Infra Clinic","Use this event category for DevOps/Infra clinic.",20);
-
-Insert into eventCategory
-value (3,"Database Clinic","ตารางนัดหมายนี้ใช้สำหรับนัดหมาย database clinic ในวิชา INT221 integrated project I",15);
-
-Insert into eventCategory
-value (4,"Client-side Clinic","ตารางนัดหมายนี้ใช้สำหรับนัดหมาย client-side clinic ในวิชา INT221 integrated project I",30);
-
-Insert into eventCategory
-value (5,"Server-side Clinic","ตารางนัดหมายนี้ใช้สำหรับนัดหมาย client-side clinic ในวิชา INT221 integrated project I",30);
- 
-Insert into event
-value (1,"Somchai Jaidee (OR-7)","somchai.jai@mail.kmutt.ac.th",cast('2022-05-23 13:30' as datetime),"",30,2); 
-
-Insert into event
-value (2,"Somsri Rakdee (SJ-3)","somsri.rak@mail.kmutt.ac.th",cast('2022-04-27 9:30' as datetime),"ขอปรึกษาปัญหาเพื่อนไม่ช่วยงาน",30,1); 
-
-Insert into event
-value (3,"สมเกียรติ ขยันเรียน กลุ่ม TT-4","somkiat.kay@kmutt.ac.th",cast('2022-05-23 16:30' as datetime),"",15,3); 
-
-select e.eventId,e.bookingName,e.bookingEmail,c.eventCategoryName,e.eventStartTime,c.eventDuration,e.eventNotes from event e join eventCategory c 
-on e.eventCategoryId = c.eventCategoryId;
-
-
