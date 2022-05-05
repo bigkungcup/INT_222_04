@@ -21,7 +21,7 @@ USE `clinic` ;
 -- Table `mydb`.`eventCategory`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `clinic`.`eventCategory` (
-  `eventCategoryId` INT NOT NULL,
+  `eventCategoryId` INT NOT NULL auto_increment,
   `eventCategoryName` VARCHAR(100) NOT NULL,
   `eventCategoryDescription` VARCHAR(500) NULL,
   `eventDuration` INT NOT NULL,
@@ -34,7 +34,7 @@ ENGINE = InnoDB;
 -- Table `clinic`.`event`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `clinic`.`event` (
-  `eventId` INT NOT NULL,
+  `eventId` INT NOT NULL auto_increment,
   `bookingName` VARCHAR(100) NOT NULL,
   `bookingEmail` VARCHAR(255) NOT NULL,
   `eventStartTime` DATETIME NOT NULL,

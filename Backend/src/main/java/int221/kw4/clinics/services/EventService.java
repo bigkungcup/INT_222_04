@@ -34,14 +34,21 @@ public class EventService {
         return listMapper.mapList(eventList, EventDTO.class, modelMapper);
     }
 
-    public EventDTO getEvent(Integer eventId){
+    public EventDTO getEvent(Integer eventId) {
         Event eventListById = repository.findById(eventId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, eventId + "")
-        );
-        return modelMapper.map(eventListById,EventDTO.class);
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Event ID: " + eventId + " does not exist !!!"));
+        return modelMapper.map(eventListById, EventDTO.class);
     }
 
-    public Event addEvent(Event newEvent){
-        return  repository.saveAndFlush(newEvent);
+    public Event addEvent(Event newEvent) {
+        return repository.saveAndFlush(newEvent);
+    }
+
+    public void deleteEvent(Integer eventId) {
+        repository.findById(eventId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Event ID: " + eventId + " does not exist !!!"));
+        repository.deleteById(eventId);
     }
 }

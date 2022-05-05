@@ -1,0 +1,16 @@
+version: '3'
+services:
+  frontend:
+    build: ./
+    image: frontend
+    container_name: frontend
+    ports:
+      - 80:80
+    networks:
+      - oasip-network
+    restart: always
+
+networks:
+  oasip-network:
+    external:
+     name: oasip-network

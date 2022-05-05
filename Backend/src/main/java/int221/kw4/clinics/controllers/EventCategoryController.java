@@ -17,12 +17,17 @@ public class EventCategoryController {
     private EventCategoryService service;
 
     @GetMapping("")
-    public List<EventCategoryDTO> getAllEventCategory(){
+    public List<EventCategoryDTO> getAllEventCategory() {
         return service.getAll();
     }
 
     @PostMapping("")
-    public EventCategory create(@RequestBody EventCategory newEventCategory){
-        return  service.addCategory(newEventCategory);
+    public EventCategory create(@RequestBody EventCategory newEventCategory) {
+        return service.addCategory(newEventCategory);
+    }
+
+    @DeleteMapping("/{eventCategoryId}")
+    public void delete(@PathVariable Integer eventCategoryId){
+        service.deleteEvent(eventCategoryId);
     }
 }
