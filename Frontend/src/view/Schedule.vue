@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount, onMounted } from "vue";
+import { ref, onBeforeMount, onBeforeUpdate } from "vue";
 import EventList from "../components/EventList.vue";
 import EventEmptyList from "../components/EventEmptyList.vue";
 
@@ -19,16 +19,27 @@ onBeforeMount(async () => {
   await getEventLists();
 });
 
+const showEmpty = ref();
 
+const getEmpty = async () => {
+  if(lists.value.length===0){
+    showEmpty.value = true
+  } 
+  else if (lists.value.length!==0){showEmpty.value = false}
+  console.log(showEmpty.value)
+}
+onBeforeUpdate(async () => {
+  await getEmpty();
+});
 
 </script>
 
 <template>
-  <div>
-  <div class="grid" v-show="!(lists.length===0)">
+  <div class="bg-fixed bg-schedule bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen overflow-auto no-scrollbar">
+  <div class="grid" v-show="!showEmpty">
     <EventList :currentEvent="lists" />
   </div>
-  <div class="grid" v-show="lists.length===0">
+  <div class="grid" v-show="showEmpty">
     <EventEmptyList />
   </div>
   </div>

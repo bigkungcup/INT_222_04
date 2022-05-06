@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from "vue-router";
+import Home from "../view/Home.vue"
 import Schedule from "../view/Schedule.vue";
 import Booking from "../view/Booking.vue";
 import ScheduleDetail from "../view/ScheduleDetail.vue";
@@ -13,6 +14,11 @@ const routes = [
   },
   {
     path: "/",
+    name: "Home",
+    component: Home,
+  },
+  {
+    path: "/schedule",
     name: "Schedule",
     component: Schedule,
   },

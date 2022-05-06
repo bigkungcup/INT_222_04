@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue";
 
 defineProps({
   currentEvent: {
@@ -7,34 +7,41 @@ defineProps({
     require: true,
   },
 });
-
 </script>
 
 <template>
-  <div
-    class="overflow-y-auto no-scrollbar bg-white h-128 w-128 place-self-center rounded-3xl py-3"
-  >
-    <div class="grid grid-cols-3 place-items-center gap-3 py-3">
-      <div
-        v-for="list in currentEvent"
-        :class="[`grid w-auto h-auto text-white p-5 justify-center drop-shadow-xl shadow-lg`, list.eventCategoryName == 'Project Management Clinic' ? `pmc`
-        :list.eventCategoryName == 'DevOps/Infra Clinic'? `dic` : list.eventCategoryName == 'Database Clinic' ? `dc` 
-        : list.eventCategoryName == 'Client-side Clinic' ? `cc`:`sc`]" 
-      >
-        <router-link :to="{ name: 'ScheduleDetail', params: { id: list.id } }">
-          <div class="text-center text-xl mb-3">
-            {{ list.eventCategoryName }}
+  <div class="grid grid-cols-2 place-items-center gap-9 py-16 px-52 text-xl">
+    <div v-for="list in currentEvent">
+      <router-link :to="{ name: 'ScheduleDetail', params: { id: list.id } }">
+        <div class="grid grid-cols-5 bg-white/70 w-100 h-auto rounded-3xl gap-4 break-all">
+          <div class="grid col-span-1">
+            <div
+              :class="[
+                `grid rounded-full w-20 h-20 -ml-20 place-self-center`,
+                list.eventCategory.id == 1
+                  ? `projectManagement`
+                  : list.eventCategory.id == 2
+                  ? `devopInfra`
+                  : list.eventCategory.id == 3
+                  ? `database`
+                  : list.eventCategory.id == 4
+                  ? `clientSide`
+                  : `serverSide`,
+              ]"
+            >
+            <img src="../assets/images/Star.png" class="p-4">
+            </div>
           </div>
-          <div
-            class="bg-white w-60 h-52 rounded-3xl text-black space-y-3 pt-5 pl-4"
-          >
-            <p>Name : {{ list.bookingName }}</p>
-            <p>Date : {{ list.eventStartTime.slice(0, 10) }}</p>
-            <p>Start Time : {{ list.eventStartTime.slice(11, 16) }}</p>
-            <p>Duration : {{ list.eventDuration }}</p>
+          <div class="grid col-span-3 p-3">
+           <p>{{ list.eventCategory.eventCategoryName }}</p> 
+            <p>{{ list.bookingName }}</p> 
+            <p>{{ list.eventStartTime.slice(0, 10) + " " +list.eventStartTime.slice(11, 16) }}</p> 
           </div>
-        </router-link>
-      </div>
+          <div class="grid col-span-1 pt-3">
+          <p>{{ list.eventDuration }} min.</p>
+          </div>
+        </div>
+      </router-link>
     </div>
   </div>
 </template>

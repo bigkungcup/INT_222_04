@@ -3,9 +3,9 @@ import Navbar from "./components/Navbar.vue";
 </script>
 
 <template> 
-  <div class="grid appBg h-screen itim ">
-    <Navbar bgColor="" />
-    <router-view class="pt-16"></router-view>
+  <div class="itim">
+    <Navbar />
+    <router-view></router-view>
   </div>
 </template>
 
@@ -21,24 +21,24 @@ import Navbar from "./components/Navbar.vue";
   background-size: cover;
 }
 
-.pmc {
-  background-color: #173f5f;
+.projectManagement {
+  background-color: #7F8EFA;
 }
 
-.dic {
-  background-color: #1F639C;
+.devopInfra {
+  background-color: #AF7AFA;
 }
 
-.dc {
-  background-color: #3CAEA3;
+.database {
+  background-color: #7FE0F7;
 }
 
-.cc {
-  background-color: #ED563B;
+.clientSide {
+  background-color: #7FC987;
 }
 
-.sc {
-  background-color: #F6D65D;
+.serverSide {
+  background-color: #FC7A7B;
 }
 
 .no-scrollbar::-webkit-scrollbar {

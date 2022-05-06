@@ -5,12 +5,15 @@ module.exports = {
   ],
   theme: {
     extend: {
-      width: {
-        '128': '90rem',
+      backgroundImage: {
+        'home': "url('./src/assets/images/BgHome.png')",
+        'schedule': "url('./src/assets/images/BgListsAll.png')",
+        'detail':"url('./src/assets/images/BgDetail.png')",
+        'booking':"url('./src/assets/images/BgCreate.png')"
       },
-      height: {
-        '128': '40rem'
-      },
+      width:{
+        '100':'30rem'
+      }
     },
   },
   plugins: [],
