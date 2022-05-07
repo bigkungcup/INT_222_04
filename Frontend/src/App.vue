@@ -2,7 +2,7 @@
 import Navbar from "./components/Navbar.vue";
 </script>
 
-<template> 
+<template>
   <div class="itim">
     <Navbar />
     <router-view></router-view>
@@ -22,23 +22,23 @@ import Navbar from "./components/Navbar.vue";
 }
 
 .projectManagement {
-  background-color: #7F8EFA;
+  background-color: #7f8efa;
 }
 
 .devopInfra {
-  background-color: #AF7AFA;
+  background-color: #af7afa;
 }
 
 .database {
-  background-color: #7FE0F7;
+  background-color: #7fe0f7;
 }
 
 .clientSide {
-  background-color: #7FC987;
+  background-color: #7fc987;
 }
 
 .serverSide {
-  background-color: #FC7A7B;
+  background-color: #fc7a7b;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -49,6 +49,4 @@ import Navbar from "./components/Navbar.vue";
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
-
 </style>

@@ -1,7 +1,6 @@
 <script setup>
-import {ref} from 'vue'
+import { ref } from "vue";
 import { formatDate, formatTime } from "../main.js";
-import EventDeleteConfirm from '../components/EventDeleteConfirm.vue'
 defineEmits(["delete"]);
 
 defineProps({
@@ -11,19 +10,22 @@ defineProps({
   },
 });
 
-const popUp = ref(false)
+const popUp = ref(false);
 
-const showPopUp = () => {
-  popUp.value = true
-  console.log(popUp.value)
-}
+const showPopUp = (id) => {
+  popUp.value = true;
+  a.value = id;
+  console.log(popUp.value);
+  console.log(a.value);
+};
 
+const a = ref();
 </script>
 
 <template>
-<div>
-  <div class="grid grid-cols-2 place-items-center gap-9 py-16 px-52 text-xl">
-    <div v-for="list in currentEvent">
+  <div>
+    <div class="grid grid-cols-2 place-items-center gap-9 py-16 px-52 text-xl">
+      <div v-for="list in currentEvent">
         <div
           class="grid grid-cols-5 bg-white/70 w-100 h-auto rounded-3xl gap-4 break-all z-0"
         >
@@ -55,11 +57,16 @@ const showPopUp = () => {
                 formatTime(list.eventStartTime)
               }}
             </p>
-            <router-link :to="{ name: 'ScheduleDetail', params: { id: list.id } }"><p class="underline underline-offset-4 text-pink-600">more details</p></router-link>
+            <router-link
+              :to="{ name: 'ScheduleDetail', params: { id: list.id } }"
+              ><p class="underline underline-offset-4 text-pink-600">
+                more details
+              </p></router-link
+            >
           </div>
           <div class="grid col-span-1 pt-3">
             <p>{{ list.eventDuration }} min.</p>
-            <button @click="showPopUp">
+            <button @click="showPopUp(list.id)">
               <img
                 src="../assets/images/Trash.png"
                 width="30"
@@ -68,14 +75,48 @@ const showPopUp = () => {
             </button>
           </div>
         </div>
+      </div>
     </div>
-  </div>
-  <div v-show="popUp" class="absolute bg-black/50 h-screen w-screen inset-0 top-0">
-  <div class="bg-white w-2/5 h-2/5">
-
-  </div>
-  </div>
+    <div
+      v-show="popUp"
+      class="flex justify-center absolute bg-black/50 h-screen w-screen inset-0 top-0"
+    >
+      <div
+        class="grid grid-rows-6 bg-white w-2/5 h-96 place-self-center rounded-3xl"
+      >
+        <div class="grid row-span-2 bgPopUp rounded-t-3xl place-items-center">
+          <img
+            src="../assets/images/Warning.png"
+            width="90"
+            class="grid absolute"
+          />
+        </div>
+        <div class="grid row-span-2 place-items-center">
+          <p class="text-5xl">Are you sure?</p>
+        </div>
+        <div>
+          <p class="grid text-2xl text-gray-500 place-items-center">
+            This schedule will be deleted. Do you confirm that?
+          </p>
+        </div>
+        <div class="flex justify-center mb-6">
+          <button
+            class="text-4xl px-5 text-green-500"
+            @click="$emit('delete', a, (popUp = false))"
+          >
+            Yes
+          </button>
+          <button class="text-4xl px-5 text-red-500" @click="popUp = false">
+            No
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
-<style></style>
+<style>
+.bgPopUp {
+  background-color: #f5c6cd;
+}
+</style>

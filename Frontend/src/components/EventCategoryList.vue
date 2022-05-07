@@ -12,7 +12,9 @@ defineProps({
     <div v-for="list in currentCategory">
       <div class="grid grid-cols-5 bg-white/70 w-100 h-28 rounded-3xl">
         <div
-          :class="[`w-full h-full rounded-l-3xl`,list.id == 1
+          :class="[
+            `w-full h-full rounded-l-3xl`,
+            list.id == 1
               ? `projectManagement`
               : list.id == 2
               ? `devopInfra`
@@ -20,12 +22,14 @@ defineProps({
               ? `database`
               : list.id == 4
               ? `clientSide`
-              : `serverSide`
+              : `serverSide`,
           ]"
         >
-        <img src="../assets/images/Star.png" class="p-4 mt-2">
+          <img src="../assets/images/Star.png" class="p-4 mt-2" />
         </div>
-        <div class="grid col-span-4 text-center text-4xl mb-3 text-amber-800 place-content-center">
+        <div
+          class="grid col-span-4 text-center text-4xl mb-3 text-amber-800 place-content-center"
+        >
           {{ list.eventCategoryName }}
         </div>
       </div>

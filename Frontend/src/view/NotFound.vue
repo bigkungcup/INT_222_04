@@ -1,8 +1,8 @@
 <script setup>
-import { useRouter } from 'vue-router'
-// const closeModal = () => useRouter().push({ name: 'Home' })
-const myRouter = useRouter()
-const closeModal = () => myRouter.push({ name: 'Home' })
+import { useRouter } from "vue-router";
+
+const myRouter = useRouter();
+const closeModal = () => myRouter.push({ name: "Home" });
 </script>
 <template>
   <div class="modal-mask">

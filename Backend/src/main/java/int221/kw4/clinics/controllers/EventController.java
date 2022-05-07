@@ -4,6 +4,7 @@ import int221.kw4.clinics.dtos.EventDTO;
 import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,7 @@ public class EventController {
     }
 
     @PostMapping("")
+    @ResponseStatus(HttpStatus.CREATED)
     public Event create(@RequestBody Event newEvent) {
         return service.addEvent(newEvent);
     }

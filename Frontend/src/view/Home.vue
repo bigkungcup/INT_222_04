@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount, onMounted } from "vue";
+import { ref, onBeforeMount} from "vue";
 import EventCategoryList from "../components/EventCategoryList.vue";
 
 //GET
@@ -18,13 +18,13 @@ onBeforeMount(async () => {
   await getEventCategory();
 });
 </script>
- 
-<template>
-<div class="bg-home bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen">
-<EventCategoryList :currentCategory="lists"/>
-</div>
-</template>
- 
-<style>
 
-</style>
+<template>
+  <div
+    class="bg-home bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen"
+  >
+    <EventCategoryList :currentCategory="lists" />
+  </div>
+</template>
+
+<style></style>
