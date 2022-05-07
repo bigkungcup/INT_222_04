@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { formatDate,formatTime } from '../main.js'
 
 const { params } = useRoute();
 const getEvent = async () => {
@@ -32,11 +33,11 @@ const goBack = () => {
         <p class="pl-10">Email : {{ displayEvent.bookingEmail }}</p>
         <p class="pl-10">Category : {{ displayEvent.eventCategory.eventCategoryName }}</p>
         <p class="pl-10">
-          Date : {{ displayEvent.eventStartTime.slice(0, 10) }}
+          Date : {{ formatDate(displayEvent.eventStartTime) }}
         </p>
         <p class="pl-10">Duration : {{ displayEvent.eventDuration }}</p>
         <p class="pl-10">
-          Start Time : {{ displayEvent.eventStartTime.slice(11, 16) }}
+          Start Time : {{ formatTime(displayEvent.eventStartTime) }}
         </p>
         <p class="col-span-2 pl-10 pr-80">Description : {{ displayEvent.eventNotes }}</p>
       </div>

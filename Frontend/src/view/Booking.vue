@@ -1,9 +1,22 @@
 <script setup>
-import { computed, ref, onBeforeMount } from "vue";
+import { ref, onBeforeMount } from "vue";
+import Datepicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
+
+//GET Schedule
+const listsSchedule = ref([]);
+const getEventLists = async () => {
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}/event`, {
+    method: "GET",
+  });
+  if (res.status === 200) {
+    listsSchedule.value = await res.json();
+  } else console.log("error, cannot get event lists");
+};
 
 //Get Category
 const lists = ref([]);
-const getEventLists = async () => {
+const getCategoryLists = async () => {
   const res = await fetch(`${import.meta.env.VITE_BASE_URL}/eventCategory`, {
     method: "GET",
   });
@@ -18,15 +31,7 @@ const createSchedule = async (currentSchedule) => {
   const res = await fetch(`${import.meta.env.VITE_BASE_URL}/event`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      // bookingName: newSchedule.bookingName,
-      // bookingEmail: newSchedule.bookingEmail,
-      // eventCategory: {
-      //   id: newSchedule.id,
-      // },
-      // eventStartTime: newSchedule.eventStartTime,
-      // eventNotes: newSchedule.eventNotes,
-      // eventDuration: newSchedule.eventDuration,    
+    body: JSON.stringify({   
     bookingName: currentSchedule.bookingName,
     bookingEmail: currentSchedule.bookingEmail,
     eventCategory: {
@@ -39,7 +44,7 @@ const createSchedule = async (currentSchedule) => {
   });
   if (res.status === 201) {
     const addedSchedule = await res.json();
-    lists.value.push(addedSchedule);
+    listsSchedule.value.push(addedSchedule);
     console.log("created successfully");
   } else console.log("error, cannot create");
   reset();
@@ -50,21 +55,10 @@ const reset = () => {
 };
 const currentSchedule = ref({});
 
-// const newSchedule = computed(() => {
-//   return {
-//     bookingName: currentSchedule.bookingName,
-//     bookingEmail: currentSchedule.bookingEmail,
-//     eventCategory: {
-//       id: currentSchedule.id,
-//     },
-//     eventStartTime: currentSchedule.eventStartTime,
-//     eventNotes: currentSchedule.eventNotes,
-//     eventDuration: currentSchedule.eventDuration,
-//   };
-// });
 
 onBeforeMount(async () => {
   await getEventLists();
+  await getCategoryLists();
 });
 </script>
 
@@ -90,8 +84,9 @@ onBeforeMount(async () => {
             v-model="currentSchedule.bookingEmail"
           />
         </p>
-        <p class="pl-10">Date/Time :</p>
-        <p class="pl-10">
+        <p class="pl-10">Date/Time :   
+        <Datepicker class="aaa" v-model="currentSchedule.eventStartTime"></Datepicker> </p>
+        <p>  
           Category :
           <select v-model="currentSchedule.id" class="px-3 rounded-lg text-3xl">
             <option v-for="list in lists" :value = "list.id" >{{list.eventCategoryName}}</option>
@@ -111,17 +106,22 @@ onBeforeMount(async () => {
           <textarea
             class="bg-white border border-slate-300 rounded-lg h-10 col-span-2 w-full h-60 mt-5 p-3 text-3xl"
             placeholder="add your note "
-            v-model="currentSchedule.eventNote"
+            v-model="currentSchedule.eventNotes"
           ></textarea>
         </p>
         <div></div>
         <div class="text-white">
-        <button class="bg-red-500 rounded-3xl w-36 py-2 mx-2 drop-shadow-xl" @onclick="$emit(reset())">Cancle</button>
-        <button class="bg-green-500 rounded-3xl w-36 py-2 mx-2 drop-shadow-xl" @onclick="$emit(createSchedule,reset())">Save</button>
+        <button class="bg-red-500 rounded-3xl w-36 py-2 mx-2 drop-shadow-xl" v-on:click="reset">Cancle</button>
+        <button class="bg-green-500 rounded-3xl w-36 py-2 mx-2 drop-shadow-xl" v-on:click="createSchedule(currentSchedule)">Save</button>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<style></style>
+<style>
+.aaa{
+  padding-left: 16px;
+  padding-right: 16px;
+}
+</style>
