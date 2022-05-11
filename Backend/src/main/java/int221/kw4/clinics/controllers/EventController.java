@@ -38,4 +38,9 @@ public class EventController {
     public void delete(@PathVariable Integer eventId){
         service.deleteEvent(eventId);
     }
+
+    @PutMapping("/{eventId}")
+    public Event update(@RequestBody Event updateEvent, @PathVariable Integer eventId){
+        return service.update(updateEvent, eventId);
+    }
 }
