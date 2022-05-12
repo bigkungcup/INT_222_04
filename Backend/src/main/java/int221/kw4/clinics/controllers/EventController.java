@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -30,7 +31,7 @@ public class EventController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public Event create(@RequestBody Event newEvent) {
+    public Event create(@RequestBody @Valid Event newEvent) {
         return service.addEvent(newEvent);
     }
 
