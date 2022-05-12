@@ -11,15 +11,15 @@ defineProps({
 });
 
 const popUp = ref(false);
+const deleteId = ref();
 
 const showPopUp = (id) => {
   popUp.value = true;
-  a.value = id;
+  deleteId.value = id;
   console.log(popUp.value);
-  console.log(a.value);
+  console.log(deleteId.value);
 };
 
-const a = ref();
 </script>
 
 <template>
@@ -102,7 +102,7 @@ const a = ref();
         <div class="flex justify-center mb-6">
           <button
             class="text-4xl px-5 text-green-500"
-            @click="$emit('delete', a, (popUp = false))"
+            @click="$emit('delete', deleteId, (popUp = false))"
           >
             Yes
           </button>

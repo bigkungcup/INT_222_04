@@ -5,7 +5,8 @@ import Booking from "../view/Booking.vue";
 import ScheduleDetail from "../view/ScheduleDetail.vue";
 import NotFound from "../view/NotFound.vue";
 
-const history = createWebHashHistory('/kw4');
+// const history = createWebHashHistory('/kw4');
+const history = createWebHashHistory();
 const routes = [
   {
     path: "/:catchNotMatchPath(.*)",
