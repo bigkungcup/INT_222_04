@@ -12,7 +12,8 @@ module.exports = {
         'booking':"url('./assets/images/BgCreate.png')"
       },
       width:{
-        '100':'30rem'
+        '100':'30rem',
+        '99':'28em'
       }
     },
   },

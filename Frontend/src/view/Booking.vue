@@ -45,10 +45,9 @@ const createSchedule = async (newEvent) => {
     listsSchedule.value.push(addedSchedule);
     showPopUp();
     console.log("created successfully");
-  } 
-  else {console.log("error, cannot create");
+  } else{
+  console.log("error, cannot create");
   alert("Please complete all required fields.");}
-  reset();
 };
 
 const popUp = ref(false);
@@ -57,20 +56,12 @@ const showPopUp = () => {
   console.log(popUp.value);
 };
 
-const currentEvent = ref({});
-
-// const a = ()=>{
-//   console.log("asdasd");
-// }
 
 onMounted(async () => {
   await getCategoryLists();
   await getEventLists();
 });
 
-const reset = () => {
-  currentEvent.value = {};
-};
 </script>
 
 <template>
@@ -79,11 +70,9 @@ const reset = () => {
   >
   <CreateEvent 
   @create = "createSchedule"
-  @reset = "reset"
   @show="showPopUp"
   :popUp="popUp"
-  :currentCategory="lists"
-  :currentEvent="listEvent"/>
+  :currentCategory="lists"/>
   </div>
 </template>
 
