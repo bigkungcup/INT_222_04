@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.time.Instant;
 
 @Getter
@@ -28,11 +25,13 @@ public class Event {
 
     @Column(name = "bookingName", nullable = false, length = 100)
     @NotBlank(message = "name shouldn't be null")
+    @Size(max = 100, min = 1)
     private String bookingName;
 
     @Column(name = "bookingEmail", nullable = false)
     @Email(message = "email invalid syntax")
     @NotNull(message = "email shouldn't be null")
+    @Size(max = 45, min = 5)
     private String bookingEmail;
 
     @Column(name = "eventStartTime", nullable = false)
@@ -41,6 +40,7 @@ public class Event {
     private Instant eventStartTime;
 
     @Column(name = "eventNotes", length = 500)
+    @Size(max = 500)
     private String eventNotes;
 
     @Column(name = "eventDuration", nullable = false)
