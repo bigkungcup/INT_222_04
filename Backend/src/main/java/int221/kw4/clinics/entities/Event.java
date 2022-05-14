@@ -24,18 +24,18 @@ public class Event {
     private Integer id;
 
     @Column(name = "bookingName", nullable = false, length = 100)
-    @NotBlank(message = "name shouldn't be null")
+    @NotBlank(message = "name shouldn't be blank/null")
     @Size(max = 100, min = 1)
     private String bookingName;
 
     @Column(name = "bookingEmail", nullable = false)
     @Email(message = "email invalid syntax")
-    @NotNull(message = "email shouldn't be null")
+    @NotBlank(message = "email shouldn't be blank/null")
     @Size(max = 45, min = 5)
     private String bookingEmail;
 
     @Column(name = "eventStartTime", nullable = false)
-    @NotNull(message = "startTime shouldn't be null")
+    @NotNull(message = "startTime shouldn't be blank/null")
     @FutureOrPresent(message = "startTime Invalid")
     private Instant eventStartTime;
 
