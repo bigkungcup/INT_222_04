@@ -3,7 +3,9 @@ import App from "./App.vue";
 import router from "./router";
 import "./index.css";
 
+
 createApp(App).use(router).mount("#app");
+
 
 export function formatDate(date) {
   const options = { year: "numeric", month: "long", day: "numeric" };

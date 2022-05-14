@@ -47,7 +47,7 @@ const createSchedule = async (newEvent) => {
     console.log("created successfully");
   } else{
   console.log("error, cannot create");
-  alert("Please complete all required fields.");}
+  showText();}
 };
 
 const popUp = ref(false);
@@ -55,6 +55,13 @@ const showPopUp = () => {
   popUp.value = true;
   console.log(popUp.value);
 };
+
+const textPopUp = ref(false);
+const showText = () => {
+  textPopUp.value = true;
+  console.log(popUp.value);
+};
+
 
 
 onMounted(async () => {
@@ -71,6 +78,7 @@ onMounted(async () => {
   <CreateEvent 
   @create = "createSchedule"
   @show="showPopUp"
+  :textPopUp="textPopUp"
   :popUp="popUp"
   :currentCategory="lists"/>
   </div>

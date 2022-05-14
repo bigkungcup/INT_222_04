@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
+import moment from "moment"
 defineEmits(['create', 'reset', 'show'])
 
 const props = defineProps({
@@ -10,6 +11,10 @@ const props = defineProps({
     require: {},
   },
   popUp: {
+    type: Boolean,
+    require: true,
+  },
+  textPopUp: {
     type: Boolean,
     require: true,
   }
@@ -35,38 +40,68 @@ const reset = () => {
   };
 };
 
+const textPopUpDate = ref(false)
+const setMinTime = (eventStartTime) => {
+  newEvent.value.eventStartTime = moment(eventStartTime).isAfter(moment(new Date())) ? eventStartTime : "a"
+  console.log(newEvent.value.eventStartTime);
+  textPopUpDate.value = true;
+}
+
 </script>
  
 <template>
   <div class="w-full h-full pt-12 px-36 pb-36">
-    <div class="grid grid-cols-2 text-4xl gap-y-10 break-all">
+    <div class="grid grid-cols-2 text-4xl gap-y-6 break-all">
       <p class="col-span-2 pl-10">
         Name :
         <input type="text" class="bg-white border border-slate-300 rounded-lg h-10 w-3/5 text-3xl"
           v-model="newEvent.bookingName" />
         <router-link :to="{ name: 'Home' }"><img src="../assets/images/Exit.png" width="60"
             class="absolute top-3 right-36" /></router-link>
+      <div v-if="newEvent.bookingName === '' || newEvent.bookingName === null || newEvent.bookingName.value === 0">
+        <p v-show="textPopUp" class="text-lg text-red-500 pl-28">*Please enter your name.</p>
+      </div>
+
       </p>
       <p class="pl-10">
         Email :
         <input type="email" class="bg-white border border-slate-300 rounded-lg h-10 text-3xl"
           v-model="newEvent.bookingEmail" />
+      <div v-if="newEvent.bookingEmail === '' || newEvent.bookingEmail === null || newEvent.bookingEmail.value === 0">
+        <p v-show="textPopUp" class="text-lg text-red-500 pl-28">*Please enter your email.</p>
+      </div>
+
       </p>
 
       <p class="flex pl-10">
         Date/Time :
-        <Datepicker :minDate="new Date()" :minTime="{ hours: new Date().getHours(), minutes: new Date().getMinutes() }"
+        <Datepicker @closed="setMinTime(newEvent.eventStartTime)" :minDate="new Date()" :minTime="{ hours: minHour,
+            minutes: minMinute}"
           v-model="newEvent.eventStartTime" class="w-52 ml-3 -mt-1">
         </Datepicker>
+      <div
+        v-if="newEvent.eventStartTime === '' || newEvent.eventStartTime === null || newEvent.eventStartTime.value === 0 && textPopUpDate === false">
+        <br>
+        <p v-show="textPopUp" class="absolute text-lg text-red-500 -ml-52">*Please enter your start time.</p>
+      </div>
+      <div
+        v-if="newEvent.eventStartTime === 'a'">
+        <br>
+        <p v-show="textPopUpDate" class="absolute text-lg text-red-500 -ml-52 break-words">*Not be able to select the previous date and time.</p>
+      </div>
       </p>
 
       <p class="pl-10">
-        Category :
+        Clinic :
         <select v-model="newEvent.eventCategory" class="px-3 rounded-lg text-3xl">
           <option v-for="list in currentCategory" :value="list">
             {{ list.eventCategoryName }}
           </option>
         </select>
+      <div
+        v-if="newEvent.eventCategory === {} || newEvent.eventCategory === null || Object.keys(newEvent.eventCategory).length === 0">
+        <p v-show="textPopUp" class="text-lg text-red-500 pl-28">*Please enter your clinic.</p>
+      </div>
       </p>
       <p class="pl-10">
         Duration :
@@ -81,9 +116,11 @@ const reset = () => {
       </p>
       <div></div>
       <div class="text-white">
-        <button class="bg-red-500 rounded-3xl w-36 py-2 mx-2 drop-shadow-xl" @click="reset()">
-          Cancel
-        </button>
+        <router-link :to="{ name: 'Home' }">
+          <button class="bg-red-500 rounded-3xl w-36 py-2 mx-2 drop-shadow-xl">
+            Cancel
+          </button>
+        </router-link>
         <button class="bg-green-500 rounded-3xl w-36 py-2 mx-2 drop-shadow-xl" @click="$emit('create', newEvent)">
           Save
         </button>
@@ -105,7 +142,7 @@ const reset = () => {
         <p>Created successfully</p>
       </div>
       <div class="grid place-items-center">
-        <button class="text-4xl px-5 text-white bgPopUp rounded-3xl w-36 py-2 mx-2" @click="reset(), popUp = false">
+        <button class="text-4xl px-5 text-white bgPopUp rounded-3xl w-36 py-2 mx-2" @click="reset()">
           OK
         </button>
       </div>
