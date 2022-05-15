@@ -33,7 +33,7 @@ const createSchedule = async (newEvent) => {
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
       bookingName: newEvent.bookingName,
-      bookingEmail: newEvent.bookingEmail,
+      bookingEmail: newEvent.bookingEmail.match(validEmail)?newEvent.bookingEmail:null,
       eventCategory: newEvent.eventCategory,
       eventStartTime: newEvent.eventStartTime,
       eventNotes: newEvent.eventNotes,
@@ -45,15 +45,20 @@ const createSchedule = async (newEvent) => {
     listsSchedule.value.push(addedSchedule);
     showPopUp();
     console.log("created successfully");
-  } else{
-  console.log("error, cannot create");
-  showText();}
+  } else {
+    console.log("error, cannot create");
+    showText();
+  }console.log(newEvent.bookingEmail.match(validEmail)?newEvent.bookingEmail:null);
 };
 
 const popUp = ref(false);
 const showPopUp = () => {
   popUp.value = true;
   console.log(popUp.value);
+};
+const disShowPopUp = () => {
+  popUp.value = false;
+  textPopUp.value = false;
 };
 
 const textPopUp = ref(false);
@@ -62,6 +67,7 @@ const showText = () => {
   console.log(popUp.value);
 };
 
+const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
 
 onMounted(async () => {
@@ -72,18 +78,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div
-    class="bg-fixed bg-booking bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen"
-  >
-  <CreateEvent 
-  @create = "createSchedule"
-  @show="showPopUp"
-  :textPopUp="textPopUp"
-  :popUp="popUp"
-  :currentCategory="lists"/>
+  <div class="bg-fixed bg-booking bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen">
+    <CreateEvent @create="createSchedule" @close="disShowPopUp" :textPopUp="textPopUp" :popUp="popUp"
+      :currentCategory="lists" />
   </div>
 </template>
 
 <style>
-
 </style>

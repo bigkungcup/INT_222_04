@@ -3,9 +3,11 @@ import { computed, ref } from "vue";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import moment from "moment"
-defineEmits(['create', 'reset', 'show'])
+defineEmits(['create','close'])
 
-const props = defineProps({
+
+
+defineProps({
   currentCategory: {
     type: Object,
     require: {},
@@ -17,7 +19,7 @@ const props = defineProps({
   textPopUp: {
     type: Boolean,
     require: true,
-  }
+  },
 });
 
 const newEvent = ref({
@@ -47,6 +49,8 @@ const setMinTime = (eventStartTime) => {
   textPopUpDate.value = true;
 }
 
+const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+
 </script>
  
 <template>
@@ -67,16 +71,17 @@ const setMinTime = (eventStartTime) => {
         Email :
         <input type="email" class="bg-white border border-slate-300 rounded-lg h-10 text-3xl"
           v-model="newEvent.bookingEmail" />
-      <div v-if="newEvent.bookingEmail === '' || newEvent.bookingEmail === null || newEvent.bookingEmail.value === 0">
+      <div v-if="newEvent.bookingEmail === '' || newEvent.bookingEmail.value === 0">
         <p v-show="textPopUp" class="text-lg text-red-500 pl-28">*Please enter your email.</p>
       </div>
-
+      <div v-if="newEvent.bookingEmail.match(validEmail) === null && newEvent.bookingEmail !== '' ">
+        <p v-show="textPopUp" class="text-lg text-red-500 pl-28">*Invalid Email.</p>
+      </div>
       </p>
 
       <p class="flex pl-10">
         Date/Time :
-        <Datepicker @closed="setMinTime(newEvent.eventStartTime)" :minDate="new Date()" :minTime="{ hours: minHour,
-            minutes: minMinute}"
+        <Datepicker @closed="setMinTime(newEvent.eventStartTime)" :minDate="new Date()"
           v-model="newEvent.eventStartTime" class="w-52 ml-3 -mt-1">
         </Datepicker>
       <div
@@ -84,10 +89,10 @@ const setMinTime = (eventStartTime) => {
         <br>
         <p v-show="textPopUp" class="absolute text-lg text-red-500 -ml-52">*Please enter your start time.</p>
       </div>
-      <div
-        v-if="newEvent.eventStartTime === 'a'">
+      <div v-if="newEvent.eventStartTime === 'a'">
         <br>
-        <p v-show="textPopUpDate" class="absolute text-lg text-red-500 -ml-52 break-words">*Not be able to select the previous date and time.</p>
+        <p v-show="textPopUpDate" class="absolute text-lg text-red-500 -ml-52 break-words">*Not be able to select the
+          previous date and time.</p>
       </div>
       </p>
 
@@ -142,7 +147,7 @@ const setMinTime = (eventStartTime) => {
         <p>Created successfully</p>
       </div>
       <div class="grid place-items-center">
-        <button class="text-4xl px-5 text-white bgPopUp rounded-3xl w-36 py-2 mx-2" @click="reset()">
+        <button class="text-4xl px-5 text-white bgPopUp rounded-3xl w-36 py-2 mx-2" @click="reset(), $emit('close')">
           OK
         </button>
       </div>

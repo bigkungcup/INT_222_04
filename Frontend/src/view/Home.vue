@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount} from "vue";
+import { ref, onBeforeMount } from "vue";
 import EventCategoryList from "../components/EventCategoryList.vue";
 
 //GET
@@ -17,6 +17,9 @@ const getEventCategory = async () => {
 onBeforeMount(async () => {
   await getEventCategory();
 });
+
+
+
 </script>
 
 <template>

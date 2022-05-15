@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { formatDate, formatTime } from "../main.js";
+import moment from "moment"
 defineEmits(["delete"]);
 
 defineProps({
@@ -25,7 +26,7 @@ const showPopUp = (id) => {
 <template>
   <div>
     <div class="grid grid-cols-2 place-items-center gap-9 py-16 px-52 text-xl">
-      <div v-for="list in currentEvent">
+      <div v-for="list in currentEvent.sort((a,b) => moment(a.eventStartTime).diff(b.eventStartTime))">
         <div
           class="grid grid-cols-5 bg-white/70 w-100 h-auto rounded-3xl gap-4 break-all z-0"
         >

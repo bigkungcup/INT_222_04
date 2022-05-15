@@ -42,9 +42,13 @@ const getEmpty = async () => {
   }
   console.log(showEmpty.value);
 };
+
+
 onBeforeUpdate(async () => {
   await getEmpty();
 });
+
+
 </script>
 
 <template>
