@@ -1,0 +1,16 @@
+version: '3'
+services:
+  proxy:
+    build: ./
+    image: proxy
+    container_name: proxy
+    ports:
+      - 81:80
+    networks:
+      - oasip-network
+    restart: always
+
+networks:
+  oasip-network:
+    external:
+     name: oasip-network
