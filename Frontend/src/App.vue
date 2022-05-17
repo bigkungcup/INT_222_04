@@ -54,4 +54,5 @@ import Navbar from "./components/Navbar.vue";
 .bgPopUp {
   background-color: #f5c6cd;
 }
+
 </style>

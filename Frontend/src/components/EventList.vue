@@ -60,8 +60,8 @@ const showPopUp = (id) => {
             </p>
             <router-link
               :to="{ name: 'ScheduleDetail', params: { id: list.id } }"
-              ><p class="underline underline-offset-4 text-pink-600">
-                more details
+              ><p class="text-pink-600 hover:text-pink-700 hover:underline underline-offset-4">
+                more details »
               </p></router-link
             >
           </div>
@@ -89,7 +89,7 @@ const showPopUp = (id) => {
           <img
             src="../assets/images/Warning.png"
             width="90"
-            class="grid absolute"
+            class="grid absolute animate-bounce"
           />
         </div>
         <div class="grid row-span-2 place-items-center">

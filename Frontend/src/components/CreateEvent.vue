@@ -58,7 +58,8 @@ const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-
     <div class="grid grid-cols-2 text-4xl gap-y-6 break-all">
       <p class="col-span-2 pl-10">
         Name :
-        <input type="text" class="bg-white border border-slate-300 rounded-lg h-10 w-3/5 text-3xl"
+        <input type="text" class="bg-white border border-slate-300 rounded-lg h-10 w-3/5 text-3xl 
+        placeholder:italic placeholder:text-2xl " placeholder=" Enter Your Name"
           v-model="newEvent.bookingName" />
         <router-link :to="{ name: 'Home' }"><img src="../assets/images/Exit.png" width="60"
             class="absolute top-3 right-36" /></router-link>
@@ -69,7 +70,8 @@ const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-
       </p>
       <p class="pl-10">
         Email :
-        <input type="email" class="bg-white border border-slate-300 rounded-lg h-10 text-3xl"
+        <input type="email" class="bg-white border border-slate-300 rounded-lg h-10 text-3xl 
+        placeholder:italic placeholder:text-2xl" placeholder=" you@example.com"
           v-model="newEvent.bookingEmail" />
       <div v-if="newEvent.bookingEmail === '' || newEvent.bookingEmail.value === 0">
         <p v-show="textPopUp" class="text-lg text-red-500 pl-28">*Please enter your email.</p>
@@ -98,7 +100,7 @@ const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-
 
       <p class="pl-10">
         Clinic :
-        <select v-model="newEvent.eventCategory" class="px-3 rounded-lg text-3xl">
+        <select v-model="newEvent.eventCategory" class="px-3 rounded-lg text-3xl" >
           <option v-for="list in currentCategory" :value="list">
             {{ list.eventCategoryName }}
           </option>
@@ -116,17 +118,17 @@ const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-
       <p class="col-span-2 pl-10 pr-80">
         Description :
         <textarea
-          class="bg-white border border-slate-300 rounded-lg h-10 col-span-2 w-full h-60 mt-5 p-3 text-3xl resize-none"
-          placeholder="add your note " v-model="newEvent.eventNotes"></textarea>
+          class="bg-white border border-slate-300 rounded-lg h-10 col-span-2 w-full h-60 mt-5 p-3 text-3xl resize-none placeholder:italic placeholder:text-2xl"
+          placeholder="Add your note" v-model="newEvent.eventNotes"></textarea>
       </p>
       <div></div>
       <div class="text-white">
         <router-link :to="{ name: 'Home' }">
-          <button class="bg-red-500 rounded-3xl w-36 py-2 mx-2 drop-shadow-xl">
+          <button class="bg-red-500 rounded-3xl w-36 py-2 mx-2 drop-shadow-xl hover:bg-red-700">
             Cancel
           </button>
         </router-link>
-        <button class="bg-green-500 rounded-3xl w-36 py-2 mx-2 drop-shadow-xl" @click="$emit('create', newEvent)">
+        <button class="bg-green-500 rounded-3xl w-36 py-2 mx-2 drop-shadow-xl hover:bg-green-700" @click="$emit('create', newEvent)">
           Save
         </button>
       </div>
@@ -136,7 +138,7 @@ const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-
     <div class="grid grid-rows-3.5 bg-white w-2/6 h-80 place-self-center rounded-3xl">
       <div class="grid row-span-1.5 bgPopUp rounded-t-3xl place-items-center">
         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img"
-          class="iconify iconify--ep" width="100" height="100" preserveAspectRatio="xMidYMid meet"
+          class="iconify iconify--ep animate-bounce pt-2" width="100" height="100" preserveAspectRatio="xMidYMid meet"
           viewBox="0 0 1024 1024">
           <path fill="#ffff"
             d="M512 64a448 448 0 1 1 0 896a448 448 0 0 1 0-896zm-55.808 536.384l-99.52-99.584a38.4 38.4 0 1 0-54.336 54.336l126.72 126.72a38.272 38.272 0 0 0 54.336 0l262.4-262.464a38.4 38.4 0 1 0-54.272-54.336L456.192 600.384z">
@@ -147,7 +149,7 @@ const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-
         <p>Created successfully</p>
       </div>
       <div class="grid place-items-center">
-        <button class="text-4xl px-5 text-white bgPopUp rounded-3xl w-36 py-2 mx-2" @click="reset(), $emit('close')">
+        <button class="text-4xl px-5 text-white bgPopUp rounded-3xl w-36 py-2 mx-2 hover:text-pink-700 hover:border-2 border-pink-700" @click="reset(), $emit('close')">
           OK
         </button>
       </div>

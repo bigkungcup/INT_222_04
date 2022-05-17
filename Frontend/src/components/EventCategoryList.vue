@@ -33,7 +33,8 @@ defineProps({
           {{ list.eventCategoryName }}
         </div>
           <div
-          class="hover-target grid col-span-4 text-2xl mb-3 text-amber-800 place-content-center p-4"
+          class="hover-target grid col-span-4 text-xl mb-3 text-amber-800 place-content-center p-6 
+          hover:scale-110 transition ease-in duration-300"
         >
           {{ list.eventCategoryDescription }}
         </div>
