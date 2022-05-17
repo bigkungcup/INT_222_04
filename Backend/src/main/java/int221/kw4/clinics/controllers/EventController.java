@@ -13,15 +13,19 @@ import java.util.List;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("/api/event")
+@RequestMapping("/api/events")
 public class EventController {
 
     @Autowired
     private EventService service;
 
     @GetMapping("")
-    public List<EventDTO> getAllEvent() {
-        return service.getAllEvent();
+    public List<EventDTO> getAllEvent(
+            @RequestParam(defaultValue = "eventStartTime") String time,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int pageSize
+    ) {
+        return service.getAllEvent(time, page, pageSize);
     }
 
     @GetMapping("/{eventId}")

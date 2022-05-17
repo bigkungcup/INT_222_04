@@ -3,6 +3,7 @@ package int221.kw4.clinics.advice;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -21,4 +22,13 @@ public class ApplicationExceptionHandler {
         });
         return errorMap;
     }
+
+//    @ExceptionHandler({Exception.class})
+//    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+//    @ResponseBody
+//    public String handleException(Exception ex) {
+//        String error = ex.get
+//        return error;
+//    }
+
 }

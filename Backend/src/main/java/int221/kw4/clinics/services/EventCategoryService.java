@@ -1,6 +1,7 @@
 package int221.kw4.clinics.services;
 
 import int221.kw4.clinics.dtos.EventCategoryDTO;
+import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.repositories.EventCategoryRepository;
 import org.modelmapper.ModelMapper;
@@ -40,5 +41,23 @@ public class EventCategoryService {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Event ID: " +  eventCategoryId + " does not exist !!!"));
         repository.deleteById(eventCategoryId);
+    }
+
+    private EventCategory mapEventCategory(EventCategory existingEventCategoty, EventCategory updateEventCategoty){
+        existingEventCategoty.setEventCategoryDescription(updateEventCategoty.getEventCategoryDescription());
+        existingEventCategoty.setEventCategoryName(updateEventCategoty.getEventCategoryName());
+        existingEventCategoty.setEventDuration(updateEventCategoty.getEventDuration());
+        return  existingEventCategoty;
+
+    }
+
+    public EventCategory update(EventCategory updateEventCategory, Integer eventCategoryId) {
+        EventCategory eventCategory = repository.findById(eventCategoryId).map(o->mapEventCategory(o, updateEventCategory))
+                .orElseGet(()->
+                {
+                    updateEventCategory.setId(eventCategoryId);
+                    return updateEventCategory;
+                });
+        return repository.saveAndFlush(eventCategory);
     }
 }

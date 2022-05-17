@@ -24,13 +24,17 @@ public class Event {
     private Integer id;
 
     @Column(name = "bookingName", nullable = false, length = 100)
-    @NotBlank(message = "name shouldn't be blank/null")
+    @NotBlank(message = "name shouldn't be blank")
+    @NotEmpty(message = "name shouldn't be empty")
+    @NotNull(message = "name shouldn't be null")
     @Size(max = 100, min = 1)
     private String bookingName;
 
     @Column(name = "bookingEmail", nullable = false)
-    @Email(message = "email invalid syntax")
-    @NotBlank(message = "email shouldn't be blank/null")
+    @Email(message = "email invalid syntax", regexp = "[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$")
+    @NotBlank(message = "email shouldn't be blank")
+    @NotEmpty(message = "email shouldn't be empty")
+    @NotNull(message = "email shouldn't be null")
     @Size(max = 45, min = 5)
     private String bookingEmail;
 

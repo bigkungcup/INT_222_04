@@ -1,6 +1,7 @@
 package int221.kw4.clinics.controllers;
 
 import int221.kw4.clinics.dtos.EventCategoryDTO;
+import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.services.EventCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,5 +30,10 @@ public class EventCategoryController {
     @DeleteMapping("/{eventCategoryId}")
     public void delete(@PathVariable Integer eventCategoryId){
         service.deleteEvent(eventCategoryId);
+    }
+
+    @PutMapping("/{eventCategoryId}")
+    public EventCategory update(@RequestBody EventCategory updateEventCategory, @PathVariable Integer eventCategoryId){
+        return service.update(updateEventCategory, eventCategoryId);
     }
 }

@@ -6,6 +6,8 @@ import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.repositories.EventRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,8 +33,8 @@ public class EventService {
     @Autowired
     private ListMapper listMapper;
 
-    public List<EventDTO> getAllEvent() {
-        List<Event> eventList = repository.findAll();
+    public List<EventDTO> getAllEvent(String time, Integer page,Integer pageSize) {
+        List<Event> eventList = repository.findAll(PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC,time))).getContent();
         return listMapper.mapList(eventList, EventDTO.class, modelMapper);
     }
 
@@ -55,12 +57,8 @@ public class EventService {
     }
 
     private Event mapEvent(Event existingEvent, Event updateEvent){
-        existingEvent.setBookingName(updateEvent.getBookingName());
-        existingEvent.setBookingEmail(updateEvent.getBookingEmail());
         existingEvent.setEventStartTime(updateEvent.getEventStartTime());
         existingEvent.setEventNotes(updateEvent.getEventNotes());
-        existingEvent.setEventDuration(updateEvent.getEventDuration());
-        existingEvent.setEventCategory(updateEvent.getEventCategory());
         return  existingEvent;
     }
 
