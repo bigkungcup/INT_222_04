@@ -1,26 +1,29 @@
 <script setup>
-import { ref, onBeforeMount } from "vue";
+import { ref, onBeforeMount, onUpdated, onBeforeUpdate, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { formatDate, formatTime } from "../main.js";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import moment from "moment"
+import { useEvent } from "../stores/event.js"
 const { params } = useRoute();
+
+const event = useEvent()
 
 //get event
 const getEvent = async () => {
-  const res = await fetch(`${import.meta.env.VITE_BASE_URL}/event`);
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events?page=${window.localStorage.getItem("page")}`);
   if (res.status === 200) {
     let result = await res.json();
     console.log(result);
     displayEvent.value = result.filter((x) => x.id == params.id)[0];
     console.log(displayEvent.value);
-  } else console.log("error, cannot get word");
+  } else console.log("error, cannot get event");
 };
 
 //edit event
 const saveEvent = async (displayEvent, editEvent) => {
-  const res = await fetch(`${import.meta.env.VITE_BASE_URL}/event/${params.id}`, {
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events/${params.id}`, {
     method: "PUT",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
@@ -48,7 +51,6 @@ const saveEvent = async (displayEvent, editEvent) => {
   }
 };
 
-
 const displayEvent = ref({
   bookingName: "",
   bookingEmail: "",
@@ -57,9 +59,12 @@ const displayEvent = ref({
   eventNotes: "",
   eventDuration: 0,
 });
+
 const myRouter = useRouter();
+
 const goBack = () => {
   myRouter.go(-1);
+  window.localStorage.clear();
 };
 
 const editEvent = ref({

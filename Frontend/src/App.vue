@@ -1,6 +1,5 @@
 <script setup>
 import Navbar from "./components/Navbar.vue";
-
 </script>
 
 <template>
@@ -54,5 +53,6 @@ import Navbar from "./components/Navbar.vue";
 .bgPopUp {
   background-color: #f5c6cd;
 }
+
 
 </style>

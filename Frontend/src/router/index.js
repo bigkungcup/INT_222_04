@@ -1,8 +1,8 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import Home from "../view/Home.vue";
-import Schedule from "../view/Schedule.vue";
+import Event from "../view/Event.vue";
 import Booking from "../view/Booking.vue";
-import ScheduleDetail from "../view/ScheduleDetail.vue";
+import EventDetail from "../view/EventDetail.vue";
 import NotFound from "../view/NotFound.vue";
 
 const history = createWebHashHistory('/kw4');
@@ -19,9 +19,9 @@ const routes = [
     component: Home,
   },
   {
-    path: "/schedule",
-    name: "Schedule",
-    component: Schedule,
+    path: "/event",
+    name: "Event",
+    component: Event,
   },
   {
     path: "/booking",
@@ -29,9 +29,9 @@ const routes = [
     component: Booking,
   },
   {
-    path: "/schedule/:id",
-    name: "ScheduleDetail",
-    component: ScheduleDetail,
+    path: "/event/:id",
+    name: "EventDetail",
+    component: EventDetail,
   },
 ];
 

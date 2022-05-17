@@ -6,7 +6,7 @@
       <router-link :to="{ name: 'Home' }"
         ><img src="../assets/images/Home.png" width="50" class="pb-8 pt-4 transition duration-150 ease-in-out hover:scale-125"
       /></router-link>
-      <router-link :to="{ name: 'Schedule' }"
+      <router-link :to="{ name: 'Event' }"
         ><img src="../assets/images/Lists.png" width="50" class="pb-8 transition duration-150 ease-in-out hover:scale-125"
       /></router-link>
       <router-link :to="{ name: 'Booking' }"
