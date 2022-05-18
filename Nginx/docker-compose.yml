@@ -5,7 +5,7 @@ services:
     image: proxy
     container_name: proxy
     ports:
-      - 81:80
+      - 80:80
     networks:
       - oasip-network
     restart: always
