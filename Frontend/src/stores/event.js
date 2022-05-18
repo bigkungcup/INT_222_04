@@ -5,7 +5,6 @@ import { useRoute, useRouter } from "vue-router";
 import "@vuepic/vue-datepicker/dist/main.css";
 
 
-
 export const useEvent = defineStore("event", () => {
   const eventLists = ref([]);
   const listsNewEvent = ref([]);
@@ -16,8 +15,7 @@ export const useEvent = defineStore("event", () => {
   const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
   //Get Event
-  const getEventLists = async (pageStart=0) => {
-    if (pageStart >= 0) {
+  const getEventLists = async () => {
       const res = await fetch(
         `${import.meta.env.VITE_BASE_URL}/events?page=${page.value}`,
         {
@@ -26,9 +24,10 @@ export const useEvent = defineStore("event", () => {
       );
       if (res.status === 200) {
         eventLists.value = await res.json();
+        // getFilter();
       } else console.log("error, cannot get event lists");
-    }
-    window.localStorage.setItem("page",page.value);
+    // window.localStorage.setItem("page",page.value);
+    console.log(eventLists.value);
   };
 
   //Create Event
@@ -91,7 +90,7 @@ export const useEvent = defineStore("event", () => {
   //Page
   const NextPage = () => {
     if (page.value < 0) {
-      page.value = 0;
+      page.value= 0;
     }
     getEventLists((page.value += 1));
     // window.localStorage.setItem("page",page.value);
@@ -120,6 +119,34 @@ export const useEvent = defineStore("event", () => {
     console.log(popUp.value);
   };
 
+  // Filter
+  // const filterPast = (currentEvent) => {
+  //   return currentEvent = eventLists.content.filter(a => moment(formatDate(a.eventStartTime)).isBefore(moment(new Date())))
+  // }
+
+    // currentEvent.sort((a,b) => moment(a.eventStartTime).diff(b.eventStartTime))
+
+    
+// const filter = ref(0)
+
+// const filterPast = (currentEvent) => {
+//     return currentEvent.filter(a => moment(a.eventStartTime).isBefore(moment(new Date())))
+// }
+
+// const filterFuture = (currentEvent) => {
+//     return currentEvent.filter(a => moment(a.eventStartTime).isAfter(moment(new Date())))
+// }
+
+// const getFilter = () => {
+//   if(filter.value == 1){
+//     eventLists.content.value = eventLists.filter(a => moment(a.eventStartTime).isBefore(moment(new Date())))
+//     console.log(eventLists.content.value);}
+//     else if(filter.value == 2){
+//     eventLists.content.value =filterFuture(eventLists.content) }
+//     console.log("Fuck you");
+//     console.log(filter.value);
+//   }
+
   return {
     eventLists,
     getEventLists,
@@ -132,6 +159,7 @@ export const useEvent = defineStore("event", () => {
     NextPage,
     BackPage,
     popUp,textPopUp,showPopUp,disShowPopUp,showText
+    // ,filter,filterFuture,getFilter,filterPast
   };
 });
 

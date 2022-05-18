@@ -8,6 +8,7 @@ const event = useEvent()
 
 onBeforeMount(async () => {
   await event.getEventLists();
+  event.page = event.eventLists.pageNumber;
 });
 
 onBeforeUpdate(async () => {
@@ -20,7 +21,7 @@ onBeforeUpdate(async () => {
   <div
     class="bg-fixed bg-schedule bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen overflow-auto no-scrollbar">
     <div class="grid" v-show="!event.showEmptyEvent">
-      <EventList :currentEvent="event.eventLists" @delete="event.removeEvent" @next="event.NextPage"
+      <EventList :currentEvent="event.eventLists.content" @delete="event.removeEvent" @next="event.NextPage"
         @back="event.BackPage" :page="event.page" />
     </div>
     <div class="grid" v-show="event.showEmptyEvent">

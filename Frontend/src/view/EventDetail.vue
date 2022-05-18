@@ -12,11 +12,11 @@ const event = useEvent()
 
 //get event
 const getEvent = async () => {
-  const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events?page=${window.localStorage.getItem("page")}`);
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events?page=${event.eventLists.pageNumber}`);
   if (res.status === 200) {
     let result = await res.json();
     console.log(result);
-    displayEvent.value = result.filter((x) => x.id == params.id)[0];
+    displayEvent.value = result.content.filter((x) => x.id == params.id)[0];
     console.log(displayEvent.value);
   } else console.log("error, cannot get event");
 };
@@ -31,7 +31,7 @@ const saveEvent = async (displayEvent, editEvent) => {
       bookingEmail: displayEvent.bookingEmail,
       eventCategory: displayEvent.eventCategory,
       eventStartTime: editEvent.eventStartTime === "" ? displayEvent.eventStartTime : editEvent.eventStartTime,
-      eventNotes: editEvent.eventNotes,
+      eventNotes: editEvent.eventNotes === "" || editEvent.eventNotes === null ? displayEvent.eventNotes : editEvent.eventNotes,
       eventDuration: displayEvent.eventDuration,
     }),
   });
@@ -155,7 +155,7 @@ onBeforeMount(async () => {
       </div>
     </div>
     <div class="flex text-white justify-center text-2xl" v-show="popUp">
-      <button class="bg-red-500 rounded-3xl w-36 py-2 mx-2 drop-shadow-xl" @click="popUp = false">
+      <button class="bg-red-500 rounded-3xl w-36 py-2 mx-2 drop-shadow-xl" @click="popUp = false,reset()">
         Cancel
       </button>
       <button class="bg-green-500 rounded-3xl w-36 py-2 mx-2 drop-shadow-xl" @click="saveEvent(displayEvent, editEvent)">
