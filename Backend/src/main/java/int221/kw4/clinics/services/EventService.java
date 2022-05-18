@@ -2,6 +2,7 @@ package int221.kw4.clinics.services;
 
 import int221.kw4.clinics.dtos.EventDTO;
 
+import int221.kw4.clinics.dtos.EventPageDTO;
 import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.repositories.EventRepository;
 import org.modelmapper.ModelMapper;
@@ -33,9 +34,8 @@ public class EventService {
     @Autowired
     private ListMapper listMapper;
 
-    public List<EventDTO> getAllEvent(String time, Integer page,Integer pageSize) {
-        List<Event> eventList = repository.findAll(PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC,time))).getContent();
-        return listMapper.mapList(eventList, EventDTO.class, modelMapper);
+    public EventPageDTO getAllEvent(String sortBy, Integer page, Integer pageSize) {
+        return modelMapper.map(repository.findAll(PageRequest.of(page, pageSize, Sort.by(Sort.Direction.ASC, sortBy))), EventPageDTO.class);
     }
 
     public EventDTO getEvent(Integer eventId) {
@@ -56,15 +56,15 @@ public class EventService {
         repository.deleteById(eventId);
     }
 
-    private Event mapEvent(Event existingEvent, Event updateEvent){
+    private Event mapEvent(Event existingEvent, Event updateEvent) {
         existingEvent.setEventStartTime(updateEvent.getEventStartTime());
         existingEvent.setEventNotes(updateEvent.getEventNotes());
-        return  existingEvent;
+        return existingEvent;
     }
 
     public Event update(Event updateEvent, Integer eventId) {
-        Event event = repository.findById(eventId).map(o->mapEvent(o, updateEvent))
-                .orElseGet(()->
+        Event event = repository.findById(eventId).map(o -> mapEvent(o, updateEvent))
+                .orElseGet(() ->
                 {
                     updateEvent.setId(eventId);
                     return updateEvent;

@@ -1,6 +1,7 @@
 package int221.kw4.clinics.controllers;
 
 import int221.kw4.clinics.dtos.EventDTO;
+import int221.kw4.clinics.dtos.EventPageDTO;
 import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,12 @@ public class EventController {
     private EventService service;
 
     @GetMapping("")
-    public List<EventDTO> getAllEvent(
-            @RequestParam(defaultValue = "eventStartTime") String time,
+    public EventPageDTO getAllEvent(
+            @RequestParam(defaultValue = "eventStartTime") String sortBy,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int pageSize
     ) {
-        return service.getAllEvent(time, page, pageSize);
+        return service.getAllEvent(sortBy, page, pageSize);
     }
 
     @GetMapping("/{eventId}")
