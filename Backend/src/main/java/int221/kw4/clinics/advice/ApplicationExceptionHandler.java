@@ -23,12 +23,4 @@ public class ApplicationExceptionHandler {
         return errorMap;
     }
 
-//    @ExceptionHandler({Exception.class})
-//    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-//    @ResponseBody
-//    public String handleException(Exception ex) {
-//        String error = ex.get
-//        return error;
-//    }
-
 }

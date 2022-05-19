@@ -11,10 +11,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
 import java.util.List;
 
 
@@ -63,7 +62,7 @@ public class EventService {
     }
 
     public Event update(Event updateEvent, Integer eventId) {
-        Event event = repository.findById(eventId).map(o -> mapEvent(o, updateEvent))
+        Event event = repository.findById(eventId).map(updateEvents -> mapEvent(updateEvents, updateEvent))
                 .orElseGet(() ->
                 {
                     updateEvent.setId(eventId);
@@ -71,4 +70,17 @@ public class EventService {
                 });
         return repository.saveAndFlush(event);
     }
+
+    public List<EventDTO> getPastEvent(Instant instant, Integer page, Integer pageSize) {
+        List<Event> pastEvent = repository.findAllByEventStartTimeBeforeOrderByEventStartTimeDesc(instant, PageRequest.of(page, pageSize));
+        return listMapper.mapList(pastEvent, EventDTO.class, modelMapper);
+    }
+
+    public List<EventDTO> getUpcomingEvent(Instant instant, Integer page, Integer pageSize) {
+        List<Event> pastEvent = repository.findAllByEventStartTimeAfterOrderByEventStartTimeAsc(instant, PageRequest.of(page, pageSize));
+        return listMapper.mapList(pastEvent, EventDTO.class, modelMapper);
+    }
+
+//    public List<EventDTO> getEventByCategory
+
 }

@@ -39,21 +39,21 @@ public class EventCategoryService {
     public void deleteEvent(Integer eventCategoryId) {
         repository.findById(eventCategoryId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Event ID: " +  eventCategoryId + " does not exist !!!"));
+                        "Event ID: " + eventCategoryId + " does not exist !!!"));
         repository.deleteById(eventCategoryId);
     }
 
-    private EventCategory mapEventCategory(EventCategory existingEventCategoty, EventCategory updateEventCategoty){
+    private EventCategory mapEventCategory(EventCategory existingEventCategoty, EventCategory updateEventCategoty) {
         existingEventCategoty.setEventCategoryDescription(updateEventCategoty.getEventCategoryDescription());
         existingEventCategoty.setEventCategoryName(updateEventCategoty.getEventCategoryName());
         existingEventCategoty.setEventDuration(updateEventCategoty.getEventDuration());
-        return  existingEventCategoty;
+        return existingEventCategoty;
 
     }
 
     public EventCategory update(EventCategory updateEventCategory, Integer eventCategoryId) {
-        EventCategory eventCategory = repository.findById(eventCategoryId).map(o->mapEventCategory(o, updateEventCategory))
-                .orElseGet(()->
+        EventCategory eventCategory = repository.findById(eventCategoryId).map(o -> mapEventCategory(o, updateEventCategory))
+                .orElseGet(() ->
                 {
                     updateEventCategory.setId(eventCategoryId);
                     return updateEventCategory;

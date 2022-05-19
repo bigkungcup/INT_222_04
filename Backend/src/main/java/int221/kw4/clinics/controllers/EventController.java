@@ -6,10 +6,10 @@ import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.Instant;
 import java.util.List;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -34,6 +34,24 @@ public class EventController {
         return service.getEvent(eventId);
     }
 
+
+    @GetMapping("/pastEvent")
+    public List<EventDTO> getAllBookingByPast(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int pageSize
+    ) {
+        return service.getPastEvent(Instant.now(), page, pageSize);
+    }
+
+    @GetMapping("/upComingEvent")
+    public List<EventDTO> getAllBookingByUpComing(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int pageSize
+    ) {
+        return service.getUpcomingEvent(Instant.now(), page, pageSize);
+    }
+
+
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public Event create(@RequestBody @Valid Event newEvent) {
@@ -41,12 +59,12 @@ public class EventController {
     }
 
     @DeleteMapping("/{eventId}")
-    public void delete(@PathVariable Integer eventId){
+    public void delete(@PathVariable Integer eventId) {
         service.deleteEvent(eventId);
     }
 
     @PutMapping("/{eventId}")
-    public Event update(@RequestBody Event updateEvent, @PathVariable Integer eventId){
+    public Event update(@RequestBody Event updateEvent, @PathVariable Integer eventId) {
         return service.update(updateEvent, eventId);
     }
 }

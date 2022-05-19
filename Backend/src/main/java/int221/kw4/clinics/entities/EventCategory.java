@@ -6,10 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.*;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -26,10 +26,17 @@ public class EventCategory {
     @Column(name = "eventCategoryId", nullable = false)
     private Integer id;
 
-    @Column(name = "eventCategoryName", nullable = false, length = 100)
+    @Column(name = "eventCategoryName", nullable = false, length = 100, unique = true)
+    @UniqueElements(message = "CategoryName is Not Unique")
+    @NotNull(message = "CategoryName shouldn't be Null")
+    @NotBlank(message = "CategoryName shouldn't be blank")
+    @NotEmpty(message = "CategoryName shouldn't be Empty")
     private String eventCategoryName;
 
     @Column(name = "eventCategoryDescription", length = 500)
+    @NotNull(message = "Description shouldn't be Null")
+    @NotBlank(message = "Description shouldn't be blank")
+    @NotEmpty(message = "Description shouldn't be Empty")
     private String eventCategoryDescription;
 
     @Column(name = "eventDuration", nullable = false)

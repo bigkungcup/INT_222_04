@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.util.List;
 
 
@@ -14,7 +15,7 @@ import java.util.List;
 
 public class EventPageDTO {
     private List<EventDTO> content;
-    private int pageNumber;
+    private int number;
     private int size;
     private int totalPages;
     private int numberOfElements;
