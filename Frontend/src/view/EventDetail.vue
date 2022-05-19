@@ -148,6 +148,7 @@ onBeforeMount(async () => {
 
         <p class="col-span-2 pl-10 pr-80" v-show="popUp">
           Description :
+          <p v-if="editEvent.eventNotes.length > 500" class="text-lg text-red-500 pl-52 -mt-8">*Description can't be longer than 500 characters.</p>
           <textarea
             class="bg-white border border-slate-300 rounded-lg h-10 col-span-2 w-full h-28 mt-5 p-3 text-3xl resize-none"
             placeholder="add your note " v-model="editEvent.eventNotes"></textarea>

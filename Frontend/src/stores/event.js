@@ -1,7 +1,5 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
 import { ref } from "vue";
-import moment from "moment"
-import { useRoute, useRouter } from "vue-router";
 import "@vuepic/vue-datepicker/dist/main.css";
 
 
@@ -24,10 +22,8 @@ export const useEvent = defineStore("event", () => {
       );
       if (res.status === 200) {
         eventLists.value = await res.json();
-        // getFilter();
       } else console.log("error, cannot get event lists");
-    // window.localStorage.setItem("page",page.value);
-    console.log(eventLists.value);
+      console.log(eventLists.value);
   };
 
   //Create Event
@@ -58,23 +54,6 @@ export const useEvent = defineStore("event", () => {
     console.log(
       newEvent.bookingEmail.match(validEmail) ? newEvent.bookingEmail : null
     );
-  };
-  
-
-  //Delete Event
-  const removeEvent = async (eventId) => {
-    const res = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/events/${eventId}`,
-      {
-        method: "DELETE",
-      }
-    );
-    if (res.status === 200) {
-      eventLists.value = eventLists.value.filter(
-        (event) => event.id !== eventId
-      );
-      console.log("deleteted succesfully");
-    } else console.log("error, cannot delete");
   };
 
   //ShowEmpty
@@ -119,47 +98,18 @@ export const useEvent = defineStore("event", () => {
     console.log(popUp.value);
   };
 
-  // Filter
-  // const filterPast = (currentEvent) => {
-  //   return currentEvent = eventLists.content.filter(a => moment(formatDate(a.eventStartTime)).isBefore(moment(new Date())))
-  // }
-
-    // currentEvent.sort((a,b) => moment(a.eventStartTime).diff(b.eventStartTime))
-
-    
-// const filter = ref(0)
-
-// const filterPast = (currentEvent) => {
-//     return currentEvent.filter(a => moment(a.eventStartTime).isBefore(moment(new Date())))
-// }
-
-// const filterFuture = (currentEvent) => {
-//     return currentEvent.filter(a => moment(a.eventStartTime).isAfter(moment(new Date())))
-// }
-
-// const getFilter = () => {
-//   if(filter.value == 1){
-//     eventLists.content.value = eventLists.filter(a => moment(a.eventStartTime).isBefore(moment(new Date())))
-//     console.log(eventLists.content.value);}
-//     else if(filter.value == 2){
-//     eventLists.content.value =filterFuture(eventLists.content) }
-//     console.log("Fuck you");
-//     console.log(filter.value);
-//   }
-
   return {
     eventLists,
     getEventLists,
     listsNewEvent,
     createEvent,
-    removeEvent,
+    // removeEvent,
     showEmptyEvent,
     getEmptyEvent,
     page,
     NextPage,
     BackPage,
     popUp,textPopUp,showPopUp,disShowPopUp,showText
-    // ,filter,filterFuture,getFilter,filterPast
   };
 });
 

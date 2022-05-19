@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onBeforeMount } from "vue";
 import { formatDate, formatTime } from "../main.js";
 import moment from "moment"
 import { useEvent } from "../stores/event.js";
@@ -37,17 +37,19 @@ const filterFuture = (currentEvent) => {
     return currentEvent.filter(a => moment(a.eventStartTime).isAfter(moment(new Date())))
 }
 
+
 </script>
 
 <template>
   <div>
     <div class="grid grid-cols-2 place-items-center gap-9 py-16 px-52 text-xl">
-      <select v-model="filter" class="col-span-2 px-3 rounded-lg text-3xl -mt-8">
+      <select v-model="filter" class="col-span-2 px-3 rounded-lg text-3xl -mt-8" >
           <option default value="0">Lists All</option>
           <option value="1">Past Events</option>
           <option value="2">Up-coming Events</option>
         </select>
-      <div v-for="list in filter == 1 ? filterPast(currentEvent) : filter == 2 ? filterFuture(currentEvent) :currentEvent">
+      <div v-for="list in filter == 1 ? filterPast(currentEvent) : filter == 2 ? filterFuture(currentEvent) :currentEvent" 
+      >
         <div
           class="grid grid-cols-5 bg-white/70 w-100 h-auto rounded-3xl gap-4 break-all z-0"
         >

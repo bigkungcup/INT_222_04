@@ -66,6 +66,9 @@ const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-
       <div v-if="newEvent.bookingName === '' || newEvent.bookingName === null || newEvent.bookingName.value === 0">
         <p v-show="textPopUp" class="text-lg text-red-500 pl-28">*Please enter your name.</p>
       </div>
+      <div v-if="newEvent.bookingName.length > 100">
+        <p  class="text-lg text-red-500 pl-28">*Name can't be longer than 100 characters.</p>
+      </div>
 
       </p>
       <p class="pl-10">
@@ -120,6 +123,9 @@ const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-
         <textarea
           class="bg-white border border-slate-300 rounded-lg h-10 col-span-2 w-full h-60 mt-5 p-3 text-3xl resize-none placeholder:italic placeholder:text-2xl"
           placeholder="Add your note" v-model="newEvent.eventNotes"></textarea>
+      <div v-if="newEvent.eventNotes.length > 500">
+        <p  class="text-lg text-red-500 pl-28">*Description can't be longer than 500 characters.</p>
+      </div>
       </p>
       <div></div>
       <div class="text-white">
