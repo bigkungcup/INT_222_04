@@ -4,6 +4,7 @@ import int221.kw4.clinics.dtos.EventDTO;
 
 import int221.kw4.clinics.dtos.EventPageDTO;
 import int221.kw4.clinics.entities.Event;
+import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.repositories.EventRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +82,10 @@ public class EventService {
         return listMapper.mapList(pastEvent, EventDTO.class, modelMapper);
     }
 
-//    public List<EventDTO> getEventByCategory
+    public List<EventDTO> getEventByCategoryId(EventCategory eventCategoryId, Integer page, Integer pageSize){
+        List<Event> eventByCategory =repository.findAllByEventCategoryOrderByEventCategoryDesc(eventCategoryId, PageRequest.of(page, pageSize));
+        return listMapper.mapList(eventByCategory, EventDTO.class, modelMapper);
+    }
+
 
 }

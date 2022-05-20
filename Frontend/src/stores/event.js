@@ -5,17 +5,21 @@ import "@vuepic/vue-datepicker/dist/main.css";
 
 export const useEvent = defineStore("event", () => {
   const eventLists = ref([]);
+  const filterEventLists = ref([]);
+  // const pastEventLists = ref([]);
+  // const upComingEventLists = ref([]);
   const listsNewEvent = ref([]);
-  const showEmptyEvent = ref();
+  const showEmptyEvent = ref(false);
+  const filter = ref(0)
   const page = ref(0);
   const popUp = ref(false);
   const textPopUp = ref(false);
   const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
   //Get Event
-  const getEventLists = async () => {
-      const res = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/events?page=${page.value}`,
+  const getEventLists = async (page=0) => {
+    const res = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/events?page=${page}`,
         {
           method: "GET",
         }
@@ -23,8 +27,96 @@ export const useEvent = defineStore("event", () => {
       if (res.status === 200) {
         eventLists.value = await res.json();
       } else console.log("error, cannot get event lists");
-      console.log(eventLists.value);
+      // console.log(eventLists.value.content.length);
   };
+
+    //  Get Filter Event
+  const getFilterEvent = async (page=0) => {
+    let res 
+    if(filter.value == 1){
+      res = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/events/pastEvent?page=${page}`,
+        {
+          method: "GET",
+        }
+      )
+    }
+    else if(filter.value == 2){
+      res = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/events/upComingEvent?page=${page}`,
+        {
+          method: "GET",
+        }
+      )
+    }
+    else if(filter.value == 3){
+      res = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/events/eventByCategory/1?page=${page}`,
+      {
+        method: "GET",
+      })
+    }
+    else if(filter.value == 4){
+      res = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/events/eventByCategory/2?page=${page}`,
+      {
+        method: "GET",
+      })
+    }
+    else if(filter.value == 5){
+      res = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/events/eventByCategory/3?page=${page}`,
+      {
+        method: "GET",
+      })
+    }
+    else if(filter.value == 6){
+      res = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/events/eventByCategory/4?page=${page}`,
+      {
+        method: "GET",
+      })
+    }
+    else{
+      res = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/events/eventByCategory/5?page=${page}`,
+      {
+        method: "GET",
+      })
+    }
+    if (res.status === 200) {
+      filterEventLists.value = await res.json();
+    } else console.log("error, cannot get event lists")
+    console.log(eventLists.value);
+};
+
+//    //Get Past Event
+//   const getPastEvent = async (page=0) => {
+//     const res = await fetch(
+//       `${import.meta.env.VITE_BASE_URL}/events/pastEvent?page=${page}`,
+//       {
+//         method: "GET",
+//       }
+//     );
+//     if (res.status === 200) {
+//       pastEventLists.value = await res.json();
+//     } else console.log("error, cannot get event lists");
+//     console.log(eventLists.value);
+// };
+
+// //Get Up-coming Event
+// const getUpcomingEvent = async (page=0) => {
+//   const res = await fetch(
+//     `${import.meta.env.VITE_BASE_URL}/events/upComingEvent?page=${page}`,
+//     {
+//       method: "GET",
+//     }
+//   );
+//   if (res.status === 200) {
+//     upComingEventLists.value = await res.json();
+//   } else console.log("error, cannot get event lists");
+//   console.log(eventLists.value);
+// };
 
   //Create Event
   const createEvent = async (newEvent) => {
@@ -58,9 +150,10 @@ export const useEvent = defineStore("event", () => {
 
   //ShowEmpty
   const getEmptyEvent = async () => {
-    if (eventLists.value.length === 0) {
+    if (eventLists.value.content.length === 0 ) {
       showEmptyEvent.value = true;
-    } else if (eventLists.value.length !== 0) {
+    } 
+    else if (eventLists.value.content.length !== 0) {
       showEmptyEvent.value = false;
     }
     console.log(showEmptyEvent.value);
@@ -69,18 +162,30 @@ export const useEvent = defineStore("event", () => {
   //Page
   const NextPage = () => {
     if (page.value < 0) {
-      page.value= 0;
+      page.value = 0;
     }
-    getEventLists((page.value += 1));
+    page.value += 1
+    getEventLists((page.value));
+    getFilterEvent((page.value));
+    // getUpcomingEvent((page.value));
+    // getPastEvent((page.value));
     // window.localStorage.setItem("page",page.value);
   };
   const BackPage = () => {
     if (page.value < 0) {
       page.value = 0;
     }
-    getEventLists((page.value -= 1));
+    page.value -= 1
+    getEventLists((page.value));
+    getFilterEvent((page.value));
+    // getUpcomingEvent((page.value));
+    // getPastEvent((page.value));
     // window.localStorage.setItem("page",page.value);
   };
+
+  // const checkFilterPage = (page) => {
+  //   getFilterEvent(page) 
+  // }
 
   //pop-up
   const showPopUp = () => {
@@ -100,7 +205,13 @@ export const useEvent = defineStore("event", () => {
 
   return {
     eventLists,
+    filterEventLists,
+    // pastEventLists,
+    // upComingEventLists,
     getEventLists,
+    getFilterEvent,
+    // getPastEvent,
+    // getUpcomingEvent,
     listsNewEvent,
     createEvent,
     // removeEvent,
@@ -109,7 +220,7 @@ export const useEvent = defineStore("event", () => {
     page,
     NextPage,
     BackPage,
-    popUp,textPopUp,showPopUp,disShowPopUp,showText
+    popUp,textPopUp,showPopUp,disShowPopUp,showText,filter
   };
 });
 
@@ -127,8 +238,15 @@ export const useEventCategory = defineStore("eventCatergory", () => {
       console.log(categoryLists.value);
     } else console.log("error, cannot get event category lists");
   };
+
+  // const sortEventCategory = () => {
+
+  // }
+
   return { categoryLists, getEventCategory };
 });
+
+  
 
 //-----------------------------------------------------------------------------------
 if (import.meta.hot) {

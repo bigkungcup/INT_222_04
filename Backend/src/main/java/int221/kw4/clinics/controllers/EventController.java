@@ -3,6 +3,7 @@ package int221.kw4.clinics.controllers;
 import int221.kw4.clinics.dtos.EventDTO;
 import int221.kw4.clinics.dtos.EventPageDTO;
 import int221.kw4.clinics.entities.Event;
+import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,6 +50,15 @@ public class EventController {
             @RequestParam(defaultValue = "6") int pageSize
     ) {
         return service.getUpcomingEvent(Instant.now(), page, pageSize);
+    }
+
+    @GetMapping("/eventByCategory/{eventCategoryId}")
+    public  List<EventDTO> getAllEventByCategory(
+            @PathVariable EventCategory eventCategoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int pageSize
+    ){
+        return service.getEventByCategoryId(eventCategoryId, page, pageSize);
     }
 
 
