@@ -15,7 +15,7 @@ import java.util.List;
 
 public class EventPageDTO {
     private List<EventDTO> content;
-    private int number;
+    private int pageNumber;
     private int size;
     private int totalPages;
     private int numberOfElements;

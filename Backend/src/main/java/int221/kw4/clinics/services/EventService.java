@@ -77,6 +77,7 @@ public class EventService {
         return listMapper.mapList(pastEvent, EventDTO.class, modelMapper);
     }
 
+
     //    Post
     public Date findEndDate(Date date, Integer duration) {
         return new Date(date.getTime()+(duration*60000+60000));
