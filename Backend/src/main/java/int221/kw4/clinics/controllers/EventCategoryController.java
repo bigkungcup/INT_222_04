@@ -1,12 +1,17 @@
 package int221.kw4.clinics.controllers;
 
 import int221.kw4.clinics.dtos.EventCategoryDTO;
+import int221.kw4.clinics.dtos.EventCategoryEditDTO;
+import int221.kw4.clinics.dtos.EventCategorypostDTO;
 import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.services.EventCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -23,7 +28,7 @@ public class EventCategoryController {
     }
 
     @PostMapping("")
-    public EventCategory create(@RequestBody EventCategory newEventCategory) {
+    public EventCategory create(@Valid @RequestBody EventCategorypostDTO newEventCategory) {
         return service.addCategory(newEventCategory);
     }
 
@@ -33,7 +38,7 @@ public class EventCategoryController {
     }
 
     @PutMapping("/{eventCategoryId}")
-    public EventCategory update(@RequestBody EventCategory updateEventCategory, @PathVariable Integer eventCategoryId){
+    public ResponseEntity update(@Valid @RequestBody EventCategoryEditDTO updateEventCategory, @PathVariable Integer eventCategoryId){
         return service.update(updateEventCategory, eventCategoryId);
     }
 }
