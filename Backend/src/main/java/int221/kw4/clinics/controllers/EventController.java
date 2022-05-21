@@ -31,6 +31,11 @@ public class EventController {
         return service.getAllEvent(sortBy, page, pageSize);
     }
 
+    @GetMapping("/eventAll")
+    public List<EventDTO> getAll(){
+        return service.getAll();
+    }
+
     @GetMapping("/{eventId}")
     public EventDTO getEventById(@PathVariable Integer eventId) {
         return service.getEvent(eventId);
