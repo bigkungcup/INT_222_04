@@ -82,6 +82,9 @@ const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-
       <div v-if="newEvent.bookingEmail.match(validEmail) === null && newEvent.bookingEmail !== '' ">
         <p v-show="textPopUp" class="text-lg text-red-500 pl-28">*Invalid Email.</p>
       </div>
+      <div v-if="newEvent.bookingEmail.length > 45">
+        <p  class="text-lg text-red-500 pl-28">*Email can't be longer than 45 characters.</p>
+      </div>
       </p>
 
       <p class="flex pl-10">
@@ -98,6 +101,11 @@ const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-
         <br>
         <p v-show="textPopUpDate" class="absolute text-lg text-red-500 -ml-52 break-words">*Not be able to select the
           previous date and time.</p>
+      </div>
+      <div
+        v-if="newEvent.eventStartTime === 'overlap'">
+        <br>
+        <p class="absolute text-lg text-red-500 -ml-52 break-words">*Overlap</p>
       </div>
       </p>
 

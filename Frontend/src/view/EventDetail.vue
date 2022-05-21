@@ -12,11 +12,9 @@ const event = useEvent()
 
 //get event
 const getEvent = async () => {
-  const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events?page=${event.eventLists.pageNumber}`);
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events/${params.id}`);
   if (res.status === 200) {
-    let result = await res.json();
-    console.log(result);
-    displayEvent.value = result.content.filter((x) => x.id == params.id)[0];
+    displayEvent.value = await res.json();
     console.log(displayEvent.value);
   } else console.log("error, cannot get event");
 };
@@ -30,15 +28,15 @@ const saveEvent = async (displayEvent, editEvent) => {
       bookingName: displayEvent.bookingName,
       bookingEmail: displayEvent.bookingEmail,
       eventCategory: displayEvent.eventCategory,
-      eventStartTime: editEvent.eventStartTime === "" ? displayEvent.eventStartTime : editEvent.eventStartTime,
-      eventNotes: editEvent.eventNotes === "" || editEvent.eventNotes === null ? displayEvent.eventNotes : editEvent.eventNotes,
+      eventStartTime: editEvent.eventStartTime === "" ? displayEvent.eventStartTime : event.getOverlapTime(editEvent.eventStartTime,displayEvent.eventCategory.id)? editEvent.eventStartTime = "overlap":editEvent.eventStartTime,
+      eventNotes: editEvent.eventNotes === "" ? displayEvent.eventNotes : editEvent.eventNotes,
       eventDuration: displayEvent.eventDuration,
     }),
   });
   if (res.status === 200) {
     let event = await res.json();
     console.log(event);
-    if (editEvent.eventStartTime !== "") {
+    if (editEvent.eventStartTime !== "" || editEvent.eventNotes !== "") {
       showEditPopUp()
     }
     popUp.value = false
@@ -87,7 +85,7 @@ const showEditPopUp = () => {
 const reset = () => {
   editEvent.value = {
     eventStartTime: "",
-    eventNotes: null
+    eventNotes: ""
   }
 }
 
@@ -132,6 +130,10 @@ onBeforeMount(async () => {
             <br>
             <p v-show="textPopUpDate" class="absolute text-lg text-red-500 -ml-52 break-words">*Not be able to select
               the previous date and time.</p>
+          </div>
+          <div v-if="editEvent.eventStartTime === 'overlap'">
+            <br>
+            <p class="absolute text-lg text-red-500 -ml-52 break-words">*Overlap.</p>
           </div>
         </div>
 

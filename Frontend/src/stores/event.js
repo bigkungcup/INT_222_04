@@ -1,15 +1,15 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
 import { ref } from "vue";
 import "@vuepic/vue-datepicker/dist/main.css";
-
+import moment from "moment"
 
 export const useEvent = defineStore("event", () => {
   const eventLists = ref([]);
+  const eventListAll = ref([]);
   const filterEventLists = ref([]);
-  // const pastEventLists = ref([]);
-  // const upComingEventLists = ref([]);
   const listsNewEvent = ref([]);
   const showEmptyEvent = ref(false);
+  const showEmptyFilterEvent = ref(false);
   const filter = ref(0)
   const page = ref(0);
   const popUp = ref(false);
@@ -27,8 +27,20 @@ export const useEvent = defineStore("event", () => {
       if (res.status === 200) {
         eventLists.value = await res.json();
       } else console.log("error, cannot get event lists");
-      // console.log(eventLists.value.content.length);
   };
+
+    //Get All Event
+    const getAllEventLists = async () => {
+      const res = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/events/eventAll`,
+          {
+            method: "GET",
+          }
+        );
+        if (res.status === 200) {
+          eventListAll.value = await res.json();
+        } else console.log("error, cannot get event lists");
+    };
 
     //  Get Filter Event
   const getFilterEvent = async (page=0) => {
@@ -90,34 +102,6 @@ export const useEvent = defineStore("event", () => {
     console.log(eventLists.value);
 };
 
-//    //Get Past Event
-//   const getPastEvent = async (page=0) => {
-//     const res = await fetch(
-//       `${import.meta.env.VITE_BASE_URL}/events/pastEvent?page=${page}`,
-//       {
-//         method: "GET",
-//       }
-//     );
-//     if (res.status === 200) {
-//       pastEventLists.value = await res.json();
-//     } else console.log("error, cannot get event lists");
-//     console.log(eventLists.value);
-// };
-
-// //Get Up-coming Event
-// const getUpcomingEvent = async (page=0) => {
-//   const res = await fetch(
-//     `${import.meta.env.VITE_BASE_URL}/events/upComingEvent?page=${page}`,
-//     {
-//       method: "GET",
-//     }
-//   );
-//   if (res.status === 200) {
-//     upComingEventLists.value = await res.json();
-//   } else console.log("error, cannot get event lists");
-//   console.log(eventLists.value);
-// };
-
   //Create Event
   const createEvent = async (newEvent) => {
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events`, {
@@ -129,7 +113,7 @@ export const useEvent = defineStore("event", () => {
           ? newEvent.bookingEmail
           : null,
         eventCategory: newEvent.eventCategory,
-        eventStartTime: newEvent.eventStartTime,
+        eventStartTime: getOverlapTime(newEvent.eventStartTime,newEvent.eventCategory.id) ? newEvent.eventStartTime = "overlap" : newEvent.eventStartTime,
         eventNotes: newEvent.eventNotes,
         eventDuration: newEvent.eventDuration,
       }),
@@ -146,6 +130,7 @@ export const useEvent = defineStore("event", () => {
     console.log(
       newEvent.bookingEmail.match(validEmail) ? newEvent.bookingEmail : null
     );
+      console.log(getOverlapTime(newEvent.eventStartTime,newEvent.eventCategory.id));
   };
 
   //ShowEmpty
@@ -159,6 +144,16 @@ export const useEvent = defineStore("event", () => {
     console.log(showEmptyEvent.value);
   };
 
+  const getEmptyFilterEvent = async () => {
+    if (filterEventLists.value.length === 0 ) {
+      showEmptyFilterEvent.value = true;
+    } 
+    else if (filterEventLists.value.length !== 0) {
+      showEmptyFilterEvent.value = false;
+    }
+    console.log(showEmptyFilterEvent.value);
+  };
+
   //Page
   const NextPage = () => {
     if (page.value < 0) {
@@ -167,9 +162,6 @@ export const useEvent = defineStore("event", () => {
     page.value += 1
     getEventLists((page.value));
     getFilterEvent((page.value));
-    // getUpcomingEvent((page.value));
-    // getPastEvent((page.value));
-    // window.localStorage.setItem("page",page.value);
   };
   const BackPage = () => {
     if (page.value < 0) {
@@ -178,14 +170,7 @@ export const useEvent = defineStore("event", () => {
     page.value -= 1
     getEventLists((page.value));
     getFilterEvent((page.value));
-    // getUpcomingEvent((page.value));
-    // getPastEvent((page.value));
-    // window.localStorage.setItem("page",page.value);
   };
-
-  // const checkFilterPage = (page) => {
-  //   getFilterEvent(page) 
-  // }
 
   //pop-up
   const showPopUp = () => {
@@ -203,20 +188,33 @@ export const useEvent = defineStore("event", () => {
     console.log(popUp.value);
   };
 
+  // Get Overlap Time
+  const getOverlapTime = (eventStartTime,category) => {
+    getAllEventLists();
+    let listAll
+    listAll = eventListAll.value.filter(a => a.eventCategory.id == category);
+    console.log(listAll);
+    return listAll.some((event) => {
+    if(moment(eventStartTime).toLocaleString("th-TH") < moment(event.eventStartTime).add(event.eventDuration,'m').toLocaleString("th-TH") && moment(eventStartTime).add(event.eventDuration,'m').toLocaleString("th-TH") > moment(event.eventStartTime).toLocaleString("th-TH"))
+      return true;
+    else
+      return false
+    })
+  }
+
   return {
     eventLists,
     filterEventLists,
-    // pastEventLists,
-    // upComingEventLists,
     getEventLists,
+    getAllEventLists,
     getFilterEvent,
-    // getPastEvent,
-    // getUpcomingEvent,
     listsNewEvent,
     createEvent,
-    // removeEvent,
     showEmptyEvent,
+    showEmptyFilterEvent,
     getEmptyEvent,
+    getEmptyFilterEvent,
+    getOverlapTime,
     page,
     NextPage,
     BackPage,
@@ -238,15 +236,8 @@ export const useEventCategory = defineStore("eventCatergory", () => {
       console.log(categoryLists.value);
     } else console.log("error, cannot get event category lists");
   };
-
-  // const sortEventCategory = () => {
-
-  // }
-
   return { categoryLists, getEventCategory };
 });
-
-  
 
 //-----------------------------------------------------------------------------------
 if (import.meta.hot) {

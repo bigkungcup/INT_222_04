@@ -28,30 +28,12 @@ const showPopUp = (id) => {
   console.log(deleteId.value);
 };
 
-// const filter = ref(0)
-
-// const filterPast = (currentEvent) => {
-//     return currentEvent.filter(a => moment(a.eventStartTime).isBefore(moment(new Date())))
-// }
-
-// const filterFuture = (currentEvent) => {
-//     return currentEvent.filter(a => moment(a.eventStartTime).isAfter(moment(new Date())))
-// }
-
 
 </script>
 
 <template>
   <div>
     <div class="grid grid-cols-2 place-items-center gap-9 py-16 px-52 text-xl">
-      <select v-model="event.filter" class="col-span-2 px-3 rounded-lg text-3xl -mt-8" @change="event.getFilterEvent()">
-          <option default value="0">Lists All</option>
-          <option value="1">Past Events</option>
-          <option value="2">Up-coming Events</option>
-          <option v-for="list in category.categoryLists" :value="list.id + 2">
-            {{ list.eventCategoryName }}
-          </option>
-        </select>
       <div v-for="list in currentEvent" 
       >
         <div
@@ -104,11 +86,12 @@ const showPopUp = (id) => {
           </div>
         </div>
       </div>
-        <div class="flex justify-evenly gap-x-16 absolute inset-x-0 bottom-16">
-          <div><button class="bg-white rounded-3xl w-36 py-2 mx-2 drop-shadow-xl hover:text-white hover:bg-black" v-show="page > 0" @click="$emit('back')">back</button></div>
+      <div> </div>
+        <div class="flex justify-evenly gap-x-16 absolute inset-x-0 bottom-28">
+          <div><button class="absolute -ml-1 bg-white rounded-3xl w-36 py-2 mx-2 drop-shadow-xl hover:text-white hover:bg-black" v-show="page > 0" @click="$emit('back')">back</button></div>
           <input type="text" class="absolute bg-white border border-slate-300 rounded-lg h-12 text-3xl w-16 text-center" disabled readonly
           :value="page+1">
-          <div><button class="bg-white rounded-3xl w-36 py-2 mx-2 drop-shadow-xl hover:text-white hover:bg-black" v-show="page+1 < event.eventLists.totalPages && currentEvent.length == 6" @click="$emit('next')">next</button></div>
+          <div><button class="absolute -ml-36 bg-white rounded-3xl w-36 py-2 mx-2 drop-shadow-xl hover:text-white hover:bg-black" v-show="page+1 < event.eventLists.totalPages && currentEvent.length == 6" @click="$emit('next')">next</button></div>
         </div>
     </div>
     <div

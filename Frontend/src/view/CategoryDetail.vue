@@ -85,7 +85,7 @@ const showNameSame = ref(false)
 
 const checkName = (eventCategoryName) => {
     for (let i = 0; i < allCategory.categoryLists.length; i++) {
-        if (eventCategoryName !== allCategory.categoryLists.eventCategoryName) {
+        if (eventCategoryName !== allCategory.categoryLists[i].eventCategoryName) {
             showNameSame.value = true
         }
     }

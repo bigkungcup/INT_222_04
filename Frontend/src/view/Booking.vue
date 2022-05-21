@@ -9,6 +9,7 @@ const category = useEventCategory();
 onMounted(async () => {
   await category.getEventCategory();
   await event.getEventLists();
+  await event.getAllEventLists();
 });
 </script>
 
