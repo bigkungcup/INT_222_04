@@ -26,21 +26,12 @@ public class EventCategory {
     @Column(name = "eventCategoryId", nullable = false)
     private Integer id;
 
-    @Column(name = "eventCategoryName", nullable = false, length = 100, unique = true)
-    @UniqueElements(message = "CategoryName is Not Unique")
-    @NotNull(message = "CategoryName shouldn't be Null")
-    @NotBlank(message = "CategoryName shouldn't be blank")
-    @NotEmpty(message = "CategoryName shouldn't be Empty")
+    @Column(name = "eventCategoryName", nullable = false, length = 100)
     private String eventCategoryName;
 
     @Column(name = "eventCategoryDescription", length = 500)
-    @NotNull(message = "Description shouldn't be Null")
-    @NotBlank(message = "Description shouldn't be blank")
-    @NotEmpty(message = "Description shouldn't be Empty")
     private String eventCategoryDescription;
 
     @Column(name = "eventDuration", nullable = false)
-    @Min(value = 1, message = "the event duration is out of range.")
-    @Max(value = 480, message = "the event duration is out of range.")
     private Integer eventDuration;
 }

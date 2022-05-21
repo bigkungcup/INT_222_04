@@ -14,10 +14,14 @@ import java.time.Instant;
 @AllArgsConstructor
 
 public class EventEditDTO {
-//    @NotNull(message = "startTime shouldn't be null")
+    @NotNull(message = "startTime shouldn't be null")
     @FutureOrPresent(message = "startTime shouldn't be past")
     private Instant eventStartTime;
 
     @Size(max = 500, message = "A note should be between 0 and 500 characters in length.")
     private String eventNotes;
+
+    private EventCategoryDTO eventCategory;
+
+    private Integer eventDuration;
 }

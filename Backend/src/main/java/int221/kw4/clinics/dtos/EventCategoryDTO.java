@@ -18,7 +18,7 @@ import java.util.Set;
 
 public class EventCategoryDTO {
     private Integer id;
-    private String eventCategoryDescription;
     private String eventCategoryName;
+    private String eventCategoryDescription;
     private int eventDuration;
 }

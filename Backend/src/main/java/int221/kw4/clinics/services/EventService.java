@@ -1,5 +1,6 @@
 package int221.kw4.clinics.services;
 
+import int221.kw4.clinics.advice.HandleOverlapError;
 import int221.kw4.clinics.dtos.*;
 
 import int221.kw4.clinics.entities.Event;
@@ -89,16 +90,17 @@ public class EventService {
         List<EventDTO> eventList = getAll();
 
         for (int i = 0; i < eventList.size(); i++) {
-            List errors = new ArrayList();
-            Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
-            Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
-            if (newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventStartTime) ||
-                    newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventEndTime) ||
-                    newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventEndTime) ||
-                    newEventStartTime.after(eventStartTime) && newEventEndTime.before(eventEndTime) ||
-                    newEventStartTime.equals(eventStartTime))
-            {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Overlap");
+            if(newEvent.getEventCategory().getId() == eventList.get(i).getEventCategory().getId()) {
+                Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
+                Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
+                if (newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventStartTime) ||
+                        newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventEndTime) ||
+                        newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventEndTime) ||
+                        newEventStartTime.after(eventStartTime) && newEventEndTime.before(eventEndTime) ||
+                        newEventStartTime.equals(eventStartTime))
+                {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Overlap");
+                }
             }
         }
         Event event = modelMapper.map(newEvent, Event.class);
@@ -114,11 +116,32 @@ public class EventService {
     }
 
 //    Update
-    public ResponseEntity update(EventEditDTO updateEvent, Integer eventId) {
+    public ResponseEntity update(EventEditDTO updateEvent, Integer eventId) throws HandleOverlapError {
+        Date newEventStartTime = Date.from(updateEvent.getEventStartTime());
+        Date newEventEndTime = findEndDate(Date.from(updateEvent.getEventStartTime()), updateEvent.getEventDuration());
+        List<EventDTO> eventList = getAll();
+
+        for (int i = 0; i < eventList.size(); i++) {
+            List errors = new ArrayList();
+            if(updateEvent.getEventCategory().getId() == eventList.get(i).getEventCategory().getId()) {
+                Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
+                Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
+                if (newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventStartTime) ||
+                        newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventEndTime) ||
+                        newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventEndTime) ||
+                        newEventStartTime.after(eventStartTime) && newEventEndTime.before(eventEndTime) ||
+                        newEventStartTime.equals(eventStartTime))
+                {
+                    throw new HandleOverlapError(errors.toString());
+                }
+            }
+        }
+
         Event event = repository.findById(eventId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST)
         );
         modelMapper.map(updateEvent, event);
+        repository.saveAndFlush(event);
         return ResponseEntity.status(200).body(event);
     }
 

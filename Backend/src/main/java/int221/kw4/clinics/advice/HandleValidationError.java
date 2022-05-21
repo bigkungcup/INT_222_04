@@ -1,9 +1,6 @@
 package int221.kw4.clinics.advice;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 import java.util.Map;
@@ -12,7 +9,8 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ValidationError {
+@ToString
+public class HandleValidationError {
     private Date timestamp = new Date();
     private Integer status = 400;
     private String message = "Bad Request";

@@ -1,12 +1,9 @@
 package int221.kw4.clinics.controllers;
 
+import int221.kw4.clinics.advice.HandleOverlapError;
 import int221.kw4.clinics.dtos.*;
 import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.entities.EventCategory;
-<<<<<<< HEAD
-import int221.kw4.clinics.repositories.EventRepository;
-=======
->>>>>>> 4079381a7bc2a0ef23d7598d1453bd1df7c4ebfb
 import int221.kw4.clinics.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -76,7 +73,7 @@ public class EventController {
     }
 
     @PutMapping("/{eventId}")
-    public ResponseEntity update(@Valid @RequestBody EventEditDTO updateEvent, @PathVariable Integer eventId) {
+    public ResponseEntity update(@Valid @RequestBody EventEditDTO updateEvent, @PathVariable Integer eventId) throws HandleOverlapError {
         return service.update(updateEvent, eventId);
     }
 }
