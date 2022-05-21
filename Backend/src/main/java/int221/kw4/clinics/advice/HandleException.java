@@ -10,10 +10,10 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class OverLapError {
+public class HandleException {
     private Date timestamp = new Date();
-    private Integer status;
-    private String message;
-    private String error;
+    private Integer status ;
+    private String message ;
+    private String error ;
     private String path;
 }

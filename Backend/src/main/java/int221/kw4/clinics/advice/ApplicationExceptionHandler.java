@@ -17,32 +17,37 @@ public class ApplicationExceptionHandler extends Exception {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public HandleValidationError handleInvalidArgument(MethodArgumentNotValidException ex) {
-        HandleValidationError validationError = new HandleValidationError();
+        HandleValidationError errors = new HandleValidationError();
         Map<String, String> errorMap = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(
                 error ->{
                     errorMap.put(error.getField(),error.getDefaultMessage());
                 }
         );
-        validationError.setFiledErrors(errorMap);
-        return  validationError;
+        errors.setStatus(400);
+        errors.setMessage("Bad Request");
+        errors.setError("Validation Error");
+        errors.setPath("/api/events");
+        errors.setFiledErrors(errorMap);
+        return  errors;
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(HandleOverlapError.class)
-    public OverLapError HandleOverlapError(HandleOverlapError ol){
-        OverLapError errors = new OverLapError();
+    @ExceptionHandler(HandleExceptionOverlap.class)
+    public HandleException HandleOverlapError(HandleExceptionOverlap ol){
+        HandleException errors = new HandleException();
         errors.setTimestamp(new Date());
         errors.setStatus(400);
         errors.setMessage("Bad Request");
         errors.setError("StartTime is Overlap");
+        errors.setPath("/api/events");
         return  errors;
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(UnexpectedTypeException.class)
-    public  HandleUniqueCategoryname handleUniqueCategoryname(UnexpectedTypeException ue){
-        HandleUniqueCategoryname errors = new HandleUniqueCategoryname();
+    public HandleException handleUniqueCategoryname(UnexpectedTypeException ue){
+        HandleException errors = new HandleException();
         errors.setTimestamp(new Date());
         errors.setStatus(500);
         errors.setMessage("Bad Request");

@@ -7,8 +7,8 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 
-public class HandleOverlapError extends Exception{
-    public HandleOverlapError(String message){
+public class HandleExceptionOverlap extends Exception{
+    public HandleExceptionOverlap(String message){
         super(message);
     }
 }

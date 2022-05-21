@@ -1,6 +1,6 @@
 package int221.kw4.clinics.controllers;
 
-import int221.kw4.clinics.advice.HandleOverlapError;
+import int221.kw4.clinics.advice.HandleExceptionOverlap;
 import int221.kw4.clinics.dtos.*;
 import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.entities.EventCategory;
@@ -68,7 +68,7 @@ public class EventController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public Event create(@Valid @RequestBody EventPostDTO newEvent) {
+    public Event create(@Valid @RequestBody EventPostDTO newEvent) throws HandleExceptionOverlap {
         return service.addEvent(newEvent);
     }
 
@@ -78,7 +78,7 @@ public class EventController {
     }
 
     @PutMapping("/{eventId}")
-    public ResponseEntity update(@Valid @RequestBody EventEditDTO updateEvent, @PathVariable Integer eventId) throws HandleOverlapError {
+    public ResponseEntity update(@Valid @RequestBody EventEditDTO updateEvent, @PathVariable Integer eventId) throws HandleExceptionOverlap {
         return service.update(updateEvent, eventId);
     }
 }

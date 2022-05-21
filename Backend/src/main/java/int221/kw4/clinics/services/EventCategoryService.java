@@ -49,9 +49,10 @@ public class EventCategoryService {
 
     public ResponseEntity update(EventCategoryEditDTO updateEventCategory, Integer eventCategoryId){
         EventCategory eventCategory = repository.findById(eventCategoryId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST)
+                () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR)
         );
         modelMapper.map(updateEventCategory, eventCategory);
+        repository.saveAndFlush(eventCategory);
         return ResponseEntity.status(HttpStatus.OK).body(eventCategory);
     }
 }
