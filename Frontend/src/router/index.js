@@ -4,6 +4,7 @@ import Event from "../view/Event.vue";
 import Booking from "../view/Booking.vue";
 import EventDetail from "../view/EventDetail.vue";
 import CategoryDetail from "../view/CategoryDetail.vue"
+import AboutUs from "../view/AboutUs.vue"
 import NotFound from "../view/NotFound.vue";
 
 const history = createWebHashHistory('/kw4');
@@ -38,6 +39,11 @@ const routes = [
     path: "/category/:id",
     name: "CategoryDetail",
     component: CategoryDetail,
+  },
+  {
+    path: "/aboutUs",
+    name: "AboutUs",
+    component: AboutUs,
   },
 ];
 

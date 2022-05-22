@@ -144,11 +144,11 @@ export const useEvent = defineStore("event", () => {
     console.log(showEmptyEvent.value);
   };
 
-  const getEmptyFilterEvent = async () => {
-    if (filterEventLists.value.length === 0 ) {
+  const getEmptyFilterEvent = async (filterEvent=[]) => {
+    if (filterEvent.length === 0 ) {
       showEmptyFilterEvent.value = true;
     } 
-    else if (filterEventLists.value.length !== 0) {
+    else if (filterEvent.length !== 0) {
       showEmptyFilterEvent.value = false;
     }
     console.log(showEmptyFilterEvent.value);
@@ -202,6 +202,14 @@ export const useEvent = defineStore("event", () => {
     })
   }
 
+  //Sort
+  const getSortAsc = (event=[]) => {
+    return event.sort((a,b) => moment(a.eventStartTime) - moment(b.eventStartTime))
+  };
+  const getSortDesc = (event=[]) => {
+    return event.sort((a,b) => moment(b.eventStartTime) - moment(a.eventStartTime))
+  };
+
   return {
     eventLists,
     filterEventLists,
@@ -218,7 +226,8 @@ export const useEvent = defineStore("event", () => {
     page,
     NextPage,
     BackPage,
-    popUp,textPopUp,showPopUp,disShowPopUp,showText,filter
+    popUp,textPopUp,showPopUp,disShowPopUp,showText,filter,
+    getSortAsc,getSortDesc
   };
 });
 

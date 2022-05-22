@@ -17,6 +17,9 @@
           ></path>
         </svg>
       </router-link>
+      <router-link :to="{ name: 'AboutUs' }">
+      <img src="../assets/images/aboutUs.png" width="50" class="pt-8 transition duration-150 ease-in-out hover:scale-125">
+      </router-link>
     </div>
   </div>
 </template>

@@ -27,13 +27,14 @@ const category = useEventCategory()
 
 onBeforeMount(async () => {
   await event.getEventLists();
+  await event.getFilterEvent();
   await category.getEventCategory();
   event.page = event.eventLists.pageNumber;
 });
 
 onBeforeUpdate(async () => {
   await event.getEmptyEvent();
-  await event.getEmptyFilterEvent();
+  await event.getEmptyFilterEvent(event.filterEventLists.content);
 });
 
 </script>
@@ -52,7 +53,7 @@ onBeforeUpdate(async () => {
         </select>
         </div>
     <div class="grid mt-8" v-show="event.filter == 0 ? !event.showEmptyEvent : !event.showEmptyFilterEvent">
-      <EventList :currentEvent="event.filter == 0 ? event.eventLists.content : event.filterEventLists" @delete="removeEvent" @next="event.NextPage"
+      <EventList :currentEvent="event.filter == 0 ? event.eventLists.content : event.filterEventLists.content" @delete="removeEvent" @next="event.NextPage"
         @back="event.BackPage" :page="event.page"/>
     </div>
     <div class="grid" v-show="event.filter == 0 ? event.showEmptyEvent : event.showEmptyFilterEvent">

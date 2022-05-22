@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount, } from "vue";
+import { ref, onBeforeMount, onBeforeUpdate, onUnmounted, onUpdated, } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useEventCategory } from "../stores/event.js"
 const { params } = useRoute();
@@ -8,11 +8,9 @@ const allCategory = useEventCategory();
 
 //get event
 const getEventCategory = async () => {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/eventCategory`);
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/eventCategory/${params.id}`);
     if (res.status === 200) {
-        let result = await res.json();
-        console.log(result);
-        displayCategory.value = result.filter((x) => x.id == params.id)[0];
+        displayCategory = await res.json();
         console.log(displayCategory.value);
     } else console.log("error, cannot get category");
 };
@@ -80,6 +78,10 @@ onBeforeMount(async () => {
     await getEventCategory();
     await allCategory.getEventCategory();
 });
+
+// onUpdated(async () => {
+//     await getEventCategory();
+// });
 
 const showNameSame = ref(false)
 

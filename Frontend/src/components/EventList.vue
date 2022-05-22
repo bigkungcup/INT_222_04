@@ -28,14 +28,19 @@ const showPopUp = (id) => {
   console.log(deleteId.value);
 };
 
+  //Sort
+  // const getSortAsc = (event) => {
+  //     event.sort((a,b) => moment(a.eventStartTime) - moment(b.eventStartTime))
+  // };
+  // const getSortDesc = (event) => {
+
 
 </script>
 
 <template>
   <div>
     <div class="grid grid-cols-2 place-items-center gap-9 py-16 px-52 text-xl">
-      <div v-for="list in currentEvent" 
-      >
+      <div v-for="list in event.filter == 2 ? event.getSortAsc(currentEvent) : event.getSortDesc(currentEvent)" >
         <div
           class="grid grid-cols-5 bg-white/70 w-100 h-auto rounded-3xl gap-4 break-all z-0"
         >
@@ -89,9 +94,9 @@ const showPopUp = (id) => {
       <div> </div>
         <div class="flex justify-evenly gap-x-16 absolute inset-x-0 bottom-28">
           <div><button class="absolute -ml-1 bg-white rounded-3xl w-36 py-2 mx-2 drop-shadow-xl hover:text-white hover:bg-black" v-show="page > 0" @click="$emit('back')">back</button></div>
-          <input type="text" class="absolute bg-white border border-slate-300 rounded-lg h-12 text-3xl w-16 text-center" disabled readonly
+          <input type="text" class="absolute bg-white/0 h-12 text-3xl w-16 text-center text-amber-900 pr-2" disabled readonly
           :value="page+1">
-          <div><button class="absolute -ml-36 bg-white rounded-3xl w-36 py-2 mx-2 drop-shadow-xl hover:text-white hover:bg-black" v-show="page+1 < event.eventLists.totalPages && currentEvent.length == 6" @click="$emit('next')">next</button></div>
+          <div><button class="absolute -ml-36 bg-white rounded-3xl w-36 py-2 mx-2 drop-shadow-xl hover:text-white hover:bg-black" v-show="event.filter == 0 ? page+1 < event.eventLists.totalPages : page+1 < event.filterEventLists.totalPages" @click="$emit('next')">next</button></div>
         </div>
     </div>
     <div
