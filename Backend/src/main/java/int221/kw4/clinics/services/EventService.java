@@ -40,7 +40,7 @@ public class EventService {
     //    Get
     public EventPageDTO getAllEvent(String sortBy, Integer page, Integer pageSize) {
         return modelMapper.map(repository.findAll(
-                        PageRequest.of(page, pageSize, Sort.by(Sort.Direction.ASC, sortBy))),
+                        PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, sortBy))),
                 EventPageDTO.class);
     }
 
