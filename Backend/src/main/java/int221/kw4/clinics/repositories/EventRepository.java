@@ -13,5 +13,5 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
 
     public Page<Event> findAllByEventStartTimeAfterOrderByEventStartTimeAsc(Instant instantTime, Pageable pageable);
 
-    public Page<Event> findAllByEventCategoryOrderByEventCategoryDesc(EventCategory eventCategory, Pageable pageable);
+    public Page<Event> findAllByEventCategory(EventCategory eventCategory, Pageable pageable);
 }

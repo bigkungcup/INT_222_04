@@ -26,7 +26,7 @@ public class EventCategory {
     @Column(name = "eventCategoryId", nullable = false)
     private Integer id;
 
-    @Column(name = "eventCategoryName", nullable = false, length = 100)
+    @Column(name = "eventCategoryName", nullable = false, length = 100 ,unique = true)
     private String eventCategoryName;
 
     @Column(name = "eventCategoryDescription", length = 500)

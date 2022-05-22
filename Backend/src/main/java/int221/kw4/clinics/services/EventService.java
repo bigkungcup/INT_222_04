@@ -57,7 +57,7 @@ public class EventService {
     }
 
     public EventPageDTO getEventByCategoryId(EventCategory eventCategoryId, Integer page, Integer pageSize) {
-        return modelMapper.map(repository.findAllByEventCategoryOrderByEventCategoryDesc(eventCategoryId, PageRequest.of(page, pageSize)),
+        return modelMapper.map(repository.findAllByEventCategory(eventCategoryId, PageRequest.of(page, pageSize)),
                 EventPageDTO.class);
     }
 

@@ -16,7 +16,7 @@ public class EventCategoryEditDTO {
     @NotNull(message = "CategoryName shouldn't be Null")
     @NotBlank(message = "CategoryName shouldn't be blank")
     @NotEmpty(message = "CategoryName shouldn't be Empty")
-    @UniqueElements(message = "CategoryName should Unique")
+//    @UniqueElements(message = "CategoryName should Unique")
     private String eventCategoryName;
 
     private String eventCategoryDescription;
