@@ -20,7 +20,7 @@ public class EventPostDTO {
 
     @Email(message = "email invalid syntax", regexp = "[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$")
     @NotNull(message = "Email shouldn't be null")
-    @Size(max = 45, min = 5, message = "Email should be between 10 and 45 characters in length.")
+    @Size(max = 255, min = 5, message = "Email should be between 10 and 45 characters in length.")
     private String bookingEmail;
 
     @NotNull(message = "startTime shouldn't be blank/null")
