@@ -1,9 +1,8 @@
 version: '3'
 services:
   frontend:
-    build: ./
-    image: bigkungcup/frontend
     container_name: frontend
+    image: bigkungcup/frontend
     ports:
       - 3000:3000
     networks:
