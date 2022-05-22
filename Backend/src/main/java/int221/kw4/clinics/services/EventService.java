@@ -44,7 +44,7 @@ public class EventService {
                 EventPageDTO.class);
     }
 
-    public List<EventDTO> getAll(){
+    public List<EventDTO> getAll() {
         List<Event> eventList = repository.findAll();
         return listMapper.mapList(eventList, EventDTO.class, modelMapper);
     }
@@ -56,26 +56,26 @@ public class EventService {
         return modelMapper.map(eventListById, EventDTO.class);
     }
 
-    public List<EventDTO> getEventByCategoryId(EventCategory eventCategoryId, Integer page, Integer pageSize){
-        List<Event> eventByCategory =repository.findAllByEventCategoryOrderByEventCategoryDesc(eventCategoryId, PageRequest.of(page, pageSize));
-        return listMapper.mapList(eventByCategory, EventDTO.class, modelMapper);
+    public EventPageDTO getEventByCategoryId(EventCategory eventCategoryId, Integer page, Integer pageSize) {
+        return modelMapper.map(repository.findAllByEventCategoryOrderByEventCategoryDesc(eventCategoryId, PageRequest.of(page, pageSize)),
+                EventPageDTO.class);
     }
 
 
-    public List<EventDTO> getPastEvent(Instant instant, Integer page, Integer pageSize) {
-        List<Event> pastEvent = repository.findAllByEventStartTimeBeforeOrderByEventStartTimeDesc(instant, PageRequest.of(page, pageSize));
-        return listMapper.mapList(pastEvent, EventDTO.class, modelMapper);
+    public EventPageDTO getPastEvent(Instant instant, Integer page, Integer pageSize) {
+        return modelMapper.map(repository.findAllByEventStartTimeBeforeOrderByEventStartTimeDesc(instant, PageRequest.of(page, pageSize)),
+                EventPageDTO.class);
     }
 
-    public List<EventDTO> getUpcomingEvent(Instant instant, Integer page, Integer pageSize) {
-        List<Event> pastEvent = repository.findAllByEventStartTimeAfterOrderByEventStartTimeAsc(instant, PageRequest.of(page, pageSize));
-        return listMapper.mapList(pastEvent, EventDTO.class, modelMapper);
+    public EventPageDTO getUpcomingEvent(Instant instant, Integer page, Integer pageSize) {
+        return modelMapper.map(repository.findAllByEventStartTimeAfterOrderByEventStartTimeAsc(instant, PageRequest.of(page, pageSize)),
+                EventPageDTO.class);
     }
 
 
     //    Post
     public Date findEndDate(Date date, Integer duration) {
-        return new Date(date.getTime()+(duration*60000+60000));
+        return new Date(date.getTime() + (duration * 60000 + 60000));
     }
 
     public Event addEvent(EventPostDTO newEvent) throws HandleExceptionOverlap {
@@ -85,15 +85,14 @@ public class EventService {
 
         for (int i = 0; i < eventList.size(); i++) {
             List errors = new ArrayList();
-            if(newEvent.getEventCategory().getId() == eventList.get(i).getEventCategory().getId()) {
+            if (newEvent.getEventCategory().getId() == eventList.get(i).getEventCategory().getId()) {
                 Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
                 Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
                 if (newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventStartTime) ||
                         newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventEndTime) ||
                         newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventEndTime) ||
                         newEventStartTime.after(eventStartTime) && newEventEndTime.before(eventEndTime) ||
-                        newEventStartTime.equals(eventStartTime))
-                {
+                        newEventStartTime.equals(eventStartTime)) {
                     throw new HandleExceptionOverlap(errors.toString());
                 }
             }
@@ -110,7 +109,7 @@ public class EventService {
         repository.deleteById(eventId);
     }
 
-//    Update
+    //    Update
     public ResponseEntity update(EventEditDTO updateEvent, Integer eventId) throws HandleExceptionOverlap {
         Date newEventStartTime = Date.from(updateEvent.getEventStartTime());
         Date newEventEndTime = findEndDate(Date.from(updateEvent.getEventStartTime()), updateEvent.getEventDuration());
@@ -118,15 +117,14 @@ public class EventService {
 
         for (int i = 0; i < eventList.size(); i++) {
             List errors = new ArrayList();
-            if(updateEvent.getEventCategory().getId() == eventList.get(i).getEventCategory().getId() && eventList.get(i).getId() != eventId) {
+            if (updateEvent.getEventCategory().getId() == eventList.get(i).getEventCategory().getId() && eventList.get(i).getId() != eventId) {
                 Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
                 Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
                 if (newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventStartTime) ||
                         newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventEndTime) ||
                         newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventEndTime) ||
                         newEventStartTime.after(eventStartTime) && newEventEndTime.before(eventEndTime) ||
-                        newEventStartTime.equals(eventStartTime))
-                {
+                        newEventStartTime.equals(eventStartTime)) {
                     throw new HandleExceptionOverlap(errors.toString());
                 }
             }

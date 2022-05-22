@@ -47,7 +47,7 @@ public class EventCategoryService {
         repository.deleteById(eventCategoryId);
     }
 
-    public ResponseEntity update(EventCategoryEditDTO updateEventCategory, Integer eventCategoryId){
+    public ResponseEntity update(EventCategoryEditDTO updateEventCategory, Integer eventCategoryId) {
         EventCategory eventCategory = repository.findById(eventCategoryId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR)
         );

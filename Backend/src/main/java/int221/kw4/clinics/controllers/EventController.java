@@ -42,7 +42,7 @@ public class EventController {
     }
 
     @GetMapping("/eventByCategory/{eventCategoryId}")
-    public  List<EventDTO> getAllEventByCategory(
+    public  EventPageDTO getAllEventByCategory(
             @PathVariable EventCategory eventCategoryId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int pageSize
@@ -51,7 +51,7 @@ public class EventController {
     }
 
     @GetMapping("/pastEvent")
-    public List<EventDTO> getAllBookingByPast(
+    public EventPageDTO getAllBookingByPast(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int pageSize
     ) {
@@ -59,7 +59,7 @@ public class EventController {
     }
 
     @GetMapping("/upComingEvent")
-    public List<EventDTO> getAllBookingByUpComing(
+    public EventPageDTO getAllBookingByUpComing(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int pageSize
     ) {
