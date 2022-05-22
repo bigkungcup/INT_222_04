@@ -1,5 +1,5 @@
 <script setup>
-import {  onMounted } from "vue";
+import {  onMounted,onUpdated } from "vue";
 import CreateEvent from "../components/CreateEvent.vue";
 import { useEvent, useEventCategory } from "../stores/event.js";
 
@@ -7,10 +7,15 @@ const event = useEvent();
 const category = useEventCategory();
 
 onMounted(async () => {
+  event.textPopUp = false;
   await category.getEventCategory();
   await event.getEventLists();
   await event.getAllEventLists();
 });
+
+onUpdated(async () => {
+  await event.getAllEventLists();
+  });
 </script>
 
 <template>

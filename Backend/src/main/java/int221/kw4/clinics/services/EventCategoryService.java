@@ -36,10 +36,10 @@ public class EventCategoryService {
         return listMapper.mapList(eventCategoryList, EventCategoryDTO.class, modelMapper);
     }
 
-    public EventCategoryDTO getById(Integer eventCategortId){
-        EventCategory eventCategoryList = repository.findById(eventCategortId).orElseThrow(
+    public EventCategoryDTO getById(Integer eventCategoryId){
+        EventCategory eventCategoryList = repository.findById(eventCategoryId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "CategortId: " + eventCategortId + "d oes not exist !!!"));
+                        "CategoryId: " + eventCategoryId + "d oes not exist !!!"));
         return modelMapper.map(eventCategoryList, EventCategoryDTO.class);
     }
 

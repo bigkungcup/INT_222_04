@@ -190,12 +190,12 @@ export const useEvent = defineStore("event", () => {
 
   // Get Overlap Time
   const getOverlapTime = (eventStartTime,category) => {
-    getAllEventLists();
     let listAll
     listAll = eventListAll.value.filter(a => a.eventCategory.id == category);
+    console.log(category);
     console.log(listAll);
     return listAll.some((event) => {
-    if(moment(eventStartTime).toLocaleString("th-TH") < moment(event.eventStartTime).add(event.eventDuration,'m').toLocaleString("th-TH") && moment(eventStartTime).add(event.eventDuration,'m').toLocaleString("th-TH") > moment(event.eventStartTime).toLocaleString("th-TH"))
+    if(moment(eventStartTime).toLocaleString("th-TH") <= moment(event.eventStartTime).add(event.eventDuration,'m').toLocaleString("th-TH") && moment(eventStartTime).add(event.eventDuration,'m').toLocaleString("th-TH") >= moment(event.eventStartTime).toLocaleString("th-TH"))
       return true;
     else
       return false

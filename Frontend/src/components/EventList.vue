@@ -28,13 +28,6 @@ const showPopUp = (id) => {
   console.log(deleteId.value);
 };
 
-  //Sort
-  // const getSortAsc = (event) => {
-  //     event.sort((a,b) => moment(a.eventStartTime) - moment(b.eventStartTime))
-  // };
-  // const getSortDesc = (event) => {
-
-
 </script>
 
 <template>
@@ -92,12 +85,12 @@ const showPopUp = (id) => {
         </div>
       </div>
       <div> </div>
-        <div class="flex justify-evenly gap-x-16 absolute inset-x-0 bottom-28">
-          <div><button class="absolute -ml-1 bg-white rounded-3xl w-36 py-2 mx-2 drop-shadow-xl hover:text-white hover:bg-black" v-show="page > 0" @click="$emit('back')">back</button></div>
-          <input type="text" class="absolute bg-white/0 h-12 text-3xl w-16 text-center text-amber-900 pr-2" disabled readonly
+        <div class="grid gap-y-6 absolute bottom-14 right-6">
+          <input type="text" class="absolute -ml-36 -mt-28 place-self-center rounded-lg bg-white h-12 text-3xl w-16 text-center text-amber-900" disabled readonly
           :value="page+1">
-          <div><button class="absolute -ml-36 bg-white rounded-3xl w-36 py-2 mx-2 drop-shadow-xl hover:text-white hover:bg-black" v-show="event.filter == 0 ? page+1 < event.eventLists.totalPages : page+1 < event.filterEventLists.totalPages" @click="$emit('next')">next</button></div>
+          <div><button class="absolute -ml-36 -mt-6 bg-white rounded-3xl w-36 py-2 mx-2 drop-shadow-xl hover:text-white hover:bg-black" v-show="event.filter == 0 ? page+1 < event.eventLists.totalPages : page+1 < event.filterEventLists.totalPages" @click="$emit('next')">next</button></div>
         </div>
+        <div><button class="absolute bottom-9 left-24 bg-white rounded-3xl w-36 py-2 mx-2 drop-shadow-xl hover:text-white hover:bg-black" v-show="page > 0" @click="$emit('back')">back</button></div>
     </div>
     <div
       v-show="popUp"
@@ -123,12 +116,12 @@ const showPopUp = (id) => {
         </div>
         <div class="flex justify-center mb-6">
           <button
-            class="text-4xl px-5 text-green-500"
+            class="text-4xl px-5 text-green-500 hover:text-green-700"
             @click="$emit('delete', deleteId, (popUp = false))"
           >
             Yes
           </button>
-          <button class="text-4xl px-5 text-red-500" @click="popUp = false">
+          <button class="text-4xl px-5 text-red-500 hover:text-red-700" @click="popUp = false">
             No
           </button>
         </div>

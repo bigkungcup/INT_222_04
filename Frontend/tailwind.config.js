@@ -17,7 +17,10 @@ module.exports = {
         '100':'30rem',
         '99':'28em'
       }
-    },
+    },      
+    // margin: {
+    //   '38': '9.5rem',
+    // }
   },
   plugins: [],
 }

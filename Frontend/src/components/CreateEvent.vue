@@ -5,8 +5,6 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import moment from "moment"
 defineEmits(['create','close'])
 
-
-
 defineProps({
   currentCategory: {
     type: Object,
@@ -41,6 +39,7 @@ const reset = () => {
     eventDuration: 0,
   };
 };
+
 
 const textPopUpDate = ref(false)
 const setMinTime = (eventStartTime) => {
@@ -82,8 +81,8 @@ const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-
       <div v-if="newEvent.bookingEmail.match(validEmail) === null && newEvent.bookingEmail !== '' ">
         <p v-show="textPopUp" class="text-lg text-red-500 pl-28">*Invalid Email.</p>
       </div>
-      <div v-if="newEvent.bookingEmail.length > 45">
-        <p  class="text-lg text-red-500 pl-28">*Email can't be longer than 45 characters.</p>
+      <div v-if="newEvent.bookingEmail.length > 255">
+        <p  class="text-lg text-red-500 pl-28">*Email can't be longer than 255 characters.</p>
       </div>
       </p>
 
@@ -105,7 +104,7 @@ const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-
       <div
         v-if="newEvent.eventStartTime === 'overlap'">
         <br>
-        <p class="absolute text-lg text-red-500 -ml-52 break-words">*Overlap</p>
+        <p class="absolute text-lg text-red-500 -ml-52 break-words">*This time has already been used.</p>
       </div>
       </p>
 

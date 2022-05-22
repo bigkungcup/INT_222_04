@@ -27,9 +27,9 @@ public class EventCategoryController {
         return service.getAll();
     }
 
-    @GetMapping("/{eventCategortId}")
-    public EventCategoryDTO getById(@PathVariable Integer eventCategortId){
-        return service.getById(eventCategortId);
+    @GetMapping("/{eventCategoryId}")
+    public EventCategoryDTO getById(@PathVariable Integer eventCategoryId){
+        return service.getById(eventCategoryId);
     }
 
     @PostMapping("")
