@@ -27,6 +27,11 @@ public class EventCategoryController {
         return service.getAll();
     }
 
+    @GetMapping("/{eventCategortId}")
+    public EventCategoryDTO getById(@PathVariable Integer eventCategortId){
+        return service.getById(eventCategortId);
+    }
+
     @PostMapping("")
     public EventCategory create(@Valid @RequestBody EventCategorypostDTO newEventCategory) {
         return service.addCategory(newEventCategory);

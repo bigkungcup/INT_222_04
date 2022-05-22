@@ -3,6 +3,7 @@ package int221.kw4.clinics.services;
 import int221.kw4.clinics.dtos.EventCategoryDTO;
 import int221.kw4.clinics.dtos.EventCategoryEditDTO;
 import int221.kw4.clinics.dtos.EventCategorypostDTO;
+import int221.kw4.clinics.dtos.EventDTO;
 import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.repositories.EventCategoryRepository;
@@ -33,6 +34,13 @@ public class EventCategoryService {
     public List<EventCategoryDTO> getAll() {
         List<EventCategory> eventCategoryList = repository.findAll();
         return listMapper.mapList(eventCategoryList, EventCategoryDTO.class, modelMapper);
+    }
+
+    public EventCategoryDTO getById(Integer eventCategortId){
+        EventCategory eventCategoryList = repository.findById(eventCategortId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "CategortId: " + eventCategortId + "d oes not exist !!!"));
+        return modelMapper.map(eventCategoryList, EventCategoryDTO.class);
     }
 
     public EventCategory addCategory(EventCategorypostDTO newEventCategory) {

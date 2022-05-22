@@ -1,5 +1,6 @@
 package int221.kw4.clinics.advice;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -45,8 +46,8 @@ public class ApplicationExceptionHandler extends Exception {
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(UnexpectedTypeException.class)
-    public HandleException handleUniqueCategoryname(UnexpectedTypeException ue){
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public HandleException handleUniqueCategoryname(DataIntegrityViolationException ue){
         HandleException errors = new HandleException();
         errors.setTimestamp(new Date());
         errors.setStatus(500);
