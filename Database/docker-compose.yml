@@ -1,0 +1,23 @@
+version: '3.7'
+services:
+  database:
+    container_name: database
+    image: mysql
+    ports:
+     - 3306:3306
+    #  - 3307:3306
+    networks:
+     - oasip-network
+    volumes:
+      - ./clinicData.sql:/docker-entrypoint-initdb.d/clinic.sql
+      - ./mysql-data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8 --collation-server=utf8_general_ci
+    environment:
+      - MYSQL_ROOT_PASSWORD=KW04
+      - LANG=en_US.UTF-8
+    restart: always
+
+networks:
+ oasip-network:
+   external:
+    name: oasip-network

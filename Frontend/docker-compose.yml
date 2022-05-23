@@ -1,0 +1,14 @@
+version: '3.7'
+services:
+  frontend:
+    build: ./
+    image: frontend
+    container_name: frontend
+    networks:
+      - oasip-network
+    restart: always
+
+networks:
+  oasip-network:
+    external:
+     name: oasip-network
