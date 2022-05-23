@@ -47,13 +47,13 @@ public class ApplicationExceptionHandler extends Exception {
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public HandleException handleUniqueCategoryname(DataIntegrityViolationException ue){
+    public HandleException handleUniqueCategoryName(DataIntegrityViolationException ue){
         HandleException errors = new HandleException();
         errors.setTimestamp(new Date());
         errors.setStatus(500);
         errors.setMessage("Bad Request");
         errors.setError("CategoryName should be Unique");
-        errors.setPath("/api/eventCategory");
+        errors.setPath("/api/eventCategories");
         return  errors;
     }
 
@@ -65,7 +65,7 @@ public class ApplicationExceptionHandler extends Exception {
         errors.setStatus(404);
         errors.setMessage("NOT FOUND");
         errors.setError(nf.getMessage());
-        errors.setPath("/api/event");
+        errors.setPath("/api/events");
         return  errors;
     }
 
@@ -77,7 +77,7 @@ public class ApplicationExceptionHandler extends Exception {
         errors.setStatus(404);
         errors.setMessage("NOT FOUND");
         errors.setError(nfc.getMessage());
-        errors.setPath("/api/event");
+        errors.setPath("/api/eventCategories");
         return  errors;
     }
 

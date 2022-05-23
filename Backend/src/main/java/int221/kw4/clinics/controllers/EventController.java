@@ -15,7 +15,7 @@ import javax.validation.Valid;
 import java.time.Instant;
 import java.util.List;
 
-// @CrossOrigin(origins = "*", allowedHeaders = "*")
+
 @RestController
 @RequestMapping("/api/events")
 public class EventController {

@@ -3,9 +3,7 @@ package int221.kw4.clinics.services;
 import int221.kw4.clinics.advices.HandleExceptionNotFoundCategory;
 import int221.kw4.clinics.dtos.EventCategoryDTO;
 import int221.kw4.clinics.dtos.EventCategoryEditDTO;
-import int221.kw4.clinics.dtos.EventCategorypostDTO;
-import int221.kw4.clinics.dtos.EventDTO;
-import int221.kw4.clinics.entities.Event;
+import int221.kw4.clinics.dtos.EventCategoryPostDTO;
 import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.repositories.EventCategoryRepository;
 import org.modelmapper.ModelMapper;
@@ -13,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -45,7 +42,7 @@ public class EventCategoryService {
         return modelMapper.map(eventCategoryList, EventCategoryDTO.class);
     }
 
-    public EventCategory addCategory(EventCategorypostDTO newEventCategory) {
+    public EventCategory addCategory(EventCategoryPostDTO newEventCategory) {
         EventCategory eventCategory = modelMapper.map(newEventCategory, EventCategory.class);
         return repository.saveAndFlush(eventCategory);
     }

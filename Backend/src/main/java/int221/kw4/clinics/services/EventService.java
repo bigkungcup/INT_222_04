@@ -76,7 +76,7 @@ public class EventService {
 
     //    Post
     public Date findEndDate(Date date, Integer duration) {
-        return new Date(date.getTime() + (duration * 60000 + 60000));
+        return new Date(date.getTime() + (duration * 60000));
     }
 
     public Event addEvent(EventPostDTO newEvent) throws HandleExceptionOverlap {
@@ -89,11 +89,9 @@ public class EventService {
             if (newEvent.getEventCategory().getId() == eventList.get(i).getEventCategory().getId()) {
                 Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
                 Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
-                if (newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventStartTime) ||
-                        newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventEndTime) ||
-                        newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventEndTime) ||
-                        newEventStartTime.after(eventStartTime) && newEventEndTime.before(eventEndTime) ||
-                        newEventStartTime.equals(eventStartTime)) {
+                if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
+                    newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
+                    newEventEndTime.equals(eventStartTime)) {
                     throw new HandleExceptionOverlap(errors.toString());
                 }
             }
@@ -122,16 +120,13 @@ public class EventService {
             if (updateEvent.getEventCategory().getId() == eventList.get(i).getEventCategory().getId() && eventList.get(i).getId() != eventId) {
                 Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
                 Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
-                if (newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventStartTime) ||
-                        newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventEndTime) ||
-                        newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventEndTime) ||
-                        newEventStartTime.after(eventStartTime) && newEventEndTime.before(eventEndTime) ||
-                        newEventStartTime.equals(eventStartTime)) {
+                if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
+                        newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
+                        newEventEndTime.equals(eventStartTime)) {
                     throw new HandleExceptionOverlap(errors.toString());
                 }
             }
         }
-
         Event event = repository.findById(eventId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST)
         );
