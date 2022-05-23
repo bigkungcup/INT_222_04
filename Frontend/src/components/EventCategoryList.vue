@@ -42,10 +42,6 @@ defineProps({
             </svg>
         </router-link>
       </div>
-
-      <!-- <div class="absolute hover-target bg-white w-99 h-auto z-10 text-2xl p-4 mx-5  mt-5">
-        {{ list.eventCategoryDescription }}
-        </div> -->
     </div>
   </div>
 </template>

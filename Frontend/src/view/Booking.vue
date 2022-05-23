@@ -1,12 +1,12 @@
 <script setup>
-import {  onMounted,onUpdated } from "vue";
+import {  onBeforeMount ,onUpdated } from "vue";
 import CreateEvent from "../components/CreateEvent.vue";
 import { useEvent, useEventCategory } from "../stores/event.js";
 
 const event = useEvent();
 const category = useEventCategory();
 
-onMounted(async () => {
+onBeforeMount(async () => {
   event.textPopUp = false;
   await category.getEventCategory();
   await event.getEventLists();
