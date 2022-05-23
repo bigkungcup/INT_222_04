@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import moment from "moment"
@@ -59,7 +59,7 @@ const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-
         Name :
         <input type="text" class="bg-white border border-slate-300 rounded-lg h-10 w-3/5 text-3xl 
         placeholder:italic placeholder:text-2xl " placeholder=" Enter Your Name"
-          v-model="newEvent.bookingName" />
+          v-model="newEvent.bookingName" /><span class="text-gray-500 text-lg">{{newEvent.bookingName.length}}/100</span>
         <router-link :to="{ name: 'Home' }"><img src="../assets/images/Exit.png" width="60"
             class="absolute top-3 right-36" /></router-link>
       <div v-if="newEvent.bookingName === '' || newEvent.bookingName === null || newEvent.bookingName.value === 0">
@@ -74,7 +74,7 @@ const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-
         Email :
         <input type="email" class="bg-white border border-slate-300 rounded-lg h-10 text-3xl 
         placeholder:italic placeholder:text-2xl" placeholder=" you@example.com"
-          v-model="newEvent.bookingEmail" />
+          v-model="newEvent.bookingEmail" /><span class="text-gray-500 text-lg">{{newEvent.bookingEmail.length}}/255</span>
       <div v-if="newEvent.bookingEmail === '' || newEvent.bookingEmail.value === 0">
         <p v-show="textPopUp" class="text-lg text-red-500 pl-28">*Please enter your email.</p>
       </div>
@@ -129,9 +129,9 @@ const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-
         Description :
         <textarea
           class="bg-white border border-slate-300 rounded-lg h-10 col-span-2 w-full h-60 mt-5 p-3 text-3xl resize-none placeholder:italic placeholder:text-2xl"
-          placeholder="Add your note" v-model="newEvent.eventNotes"></textarea>
+          placeholder="Add your note" v-model="newEvent.eventNotes"></textarea><span class="absolute -ml-16 -mt-2 text-gray-500 text-lg">{{newEvent.eventNotes.length}}/500</span>
       <div v-if="newEvent.eventNotes.length > 500">
-        <p  class="text-lg text-red-500 pl-28">*Description can't be longer than 500 characters.</p>
+        <p class="text-lg text-red-500 pl-28">*Description can't be longer than 500 characters.</p>
       </div>
       </p>
       <div></div>

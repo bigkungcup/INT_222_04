@@ -54,5 +54,4 @@ import Navbar from "./components/Navbar.vue";
   background-color: #f5c6cd;
 }
 
-
 </style>

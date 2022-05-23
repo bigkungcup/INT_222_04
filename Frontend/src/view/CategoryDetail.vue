@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount, onBeforeUpdate, onUnmounted, onUpdated, } from "vue";
+import { ref, onBeforeMount } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useEventCategory } from "../stores/event.js"
 const { params } = useRoute();
@@ -8,20 +8,20 @@ const allCategory = useEventCategory();
 
 //get event
 const getEventCategory = async () => {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/eventCategory/${params.id}`,
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/eventCategories/${params.id}`,
         {
             method: "GET",
         }
     );
     if (res.status === 200) {
         displayCategory.value = await res.json();
-        console.log(displayCategory.value);
+        console.log("get successfully");
     } else console.log("error, cannot get category");
 };
 
 //edit event
 const saveEventCategory = async (displayCategory, editCategory) => {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/eventCategory/${params.id}`, {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/eventCategories/${params.id}`, {
         method: "PUT",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -53,7 +53,6 @@ const displayCategory = ref({
 });
 
 const myRouter = useRouter();
-
 const goBack = () => {
     myRouter.go(-1);
 };
@@ -76,7 +75,6 @@ const showEditPopUp = () => {
     console.log(editPopUp.value);
 };
 
-const showNameSame = ref(false)
 
 const reset = () => {
     editCategory.value = {
@@ -87,7 +85,7 @@ const reset = () => {
     showNameSame.value = false
 }
 
-
+const showNameSame = ref(false)
 const checkName = (eventCategoryName) => {
     for (let i = 0; i < allCategory.categoryLists.length; i++) {
         if (eventCategoryName !== allCategory.categoryLists[i].eventCategoryName) {

@@ -1,9 +1,8 @@
 <script setup>
-import { ref, onBeforeMount, onBeforeUpdate } from "vue";
+import { onBeforeMount, onBeforeUpdate } from "vue";
 import EventList from "../components/EventList.vue";
 import EventEmptyList from "../components/EventEmptyList.vue";
 import { useEvent,useEventCategory } from "../stores/event.js"
-import moment from "moment"
 
 const event = useEvent()
 const category = useEventCategory()

@@ -26,6 +26,7 @@ export const useEvent = defineStore("event", () => {
       );
       if (res.status === 200) {
         eventLists.value = await res.json();
+        console.log("get event lists successfully");
       } else console.log("error, cannot get event lists");
   };
 
@@ -39,6 +40,7 @@ export const useEvent = defineStore("event", () => {
         );
         if (res.status === 200) {
           eventListAll.value = await res.json();
+          console.log("get all event lists successfully");
         } else console.log("error, cannot get event lists");
     };
 
@@ -47,7 +49,7 @@ export const useEvent = defineStore("event", () => {
     let res 
     if(filter.value == 1){
       res = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/events/pastEvent?page=${page}`,
+        `${import.meta.env.VITE_BASE_URL}/events/pastEvents?page=${page}`,
         {
           method: "GET",
         }
@@ -55,7 +57,7 @@ export const useEvent = defineStore("event", () => {
     }
     else if(filter.value == 2){
       res = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/events/upComingEvent?page=${page}`,
+        `${import.meta.env.VITE_BASE_URL}/events/upComingEvents?page=${page}`,
         {
           method: "GET",
         }
@@ -98,8 +100,8 @@ export const useEvent = defineStore("event", () => {
     }
     if (res.status === 200) {
       filterEventLists.value = await res.json();
+      console.log("get filter event lists successfully");
     } else console.log("error, cannot get event lists")
-    console.log(eventLists.value);
 };
 
   //Create Event
@@ -127,10 +129,6 @@ export const useEvent = defineStore("event", () => {
       console.log("error, cannot create");
       showText();
     }
-    console.log(
-      newEvent.bookingEmail.match(validEmail) ? newEvent.bookingEmail : null
-    );
-      console.log(getOverlapTime(newEvent.eventStartTime,newEvent.eventCategory.id));
   };
 
   //ShowEmpty
@@ -141,7 +139,6 @@ export const useEvent = defineStore("event", () => {
     else if (eventLists.value.content.length !== 0) {
       showEmptyEvent.value = false;
     }
-    console.log(showEmptyEvent.value);
   };
 
   const getEmptyFilterEvent = async (filterEvent=[]) => {
@@ -151,7 +148,6 @@ export const useEvent = defineStore("event", () => {
     else if (filterEvent.length !== 0) {
       showEmptyFilterEvent.value = false;
     }
-    console.log(showEmptyFilterEvent.value);
   };
 
   //Page
@@ -175,7 +171,6 @@ export const useEvent = defineStore("event", () => {
   //pop-up
   const showPopUp = () => {
     popUp.value = true;
-    console.log(popUp.value);
   };
   const disShowPopUp = () => {
     popUp.value = false;
@@ -185,15 +180,12 @@ export const useEvent = defineStore("event", () => {
   //Text pop-up
   const showText = () => {
     textPopUp.value = true;
-    console.log(popUp.value);
   };
 
   // Get Overlap Time
   const getOverlapTime = (eventStartTime,category) => {
     let listAll
     listAll = eventListAll.value.filter(a => a.eventCategory.id == category);
-    console.log(category);
-    console.log(listAll);
     return listAll.some((event) => {
     if(moment(eventStartTime).toLocaleString("th-TH") <= moment(event.eventStartTime).add(event.eventDuration,'m').toLocaleString("th-TH") && moment(eventStartTime).add(event.eventDuration,'m').toLocaleString("th-TH") >= moment(event.eventStartTime).toLocaleString("th-TH"))
       return true;
@@ -232,17 +224,17 @@ export const useEvent = defineStore("event", () => {
 });
 
 //-----------------------------------------------------------------------------------
-export const useEventCategory = defineStore("eventCatergory", () => {
+export const useEventCategory = defineStore("eventCategory", () => {
   const categoryLists = ref([]);
 
   //Get Category
   const getEventCategory = async () => {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/eventCategory`, {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/eventCategories`, {
       method: "GET",
     });
     if (res.status === 200) {
       categoryLists.value = await res.json();
-      console.log(categoryLists.value);
+      console.log("get category lists successfully");
     } else console.log("error, cannot get event category lists");
   };
   return { categoryLists, getEventCategory };

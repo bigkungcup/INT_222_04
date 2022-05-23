@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onBeforeMount } from "vue";
+import { onBeforeMount } from "vue";
 import EventCategoryList from "../components/EventCategoryList.vue";
-import { useEventCategory } from "../stores/event";
+import { useEventCategory } from "../stores/event.js";
 
 const category = useEventCategory();
 

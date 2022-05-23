@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount, onUpdated, onBeforeUpdate, onMounted } from "vue";
+import { ref, onBeforeMount } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { formatDate, formatTime } from "../main.js";
 import Datepicker from "@vuepic/vue-datepicker";
@@ -15,7 +15,7 @@ const getEvent = async () => {
   const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events/${params.id}`);
   if (res.status === 200) {
     displayEvent.value = await res.json();
-    console.log(displayEvent.value);
+    console.log("get successfully");
   } else console.log("error, cannot get event");
 };
 
@@ -152,7 +152,7 @@ onBeforeMount(async () => {
           <p v-if="editEvent.eventNotes.length > 500" class="text-lg text-red-500 pl-52 -mt-8">*Description can't be longer than 500 characters.</p>
           <textarea
             class="bg-white border border-slate-300 rounded-lg h-10 col-span-2 w-full h-28 mt-5 p-3 text-3xl resize-none"
-            placeholder="add your note " v-model="editEvent.eventNotes"></textarea>
+            placeholder="add your note " v-model="editEvent.eventNotes"></textarea><span class="absolute -ml-16 -mt-2 text-gray-500 text-lg">{{editEvent.eventNotes.length}}/500</span>
         </p>
       </div>
     </div>

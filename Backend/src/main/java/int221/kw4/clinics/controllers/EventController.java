@@ -15,7 +15,7 @@ import javax.validation.Valid;
 import java.time.Instant;
 import java.util.List;
 
-// @CrossOrigin(origins = "*", allowedHeaders = "*")
+ @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/api/events")
 public class EventController {
@@ -51,16 +51,16 @@ public class EventController {
         return service.getEventByCategoryId(eventCategoryId, page, pageSize);
     }
 
-    @GetMapping("/pastEvent")
-    public EventPageDTO getAllBookingByPast(
+    @GetMapping("/pastEvents")
+    public EventPageDTO getAllEventByPast(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int pageSize
     ) {
         return service.getPastEvent(Instant.now(), page, pageSize);
     }
 
-    @GetMapping("/upComingEvent")
-    public EventPageDTO getAllBookingByUpComing(
+    @GetMapping("/upComingEvents")
+    public EventPageDTO getAllEventByUpComing(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int pageSize
     ) {

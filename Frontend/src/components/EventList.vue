@@ -1,9 +1,8 @@
 <script setup>
-import { ref, onBeforeMount } from "vue";
+import { ref } from "vue";
 import { formatDate, formatTime } from "../main.js";
-import moment from "moment"
-import { useEvent,useEventCategory } from "../stores/event.js";
-defineEmits(["delete","next","back","filter"]);
+import { useEvent } from "../stores/event.js";
+defineEmits(["delete","next","back"]);
 
 defineProps({
   currentEvent: {
@@ -17,7 +16,6 @@ defineProps({
 });
 
 const event = useEvent()
-const category = useEventCategory();
 const popUp = ref(false);
 const deleteId = ref();
 

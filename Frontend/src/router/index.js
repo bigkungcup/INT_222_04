@@ -8,7 +8,6 @@ import AboutUs from "../view/AboutUs.vue"
 import NotFound from "../view/NotFound.vue";
 
 const history = createWebHashHistory('/kw4');
-// const history = createWebHashHistory();
 const routes = [
   {
     path: "/:catchNotMatchPath(.*)",
