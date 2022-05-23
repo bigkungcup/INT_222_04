@@ -14,7 +14,7 @@ export const useEvent = defineStore("event", () => {
   const page = ref(0);
   const popUp = ref(false);
   const textPopUp = ref(false);
-  const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+  const validEmail = /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
   //Get Event
   const getEventLists = async (page=0) => {
