@@ -1,5 +1,6 @@
 package int221.kw4.clinics.controllers;
 
+import int221.kw4.clinics.advices.HandleExceptionNotFoundCategory;
 import int221.kw4.clinics.dtos.EventCategoryDTO;
 import int221.kw4.clinics.dtos.EventCategoryEditDTO;
 import int221.kw4.clinics.dtos.EventCategorypostDTO;
@@ -16,7 +17,7 @@ import java.util.List;
 
 // @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("/api/eventCategory")
+@RequestMapping("/api/eventCategories")
 public class EventCategoryController {
 
     @Autowired
@@ -28,7 +29,7 @@ public class EventCategoryController {
     }
 
     @GetMapping("/{eventCategoryId}")
-    public EventCategoryDTO getById(@PathVariable Integer eventCategoryId){
+    public EventCategoryDTO getById(@PathVariable Integer eventCategoryId) throws HandleExceptionNotFoundCategory {
         return service.getById(eventCategoryId);
     }
 
@@ -38,12 +39,13 @@ public class EventCategoryController {
     }
 
     @DeleteMapping("/{eventCategoryId}")
-    public void delete(@PathVariable Integer eventCategoryId){
+    public void delete(@PathVariable Integer eventCategoryId) throws HandleExceptionNotFoundCategory {
         service.deleteEvent(eventCategoryId);
     }
 
     @PutMapping("/{eventCategoryId}")
-    public ResponseEntity update(@Valid @RequestBody EventCategoryEditDTO updateEventCategory, @PathVariable Integer eventCategoryId){
+    public ResponseEntity update(@Valid @RequestBody EventCategoryEditDTO updateEventCategory,
+                                 @PathVariable Integer eventCategoryId) throws HandleExceptionNotFoundCategory {
         return service.update(updateEventCategory, eventCategoryId);
     }
 }

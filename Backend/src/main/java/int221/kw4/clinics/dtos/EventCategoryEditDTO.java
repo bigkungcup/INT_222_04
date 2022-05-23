@@ -16,12 +16,11 @@ public class EventCategoryEditDTO {
     @NotNull(message = "CategoryName shouldn't be Null")
     @NotBlank(message = "CategoryName shouldn't be blank")
     @NotEmpty(message = "CategoryName shouldn't be Empty")
-//    @UniqueElements(message = "CategoryName should Unique")
     private String eventCategoryName;
 
     private String eventCategoryDescription;
 
-    @Min(value = 1, message = "the event duration is out of range.")
-    @Max(value = 480, message = "the event duration is out of range.")
+    @Min(value = 1, message = "the event duration is out of range 1 - 500.")
+    @Max(value = 480, message = "the event duration is out of range 1 - 500.")
     private int eventDuration;
 }

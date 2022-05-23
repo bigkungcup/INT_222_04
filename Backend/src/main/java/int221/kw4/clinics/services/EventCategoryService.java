@@ -1,5 +1,6 @@
 package int221.kw4.clinics.services;
 
+import int221.kw4.clinics.advices.HandleExceptionNotFoundCategory;
 import int221.kw4.clinics.dtos.EventCategoryDTO;
 import int221.kw4.clinics.dtos.EventCategoryEditDTO;
 import int221.kw4.clinics.dtos.EventCategorypostDTO;
@@ -36,10 +37,11 @@ public class EventCategoryService {
         return listMapper.mapList(eventCategoryList, EventCategoryDTO.class, modelMapper);
     }
 
-    public EventCategoryDTO getById(Integer eventCategoryId){
+    public EventCategoryDTO getById(Integer eventCategoryId) throws HandleExceptionNotFoundCategory {
         EventCategory eventCategoryList = repository.findById(eventCategoryId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "CategoryId: " + eventCategoryId + "d oes not exist !!!"));
+                () -> new HandleExceptionNotFoundCategory(
+                        "CategoryId: " + eventCategoryId + " does not exist !!!")
+        );
         return modelMapper.map(eventCategoryList, EventCategoryDTO.class);
     }
 
@@ -48,16 +50,18 @@ public class EventCategoryService {
         return repository.saveAndFlush(eventCategory);
     }
 
-    public void deleteEvent(Integer eventCategoryId) {
+    public void deleteEvent(Integer eventCategoryId) throws HandleExceptionNotFoundCategory {
         repository.findById(eventCategoryId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Event ID: " + eventCategoryId + " does not exist !!!"));
+                () -> new HandleExceptionNotFoundCategory(
+                        "CategoryId: " + eventCategoryId + " does not exist !!!")
+        );
         repository.deleteById(eventCategoryId);
     }
 
-    public ResponseEntity update(EventCategoryEditDTO updateEventCategory, Integer eventCategoryId) {
+    public ResponseEntity update(EventCategoryEditDTO updateEventCategory, Integer eventCategoryId) throws HandleExceptionNotFoundCategory {
         EventCategory eventCategory = repository.findById(eventCategoryId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR)
+                () -> new HandleExceptionNotFoundCategory(
+                        "CategoryId: " + eventCategoryId + " does not exist !!!")
         );
         modelMapper.map(updateEventCategory, eventCategory);
         repository.saveAndFlush(eventCategory);

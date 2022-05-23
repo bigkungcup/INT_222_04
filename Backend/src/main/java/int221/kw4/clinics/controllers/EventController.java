@@ -1,6 +1,7 @@
 package int221.kw4.clinics.controllers;
 
-import int221.kw4.clinics.advice.HandleExceptionOverlap;
+import int221.kw4.clinics.advices.HandleExceptionNotFound;
+import int221.kw4.clinics.advices.HandleExceptionOverlap;
 import int221.kw4.clinics.dtos.*;
 import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.entities.EventCategory;
@@ -37,7 +38,7 @@ public class EventController {
     }
 
     @GetMapping("/{eventId}")
-    public EventDTO getEventById(@PathVariable Integer eventId) {
+    public EventDTO getEventById(@PathVariable Integer eventId) throws HandleExceptionNotFound {
         return service.getEvent(eventId);
     }
 
@@ -73,7 +74,7 @@ public class EventController {
     }
 
     @DeleteMapping("/{eventId}")
-    public void delete(@PathVariable Integer eventId) {
+    public void delete(@PathVariable Integer eventId) throws HandleExceptionNotFound {
         service.deleteEvent(eventId);
     }
 

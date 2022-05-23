@@ -1,6 +1,7 @@
 package int221.kw4.clinics.services;
 
-import int221.kw4.clinics.advice.HandleExceptionOverlap;
+import int221.kw4.clinics.advices.HandleExceptionNotFound;
+import int221.kw4.clinics.advices.HandleExceptionOverlap;
 import int221.kw4.clinics.dtos.*;
 
 import int221.kw4.clinics.entities.Event;
@@ -49,9 +50,9 @@ public class EventService {
         return listMapper.mapList(eventList, EventDTO.class, modelMapper);
     }
 
-    public EventDTO getEvent(Integer eventId) {
+    public EventDTO getEvent(Integer eventId) throws HandleExceptionNotFound {
         Event eventListById = repository.findById(eventId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                () -> new HandleExceptionNotFound(
                         "Event ID: " + eventId + " does not exist !!!"));
         return modelMapper.map(eventListById, EventDTO.class);
     }
@@ -102,10 +103,11 @@ public class EventService {
     }
 
     //    Delete
-    public void deleteEvent(Integer eventId) {
+    public void deleteEvent(Integer eventId) throws HandleExceptionNotFound {
         repository.findById(eventId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Event ID: " + eventId + " does not exist !!!"));
+                () -> new HandleExceptionNotFound(
+                        "Event ID: " + eventId + " does not exist !!!")
+        );
         repository.deleteById(eventId);
     }
 
