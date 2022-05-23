@@ -12,7 +12,7 @@ import javax.validation.constraints.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventCategorypostDTO {
+public class EventCategoryPostDTO {
     @NotNull(message = "CategoryName shouldn't be Null")
     @NotBlank(message = "CategoryName shouldn't be blank")
     @NotEmpty(message = "CategoryName shouldn't be Empty")
