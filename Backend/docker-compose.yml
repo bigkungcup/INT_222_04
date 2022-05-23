@@ -1,10 +1,9 @@
 version: '3.7'
 services:
   backend:
-    container_name: backend ##ชื่อ Container จะเอาไปเชื่อมกับ Nginx.conf ที่ส่วน Server:8080
+    build: ./
     image: bigkungcup/backend
-    # ports:
-    #   - 8080:8080
+    container_name: backend ##ชื่อ Container จะเอาไปเชื่อมกับ Nginx.conf ที่ส่วน Server:8080
     networks:
       - oasip-network
     restart: always
