@@ -18,7 +18,7 @@ public class EventPostDTO {
     @Size(max = 100, min = 1, message = "Name should be between 1 and 100 characters in length.")
     private String bookingName;
 
-    @Email(message = "email invalid syntax", regexp = "[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$")
+    @Email(message = "email invalid syntax", regexp = "[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$")
     @NotNull(message = "Email shouldn't be null")
     @Size(max = 255, min = 5, message = "Email should be between 10 and 45 characters in length.")
     private String bookingEmail;
