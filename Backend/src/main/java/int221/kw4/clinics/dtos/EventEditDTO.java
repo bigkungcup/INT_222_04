@@ -21,7 +21,7 @@ public class EventEditDTO {
     @Size(max = 500, message = "A note should be between 0 and 500 characters in length.")
     private String eventNotes;
 
-    private EventCategoryDTO eventCategory;
+    private Integer eventCategoryId;
 
     private Integer eventDuration;
 }

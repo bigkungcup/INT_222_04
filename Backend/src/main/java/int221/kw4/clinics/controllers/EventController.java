@@ -32,9 +32,9 @@ public class EventController {
         return service.getAllEvent(sortBy, page, pageSize);
     }
 
-    @GetMapping("/eventAll")
-    public List<EventDTO> getAll(){
-        return service.getAll();
+    @GetMapping("/eventAllByTime/{eventCategoryId}")
+    public List<EventDTO> getEventByCurrentTime(@PathVariable Integer eventCategoryId){
+        return service.getEventByCurrentTime(Instant.now(), eventCategoryId);
     }
 
     @GetMapping("/{eventId}")
@@ -42,7 +42,7 @@ public class EventController {
         return service.getEvent(eventId);
     }
 
-    @GetMapping("/eventByCategory/{eventCategoryId}")
+    @GetMapping("{eventCategoryId}/eventByCategory")
     public  EventPageDTO getAllEventByCategory(
             @PathVariable EventCategory eventCategoryId,
             @RequestParam(defaultValue = "0") int page,

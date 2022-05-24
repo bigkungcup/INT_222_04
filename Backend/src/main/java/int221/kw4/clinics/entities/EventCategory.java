@@ -2,10 +2,7 @@ package int221.kw4.clinics.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
@@ -18,6 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@ToString
 @JsonIgnoreProperties({"hibernateLazyInitializer"})
 @Table(name = "eventCategory")
 public class EventCategory {
