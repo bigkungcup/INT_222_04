@@ -15,7 +15,7 @@ import javax.validation.Valid;
 import java.time.Instant;
 import java.util.List;
 
-
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/api/events")
 public class EventController {
@@ -33,8 +33,9 @@ public class EventController {
     }
 
     @GetMapping("/eventAllByTime/{eventCategoryId}")
-    public List<EventDTO> getEventByCurrentTime(@PathVariable Integer eventCategoryId){
-        return service.getEventByCurrentTime(Instant.now(), eventCategoryId);
+    public List<EventDTO> getEventByCurrentTime(@PathVariable Integer eventCategoryId,
+                                                @RequestBody Instant instant){
+        return service.getEventByCurrentTime(instant, eventCategoryId);
     }
 
     @GetMapping("/{eventId}")

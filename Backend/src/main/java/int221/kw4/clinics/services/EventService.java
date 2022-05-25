@@ -51,9 +51,6 @@ public class EventService {
 
     public List<EventDTO> getEventByCurrentTime(Instant instantTime, Integer eventCategoryId){
         List<Event> eventList = repository.getEventByCurrentTime(instantTime, eventCategoryId);
-        System.out.println(eventList);
-        System.out.println(instantTime);
-        System.out.println(eventCategoryId);
         return listMapper.mapList(eventList, EventDTO.class, modelMapper);
     }
 
@@ -100,7 +97,7 @@ public class EventService {
     public Event addEvent(EventPostDTO newEvent) throws HandleExceptionOverlap {
         Date newEventStartTime = Date.from(newEvent.getEventStartTime());
         Date newEventEndTime = findEndDate(Date.from(newEvent.getEventStartTime()), newEvent.getEventDuration());
-        List<EventDTO> eventList = getEventByCurrentTime(Instant.now(),newEvent.getEventCategoryId());
+        List<EventDTO> eventList = getEventByCurrentTime(newEvent.getEventStartTime(),newEvent.getEventCategoryId());
 
         System.out.println(eventList);
 
@@ -132,7 +129,7 @@ public class EventService {
     public ResponseEntity update(EventEditDTO updateEvent, Integer eventId) throws HandleExceptionOverlap {
         Date newEventStartTime = Date.from(updateEvent.getEventStartTime());
         Date newEventEndTime = findEndDate(Date.from(updateEvent.getEventStartTime()), updateEvent.getEventDuration());
-        List<EventDTO> eventList = getEventByCurrentTime(Instant.now(), updateEvent.getEventCategoryId());
+        List<EventDTO> eventList = getEventByCurrentTime(updateEvent.getEventStartTime(), updateEvent.getEventCategoryId());
 
         for (int i = 0; i < eventList.size(); i++) {
             List errors = new ArrayList();

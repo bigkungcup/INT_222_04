@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -32,6 +34,6 @@ public class EventCategory {
 
     @JsonIgnore
     @OneToMany(mappedBy = "eventCategory")
-    private Set<Event> events = new LinkedHashSet<>();
+    private List<Event> events = new ArrayList<>();
 
 }
