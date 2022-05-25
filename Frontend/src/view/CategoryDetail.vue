@@ -130,7 +130,7 @@ onBeforeMount(async () => {
 
                 <p v-if="showNameSame && editCategory.eventCategoryName !== ''" class="text-lg text-red-500 pl-36 -mt-4">*Category name is not unique.</p>
                 <p v-if="editCategory.eventCategoryName.length > 100" class="text-lg text-red-500 pl-36 -mt-4">
-                    *Description can't be longer than 100 characters.</p>
+                    *Category Name can't be longer than 100 characters.</p>
 
                 <p class="pl-10 py-6" v-show="popUp">Duration : <input type="number"
                         class="bg-white border border-slate-300 rounded-lg h-10 w-24 text-3xl text-center"

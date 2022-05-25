@@ -61,12 +61,6 @@ public class EventService {
         return modelMapper.map(eventListById, EventDTO.class);
     }
 
-    public EventPageDTO getEventByCategoryId(EventCategory eventCategoryId, Integer page, Integer pageSize) {
-        return modelMapper.map(repository.findAllByEventCategory(eventCategoryId, PageRequest.of(page, pageSize)),
-                EventPageDTO.class);
-    }
-
-
     public EventPageDTO getPastEvent(Instant instant, Integer page, Integer pageSize) {
         return modelMapper.map(repository.findAllByEventStartTimeBeforeOrderByEventStartTimeDesc(instant, PageRequest.of(page, pageSize)),
                 EventPageDTO.class);

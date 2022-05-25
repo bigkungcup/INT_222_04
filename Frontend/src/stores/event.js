@@ -30,16 +30,16 @@ export const useEvent = defineStore("event", () => {
       } else console.log("error, cannot get event lists");
   };
 
-    //Get All Event
-    const getAllEventLists = async () => {
-      const res = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/events/eventAll`,
-          {
-            method: "GET",
-          }
-        );
+    // Get All Event
+    const getEventAllByTime = async (categoryId) => {
+      const  res = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/eventCategories/${categoryId}/events`,
+        {
+          method: "GET",
+        })
         if (res.status === 200) {
           eventListAll.value = await res.json();
+          console.log(eventListAll.value);
           console.log("get all event lists successfully");
         } else console.log("error, cannot get event lists");
     };
@@ -47,7 +47,14 @@ export const useEvent = defineStore("event", () => {
     //  Get Filter Event
   const getFilterEvent = async (page=0) => {
     let res 
-    if(filter.value == 1){
+    if(filter.value >= 1 && filter.value <= 5){
+      res = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/eventCategories/${filter.value}/events`,
+      {
+        method: "GET",
+      })
+    }
+    else if(filter.value == 6){
       res = await fetch(
         `${import.meta.env.VITE_BASE_URL}/events/pastEvents?page=${page}`,
         {
@@ -55,48 +62,13 @@ export const useEvent = defineStore("event", () => {
         }
       )
     }
-    else if(filter.value == 2){
+    else{
       res = await fetch(
         `${import.meta.env.VITE_BASE_URL}/events/upComingEvents?page=${page}`,
         {
           method: "GET",
         }
       )
-    }
-    else if(filter.value == 3){
-      res = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/events/eventByCategory/1?page=${page}`,
-      {
-        method: "GET",
-      })
-    }
-    else if(filter.value == 4){
-      res = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/events/eventByCategory/2?page=${page}`,
-      {
-        method: "GET",
-      })
-    }
-    else if(filter.value == 5){
-      res = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/events/eventByCategory/3?page=${page}`,
-      {
-        method: "GET",
-      })
-    }
-    else if(filter.value == 6){
-      res = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/events/eventByCategory/4?page=${page}`,
-      {
-        method: "GET",
-      })
-    }
-    else{
-      res = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/events/eventByCategory/5?page=${page}`,
-      {
-        method: "GET",
-      })
     }
     if (res.status === 200) {
       filterEventLists.value = await res.json();
@@ -114,11 +86,12 @@ export const useEvent = defineStore("event", () => {
         bookingEmail: newEvent.bookingEmail.match(validEmail)
           ? newEvent.bookingEmail
           : null,
-        eventCategory: newEvent.eventCategory,
-        eventStartTime: getOverlapTime(newEvent.eventStartTime,newEvent.eventCategory.id) ? newEvent.eventStartTime = "overlap" : newEvent.eventStartTime,
+        eventCategoryId: newEvent.eventCategoryId,
+        eventStartTime: getOverlapTime(newEvent.eventStartTime) ? newEvent.eventStartTime = "overlap" : newEvent.eventStartTime,
         eventNotes: newEvent.eventNotes,
         eventDuration: newEvent.eventDuration,
       }),
+      
     });
     if (res.status === 201) {
       const addEvent = await res.json();
@@ -127,6 +100,7 @@ export const useEvent = defineStore("event", () => {
       console.log("created successfully");
     } else {
       console.log("error, cannot create");
+      
       showText();
     }
   };
@@ -183,9 +157,10 @@ export const useEvent = defineStore("event", () => {
   };
 
   // Get Overlap Time
-  const getOverlapTime = (eventStartTime,category) => {
+  const getOverlapTime = (eventStartTime) => {
     let listAll
-    listAll = eventListAll.value.filter(a => a.eventCategory.id == category);
+    listAll = eventListAll.value.events;
+    console.log(listAll);
     return listAll.some((event) => {
     if(moment(eventStartTime).toLocaleString("th-TH") <= moment(event.eventStartTime).add(event.eventDuration,'m').toLocaleString("th-TH") && moment(eventStartTime).add(event.eventDuration,'m').toLocaleString("th-TH") >= moment(event.eventStartTime).toLocaleString("th-TH"))
       return true;
@@ -206,7 +181,7 @@ export const useEvent = defineStore("event", () => {
     eventLists,
     filterEventLists,
     getEventLists,
-    getAllEventLists,
+    getEventAllByTime,
     getFilterEvent,
     listsNewEvent,
     createEvent,
@@ -215,6 +190,7 @@ export const useEvent = defineStore("event", () => {
     getEmptyEvent,
     getEmptyFilterEvent,
     getOverlapTime,
+    validEmail,
     page,
     NextPage,
     BackPage,

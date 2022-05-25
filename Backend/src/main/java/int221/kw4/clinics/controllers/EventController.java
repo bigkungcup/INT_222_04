@@ -32,24 +32,9 @@ public class EventController {
         return service.getAllEvent(sortBy, page, pageSize);
     }
 
-    @GetMapping("/eventAllByTime/{eventCategoryId}/{instant}")
-    public List<EventDTO> getEventByCurrentTime(@PathVariable Integer eventCategoryId,
-                                                @PathVariable Instant instant){
-        return service.getEventByCurrentTime(instant, eventCategoryId);
-    }
-
     @GetMapping("/{eventId}")
     public EventDTO getEventById(@PathVariable Integer eventId) throws HandleExceptionNotFound {
         return service.getEvent(eventId);
-    }
-
-    @GetMapping("{eventCategoryId}/eventByCategory")
-    public  EventPageDTO getAllEventByCategory(
-            @PathVariable EventCategory eventCategoryId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "6") int pageSize
-    ){
-        return service.getEventByCategoryId(eventCategoryId, page, pageSize);
     }
 
     @GetMapping("/pastEvents")

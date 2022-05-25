@@ -3,6 +3,7 @@ import { ref } from "vue";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import moment from "moment"
+import { useEvent } from "../stores/event.js"
 defineEmits(['create','close'])
 
 defineProps({
@@ -17,13 +18,13 @@ defineProps({
   textPopUp: {
     type: Boolean,
     require: true,
-  },
+  }
 });
 
 const newEvent = ref({
   bookingName: "",
   bookingEmail: "",
-  eventCategory: {},
+  eventCategoryId: 0,
   eventStartTime: "",
   eventNotes: "",
   eventDuration: 0,
@@ -33,22 +34,35 @@ const reset = () => {
   newEvent.value = {
     bookingName: "",
     bookingEmail: "",
-    eventCategory: {},
+    eventCategoryId: 0,
     eventStartTime: "",
     eventNotes: "",
     eventDuration: 0,
-  };
+  },
+  eventCategory.value = {
+  id: 0,
+  eventCategoryName: "",
+  eventCategoryDescription : "",
+  eventDuration: 0
+}
 };
 
+const event = useEvent();
+
+const eventCategory = ref({
+  id: 0,
+  eventCategoryName: "",
+  eventCategoryDescription : "",
+  eventDuration: 0
+});
 
 const textPopUpDate = ref(false)
 const setMinTime = (eventStartTime) => {
-  newEvent.value.eventStartTime = moment(eventStartTime).isAfter(moment(new Date())) ? eventStartTime : "a"
+  newEvent.value.eventStartTime = moment(eventStartTime).isAfter(moment(new Date())) ? eventStartTime : "past time"
   console.log(newEvent.value.eventStartTime);
   textPopUpDate.value = true;
 }
 
-const validEmail = /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
 </script>
  
@@ -74,15 +88,15 @@ const validEmail = /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9
         Email :
         <input type="email" class="bg-white border border-slate-300 rounded-lg h-10 text-3xl 
         placeholder:italic placeholder:text-2xl" placeholder=" you@example.com"
-          v-model="newEvent.bookingEmail" /><span class="text-gray-500 text-lg">{{newEvent.bookingEmail.length}}/255</span>
+          v-model="newEvent.bookingEmail" /><span class="text-gray-500 text-lg">{{newEvent.bookingEmail.length}}/100</span>
       <div v-if="newEvent.bookingEmail === '' || newEvent.bookingEmail.value === 0">
         <p v-show="textPopUp" class="text-lg text-red-500 pl-28">*Please enter your email.</p>
       </div>
-      <div v-if="newEvent.bookingEmail.match(validEmail) === null && newEvent.bookingEmail !== '' ">
+      <div v-if="newEvent.bookingEmail.match(event.validEmail) === null && newEvent.bookingEmail !== '' ">
         <p v-show="textPopUp" class="text-lg text-red-500 pl-28">*Invalid Email.</p>
       </div>
-      <div v-if="newEvent.bookingEmail.length > 255">
-        <p  class="text-lg text-red-500 pl-28">*Email can't be longer than 255 characters.</p>
+      <div v-if="newEvent.bookingEmail.length >= 100 || newEvent.bookingEmail.length < 10 && newEvent.bookingEmail !== ''">
+        <p  class="text-lg text-red-500 pl-28">*Email should be between 10 and 100 characters.</p>
       </div>
       </p>
 
@@ -96,7 +110,7 @@ const validEmail = /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9
         <br>
         <p v-show="textPopUp" class="absolute text-lg text-red-500 -ml-52">*Please enter your start time.</p>
       </div>
-      <div v-if="newEvent.eventStartTime === 'a'">
+      <div v-if="newEvent.eventStartTime === 'past time'">
         <br>
         <p v-show="textPopUpDate" class="absolute text-lg text-red-500 -ml-52 break-words">*Not be able to select the
           previous date and time.</p>
@@ -110,20 +124,20 @@ const validEmail = /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9
 
       <p class="pl-10">
         Clinic :
-        <select v-model="newEvent.eventCategory" class="px-3 rounded-lg text-3xl" >
+        <select v-model="eventCategory" class="px-3 rounded-lg text-3xl" @change="newEvent.eventCategoryId = eventCategory.id,event.getEventAllByTime(eventCategory.id)">
           <option v-for="list in currentCategory" :value="list">
             {{ list.eventCategoryName }}
           </option>
         </select>
       <div
-        v-if="newEvent.eventCategory === {} || newEvent.eventCategory === null || Object.keys(newEvent.eventCategory).length === 0">
+        v-if="newEvent.eventCategoryId === 0">
         <p v-show="textPopUp" class="text-lg text-red-500 pl-28">*Please enter your clinic.</p>
       </div>
       </p>
       <p class="pl-10">
         Duration :
         <input type="text" class="bg-white border border-slate-300 rounded-lg h-10 text-3xl w-1/5" disabled readonly
-          :value="newEvent.eventDuration = newEvent.eventCategory.eventDuration"> min.
+          :value="newEvent.eventDuration = eventCategory.eventDuration"> min.
       </p>
       <p class="col-span-2 pl-10 pr-80">
         Description :

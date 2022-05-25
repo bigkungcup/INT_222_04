@@ -95,7 +95,7 @@ const setMinTime = (eventStartTime) => {
 }
 
 onBeforeMount(async () => {
-  await event.getAllEventLists();
+  // await event.getAllEventLists();
   await getEvent();
 });
 

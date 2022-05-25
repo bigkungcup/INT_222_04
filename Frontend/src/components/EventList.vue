@@ -31,7 +31,7 @@ const showPopUp = (id) => {
 <template>
   <div>
     <div class="grid grid-cols-2 place-items-center gap-9 py-16 px-52 text-xl">
-      <div v-for="list in event.filter == 2 ? event.getSortAsc(currentEvent) : event.getSortDesc(currentEvent)" >
+      <div v-for="list in event.filter == 7 ? event.getSortAsc(currentEvent) : event.getSortDesc(currentEvent)" >
         <div
           class="grid grid-cols-5 bg-white/70 w-100 h-auto rounded-3xl gap-4 break-all z-0"
         >

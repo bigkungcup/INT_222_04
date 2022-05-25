@@ -26,14 +26,13 @@ const category = useEventCategory()
 
 onBeforeMount(async () => {
   await event.getEventLists();
-  await event.getFilterEvent();
   await category.getEventCategory();
   event.page = event.eventLists.pageNumber;
 });
 
 onBeforeUpdate(async () => {
   await event.getEmptyEvent();
-  await event.getEmptyFilterEvent(event.filterEventLists.content);
+  await event.getEmptyFilterEvent(event.filter >= 1 && event.filter <=5 ? event.filterEventLists.events : event.filterEventLists.content);
 });
 
 </script>
@@ -44,15 +43,15 @@ onBeforeUpdate(async () => {
     <div class="absolute place-self-center top-10">      
       <select v-model="event.filter" class="col-span-2 px-3 rounded-lg text-3xl -mt-8" @change="event.getFilterEvent(),event.page=0">
           <option default value="0">Lists All</option>
-          <option value="1">Past Events</option>
-          <option value="2">Up-coming Events</option>
-          <option v-for="list in category.categoryLists" :value="list.id + 2">
+          <option value="6">Past Events</option>
+          <option value="7">Up-coming Events</option>
+          <option v-for="list in category.categoryLists" :value="list.id">
             {{ list.eventCategoryName }}
           </option>
         </select>
         </div>
     <div class="grid mt-8" v-show="event.filter == 0 ? !event.showEmptyEvent : !event.showEmptyFilterEvent">
-      <EventList :currentEvent="event.filter == 0 ? event.eventLists.content : event.filterEventLists.content" @delete="removeEvent" @next="event.NextPage"
+      <EventList :currentEvent="event.filter == 0 ? event.eventLists.content : event.filter >= 1 && event.filter <=5 ? event.filterEventLists.events : event.filterEventLists.content" @delete="removeEvent" @next="event.NextPage"
         @back="event.BackPage" :page="event.page"/>
     </div>
     <div class="grid" v-show="event.filter == 0 ? event.showEmptyEvent : event.showEmptyFilterEvent">
