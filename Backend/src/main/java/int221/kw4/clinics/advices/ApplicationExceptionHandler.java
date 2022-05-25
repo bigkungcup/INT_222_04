@@ -51,7 +51,7 @@ public class ApplicationExceptionHandler extends Exception {
         HandleException errors = new HandleException();
         errors.setTimestamp(new Date());
         errors.setStatus(500);
-        errors.setMessage("Bad Request");
+        errors.setMessage("Inernal Server Error");
         errors.setError("CategoryName should be Unique");
         errors.setPath("/api/eventCategories");
         return  errors;

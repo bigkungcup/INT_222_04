@@ -3,10 +3,8 @@ package int221.kw4.clinics.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
-import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -14,9 +12,8 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@ToString
 @JsonIgnoreProperties({"hibernateLazyInitializer"})
+@Entity
 @Table(name = "eventCategory")
 public class EventCategory {
     @Id
@@ -24,7 +21,7 @@ public class EventCategory {
     @Column(name = "eventCategoryId", nullable = false)
     private Integer id;
 
-    @Column(name = "eventCategoryName", nullable = false, length = 100 ,unique = true)
+    @Column(name = "eventCategoryName", nullable = false, length = 100)
     private String eventCategoryName;
 
     @Column(name = "eventCategoryDescription", length = 500)
@@ -32,4 +29,9 @@ public class EventCategory {
 
     @Column(name = "eventDuration", nullable = false)
     private Integer eventDuration;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "eventCategory")
+    private Set<Event> events = new LinkedHashSet<>();
+
 }

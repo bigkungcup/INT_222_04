@@ -1,6 +1,7 @@
 package int221.kw4.clinics.services;
 
 import int221.kw4.clinics.advices.HandleExceptionNotFoundCategory;
+import int221.kw4.clinics.dtos.EventCategorySortEventDTO;
 import int221.kw4.clinics.dtos.EventCategoryDTO;
 import int221.kw4.clinics.dtos.EventCategoryEditDTO;
 import int221.kw4.clinics.dtos.EventCategoryPostDTO;
@@ -31,6 +32,7 @@ public class EventCategoryService {
 
     public List<EventCategoryDTO> getAll() {
         List<EventCategory> eventCategoryList = repository.findAll();
+        System.out.println(eventCategoryList);
         return listMapper.mapList(eventCategoryList, EventCategoryDTO.class, modelMapper);
     }
 
@@ -40,6 +42,14 @@ public class EventCategoryService {
                         "CategoryId: " + eventCategoryId + " does not exist !!!")
         );
         return modelMapper.map(eventCategoryList, EventCategoryDTO.class);
+    }
+
+    public EventCategorySortEventDTO getEventByCategory(Integer eventCategoryId) throws HandleExceptionNotFoundCategory {
+        EventCategory eventCategoryList = repository.findById(eventCategoryId).orElseThrow(
+                () -> new HandleExceptionNotFoundCategory(
+                        "CategoryId: " + eventCategoryId + " does not exist !!!")
+        );
+        return modelMapper.map(eventCategoryList, EventCategorySortEventDTO.class);
     }
 
     public EventCategory addCategory(EventCategoryPostDTO newEventCategory) {

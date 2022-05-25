@@ -13,16 +13,4 @@ public class ClinicsApplication {
         SpringApplication.run(ClinicsApplication.class, args);
     }
 
-//    @Bean
-//    public WebMvcConfigurer corsConfigurer() {
-//        return new WebMvcConfigurer() {
-//            @Override
-//            public void addCorsMappings(CorsRegistry registry) {
-//                registry.addMapping("/api/**")
-//                        .allowedOrigins("*")
-//                        .allowedHeaders("*")
-//                        .allowedMethods("POST", "GET","PUT");
-//            }
-//        };
-//    }
 }

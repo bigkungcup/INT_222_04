@@ -1,6 +1,7 @@
 package int221.kw4.clinics.controllers;
 
 import int221.kw4.clinics.advices.HandleExceptionNotFoundCategory;
+import int221.kw4.clinics.dtos.EventCategorySortEventDTO;
 import int221.kw4.clinics.dtos.EventCategoryDTO;
 import int221.kw4.clinics.dtos.EventCategoryEditDTO;
 import int221.kw4.clinics.dtos.EventCategoryPostDTO;
@@ -29,6 +30,11 @@ public class EventCategoryController {
     @GetMapping("/{eventCategoryId}")
     public EventCategoryDTO getById(@PathVariable Integer eventCategoryId) throws HandleExceptionNotFoundCategory {
         return service.getById(eventCategoryId);
+    }
+
+    @GetMapping("/{eventCategoryId}/events")
+    public EventCategorySortEventDTO getEventByCategory(@PathVariable Integer eventCategoryId) throws HandleExceptionNotFoundCategory {
+        return service.getEventByCategory(eventCategoryId);
     }
 
     @PostMapping("")
