@@ -32,9 +32,9 @@ public class EventController {
         return service.getAllEvent(sortBy, page, pageSize);
     }
 
-    @GetMapping("/eventAllByTime/{eventCategoryId}")
+    @GetMapping("/eventAllByTime/{eventCategoryId}/{instant}")
     public List<EventDTO> getEventByCurrentTime(@PathVariable Integer eventCategoryId,
-                                                @RequestBody Instant instant){
+                                                @PathVariable Instant instant){
         return service.getEventByCurrentTime(instant, eventCategoryId);
     }
 

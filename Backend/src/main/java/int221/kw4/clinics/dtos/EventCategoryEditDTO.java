@@ -17,6 +17,7 @@ public class EventCategoryEditDTO {
     @NotNull(message = "CategoryName shouldn't be Null")
     @NotBlank(message = "CategoryName shouldn't be blank")
     @NotEmpty(message = "CategoryName shouldn't be Empty")
+    @Size(max = 100, message = "the categoryName is out of range 0 - 100.")
     private String eventCategoryName;
 
     @Size(max = 500, message = "the event duration is out of range 0 - 500.")
