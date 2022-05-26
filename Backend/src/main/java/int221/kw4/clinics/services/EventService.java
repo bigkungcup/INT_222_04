@@ -93,20 +93,16 @@ public class EventService {
         Date newEventEndTime = findEndDate(Date.from(newEvent.getEventStartTime()), newEvent.getEventDuration());
         List<EventDTO> eventList = getEventByCurrentTime(newEvent.getEventStartTime(),newEvent.getEventCategoryId());
 
-        System.out.println(eventList);
-
         for (int i = 0; i < eventList.size(); i++) {
-            List errors = new ArrayList();
                 Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
                 Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
                 if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
                     newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
                     newEventEndTime.equals(eventStartTime)) {
-                    throw new HandleExceptionOverlap(errors.toString());
+                    throw new HandleExceptionOverlap("StartTime is Overlap");
             }
         }
         Event event = mapEvent(newEvent);
-        System.out.println(event.toString());
         return repository.saveAndFlush(event);
     }
 
@@ -126,14 +122,13 @@ public class EventService {
         List<EventDTO> eventList = getEventByCurrentTime(updateEvent.getEventStartTime(), updateEvent.getEventCategoryId());
 
         for (int i = 0; i < eventList.size(); i++) {
-            List errors = new ArrayList();
             if (eventList.get(i).getId() != eventId) {
                 Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
                 Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
                 if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
                         newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
                         newEventEndTime.equals(eventStartTime)) {
-                    throw new HandleExceptionOverlap(errors.toString());
+                    throw new HandleExceptionOverlap("StartTime is Overlap");
                 }
             }
         }

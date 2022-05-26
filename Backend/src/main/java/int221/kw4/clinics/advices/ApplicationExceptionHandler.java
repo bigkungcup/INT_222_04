@@ -40,7 +40,7 @@ public class ApplicationExceptionHandler extends Exception {
         errors.setTimestamp(new Date());
         errors.setStatus(400);
         errors.setMessage("Bad Request");
-        errors.setError("StartTime is Overlap");
+        errors.setError(ol.getMessage());
         errors.setPath("/api/events");
         return  errors;
     }
