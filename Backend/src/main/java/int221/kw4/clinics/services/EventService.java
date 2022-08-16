@@ -6,6 +6,7 @@ import int221.kw4.clinics.dtos.*;
 
 import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.entities.EventCategory;
+import int221.kw4.clinics.repositories.EventCategoryRepository;
 import int221.kw4.clinics.repositories.EventRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ import java.util.List;
 @Service
 public class EventService {
 
+    @Autowired
+    private EventCategoryRepository eventCategoryRepository;
     private final EventRepository repository;
 
     @Autowired
@@ -73,32 +76,46 @@ public class EventService {
                 EventPageDTO.class);
     }
 
+    public List<EventDTO> getEventByCurrentTime(Instant instantTime, Integer eventCategoryId){
+        List<Event> eventList = repository.getEventByCurrentTime(instantTime, eventCategoryId);
+        return listMapper.mapList(eventList, EventDTO.class, modelMapper);
+    }
+
+    public Event mapEvent(EventPostDTO newEvent){
+        Event event = new Event();
+        event.setBookingName(newEvent.getBookingName());
+        event.setBookingEmail(newEvent.getBookingEmail());
+        event.setEventStartTime(newEvent.getEventStartTime());
+        event.setEventNotes(newEvent.getEventNotes());
+        event.setEventDuration(newEvent.getEventDuration());
+        event.setEventCategory(eventCategoryRepository.findById(newEvent.getEventCategoryId()).get());
+        return event;
+    }
 
     //    Post
     public Date findEndDate(Date date, Integer duration) {
         return new Date(date.getTime() + (duration * 60000));
     }
 
+
     public Event addEvent(EventPostDTO newEvent) throws HandleExceptionOverlap {
         Date newEventStartTime = Date.from(newEvent.getEventStartTime());
         Date newEventEndTime = findEndDate(Date.from(newEvent.getEventStartTime()), newEvent.getEventDuration());
-        List<EventDTO> eventList = getAll();
+        List<EventDTO> eventList = getEventByCurrentTime(newEvent.getEventStartTime(),newEvent.getEventCategoryId());
 
         for (int i = 0; i < eventList.size(); i++) {
-            List errors = new ArrayList();
-            if (newEvent.getEventCategory().getId() == eventList.get(i).getEventCategory().getId()) {
-                Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
-                Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
-                if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
+            Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
+            Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
+            if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
                     newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
                     newEventEndTime.equals(eventStartTime)) {
-                    throw new HandleExceptionOverlap(errors.toString());
-                }
+                throw new HandleExceptionOverlap("StartTime is Overlap");
             }
         }
-        Event event = modelMapper.map(newEvent, Event.class);
+        Event event = mapEvent(newEvent);
         return repository.saveAndFlush(event);
     }
+
 
     //    Delete
     public void deleteEvent(Integer eventId) throws HandleExceptionNotFound {

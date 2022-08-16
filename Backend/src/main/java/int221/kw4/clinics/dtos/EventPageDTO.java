@@ -12,7 +12,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class EventPageDTO {
     private List<EventDTO> content;
     private int pageNumber;
