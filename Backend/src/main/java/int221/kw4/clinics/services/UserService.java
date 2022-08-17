@@ -2,10 +2,8 @@ package int221.kw4.clinics.services;
 
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.advices.HandleExceptionUnique;
-import int221.kw4.clinics.dtos.EventPageDTO;
-import int221.kw4.clinics.dtos.UserDTO;
-import int221.kw4.clinics.dtos.UserPageDTO;
-import int221.kw4.clinics.dtos.UserPostDTO;
+import int221.kw4.clinics.dtos.*;
+import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.entities.User;
 import int221.kw4.clinics.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -37,6 +35,13 @@ public class UserService {
     public List<UserDTO> getAll() {
         List<User> userList = repository.findAll();
         return listMapper.mapList(userList, UserDTO.class, modelMapper);
+    }
+
+    public UserDTO getUserById(Integer userId) throws HandleExceptionNotFound{
+        User userById = repository.findById(userId).orElseThrow(
+                () -> new HandleExceptionNotFound(
+                        "User ID: " + userId + " does not exist !!!"));
+        return modelMapper.map(userById, UserDTO.class);
     }
 
     public User createUser(UserPostDTO newUser){

@@ -1,6 +1,7 @@
 package int221.kw4.clinics.controllers;
 
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
+import int221.kw4.clinics.dtos.UserDTO;
 import int221.kw4.clinics.dtos.UserPageDTO;
 import int221.kw4.clinics.dtos.UserPostDTO;
 import int221.kw4.clinics.entities.User;
@@ -25,6 +26,11 @@ public class UserController {
                                    @RequestParam(defaultValue = "0") int page,
                                    @RequestParam(defaultValue = "6") int pageSize){
         return service.getAllUser(sortBy, page, pageSize);
+    }
+
+    @GetMapping("/{userId}")
+    public UserDTO getUserById(@PathVariable Integer userId) throws HandleExceptionNotFound{
+        return service.getUserById(userId);
     }
 
     @PostMapping("")
