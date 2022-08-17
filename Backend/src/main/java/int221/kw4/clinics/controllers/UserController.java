@@ -1,5 +1,6 @@
 package int221.kw4.clinics.controllers;
 
+import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.dtos.UserPageDTO;
 import int221.kw4.clinics.dtos.UserPostDTO;
 import int221.kw4.clinics.entities.User;
@@ -30,5 +31,10 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public User create(@Valid @RequestBody UserPostDTO newUser){
         return service.createUser(newUser);
+    }
+
+    @DeleteMapping("/{userId}")
+    public void delete(@PathVariable Integer userId) throws HandleExceptionNotFound {
+        service.deleteUser(userId);
     }
 }

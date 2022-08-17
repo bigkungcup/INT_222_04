@@ -1,5 +1,7 @@
 package int221.kw4.clinics.services;
 
+import int221.kw4.clinics.advices.HandleExceptionNotFound;
+import int221.kw4.clinics.advices.HandleExceptionUnique;
 import int221.kw4.clinics.dtos.EventPageDTO;
 import int221.kw4.clinics.dtos.UserDTO;
 import int221.kw4.clinics.dtos.UserPageDTO;
@@ -38,7 +40,23 @@ public class UserService {
     }
 
     public User createUser(UserPostDTO newUser){
+        List<User> userList = repository.findAll();
+        for (int i = 0; i < userList.size(); i++) {
+            if(newUser.getName().equals(userList.get(i).getName())){
+                throw new RuntimeException("Name should be Unique");
+            } else if (newUser.getEmail().equals(userList.get(i).getEmail())) {
+                throw new RuntimeException("Email should be Unique");
+            }
+        }
         User user = modelMapper.map(newUser, User.class);
         return repository.saveAndFlush(user);
+    }
+
+    public void deleteUser(Integer userId) throws HandleExceptionNotFound {
+        repository.findById(userId).orElseThrow(
+                () -> new HandleExceptionNotFound(
+                        "User ID: " + userId + " does not exist !!!")
+        );
+        repository.deleteById(userId);
     }
 }
