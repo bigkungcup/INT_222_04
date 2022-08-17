@@ -1,6 +1,8 @@
 package int221.kw4.clinics.entities;
 
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.LastModifiedBy;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -29,8 +31,11 @@ public class User {
     private String role;
 
     @Column(name = "createdOn", nullable = false, updatable = false, insertable = false)
+    @CreationTimestamp
     private Instant createdOn;
 
     @Column(name = "updatedOn", nullable = false, updatable = false, insertable = false)
+    @CreationTimestamp
+    @LastModifiedBy
     private Instant updatedOn;
 }
