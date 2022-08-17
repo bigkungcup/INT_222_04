@@ -255,7 +255,7 @@ export const useUser = defineStore("user", () => {
       userList.value = await res.json();
       console.log("get category lists successfully");
       console.log(userList.value);
-    } else console.log("error, cannot get event category lists");
+    } else console.log("error, cannot get user lists");
   };
 
   //ShowEmpty
