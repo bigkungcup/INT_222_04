@@ -241,6 +241,52 @@ export const useEventCategory = defineStore("eventCategory", () => {
 });
 
 //-----------------------------------------------------------------------------------
+export const useUser = defineStore("user", () => {
+  const userList = ref([]);
+  const page = ref(0);
+  const showEmptyUser = ref(false);
+
+  //Get User
+  const getUserList = async (page=0) => {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users?page=${page}`, {
+      method: "GET",
+    });
+    if (res.status === 200) {
+      userList.value = await res.json();
+      console.log("get category lists successfully");
+      console.log(userList.value);
+    } else console.log("error, cannot get event category lists");
+  };
+
+  //ShowEmpty
+  const getEmptyUser = async () => {
+    if (userList.value.content.length === 0 ) {
+      showEmptyUser.value = true;
+    } 
+    else if (userList.value.content.length !== 0) {
+      showEmptyUser.value = false;
+    }
+  };
+
+    //Page
+    const NextPage = () => {
+      if (page.value < 0) {
+        page.value = 0;
+      }
+      page.value += 1
+      getUserList((page.value));
+    };
+    const BackPage = () => {
+      if (page.value < 0) {
+        page.value = 0;
+      }
+      page.value -= 1
+      getUserList((page.value));
+    };
+  return { userList, getUserList,page,NextPage,BackPage,getEmptyUser,showEmptyUser };
+});
+
+//-----------------------------------------------------------------------------------
 if (import.meta.hot) {
   import.meta.hot.accept(
     acceptHMRUpdate(useEvent, useEventCategory, import.meta.hot)
