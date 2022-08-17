@@ -7,6 +7,7 @@ import int221.kw4.clinics.dtos.EventCategoryPostDTO;
 import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.services.EventCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +33,7 @@ public class EventCategoryController {
     }
 
     @PostMapping("")
+    @ResponseStatus(HttpStatus.CREATED)
     public EventCategory create(@Valid @RequestBody EventCategoryPostDTO newEventCategory) {
         return service.addCategory(newEventCategory);
     }
