@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -27,6 +28,11 @@ public class UserController {
                                    @RequestParam(defaultValue = "0") int page,
                                    @RequestParam(defaultValue = "6") int pageSize){
         return service.getAllUser(sortBy, page, pageSize);
+    }
+
+    @GetMapping("/userAll")
+    public List<UserDTO> getAllUsers(){
+        return service.getAll();
     }
 
     @GetMapping("/{userId}")
