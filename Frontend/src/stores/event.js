@@ -243,8 +243,13 @@ export const useEventCategory = defineStore("eventCategory", () => {
 //-----------------------------------------------------------------------------------
 export const useUser = defineStore("user", () => {
   const userList = ref([]);
+  const userAll = ref([]);
   const page = ref(0);
   const showEmptyUser = ref(false);
+  const listsNewUser = ref([]);
+  const popUp = ref(false);
+  const textPopUp = ref(false);
+  const validEmail = /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
   //Get User
   const getUserList = async (page=0) => {
@@ -258,6 +263,42 @@ export const useUser = defineStore("user", () => {
     } else console.log("error, cannot get user lists");
   };
 
+    //Get All User
+    const getUserAll = async () => {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/userAll`, {
+        method: "GET",
+      });
+      if (res.status === 200) {
+        userAll.value = await res.json();
+        console.log("get category lists successfully");
+        console.log(userAll.value);
+      } else console.log("error, cannot get user lists");
+    };
+
+    //Create User
+    const createUser = async (newUser) => {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name: newUser.name,
+          email: newUser.email.match(validEmail)
+          ? newUser.email
+          : null,
+          role: newUser.role
+        }),
+      });
+      if (res.status === 201) {
+        const addUser = await res.json();
+        listsNewUser.value.push(addUser);
+        showPopUp();
+        console.log("created successfully");
+      } else {
+        console.log("error, cannot create");
+        showText();
+      }
+    };
+
   //ShowEmpty
   const getEmptyUser = async () => {
     if (userList.value.content.length === 0 ) {
@@ -268,8 +309,8 @@ export const useUser = defineStore("user", () => {
     }
   };
 
-    //Page
-    const NextPage = () => {
+  //Page
+  const NextPage = () => {
       if (page.value < 0) {
         page.value = 0;
       }
@@ -283,12 +324,43 @@ export const useUser = defineStore("user", () => {
       page.value -= 1
       getUserList((page.value));
     };
-  return { userList, getUserList,page,NextPage,BackPage,getEmptyUser,showEmptyUser };
+
+  //pop-up
+  const showPopUp = () => {
+    popUp.value = true;
+  };
+  const disShowPopUp = () => {
+    popUp.value = false;
+    textPopUp.value = false;
+  };
+
+  //Text pop-up
+  const showText = () => {
+    textPopUp.value = true;
+  };
+  
+  return { 
+    userList, 
+    getUserList,
+    userAll,
+    getUserAll,
+    page,
+    NextPage,
+    BackPage,
+    getEmptyUser,
+    showEmptyUser,
+    createUser,
+    showPopUp,
+    disShowPopUp,
+    showText,
+    listsNewUser,
+    popUp,
+    textPopUp };
 });
 
 //-----------------------------------------------------------------------------------
 if (import.meta.hot) {
   import.meta.hot.accept(
-    acceptHMRUpdate(useEvent, useEventCategory, import.meta.hot)
+    acceptHMRUpdate(useEvent, useEventCategory, useUser, import.meta.hot)
   );
 }

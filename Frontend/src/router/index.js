@@ -8,6 +8,7 @@ import AboutUs from "../view/AboutUs.vue"
 import NotFound from "../view/NotFound.vue";
 import User from "../view/User.vue"
 import UserDetail from "../view/UserDetail.vue"
+import Register from "../view/Register.vue"
 
 const history = createWebHashHistory('/kw4');
 const routes = [
@@ -56,6 +57,11 @@ const routes = [
     name: "UserDetail",
     component: UserDetail,
   },
+  {
+    path: "/register",
+    name: "Register",
+    component: Register
+  }
 ];
 
 const router = createRouter({ history, routes });
