@@ -51,23 +51,23 @@ public class ApplicationExceptionHandler extends Exception {
         HandleException errors = new HandleException();
         errors.setTimestamp(new Date());
         errors.setStatus(500);
-        errors.setMessage("Bad Request");
+        errors.setMessage("INTERNAL SERVER ERROR");
         errors.setError("CategoryName should be Unique");
         errors.setPath("/api/eventCategories");
         return  errors;
     }
 
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    @ExceptionHandler(HandleExceptionUnique.class)
-//    public HandleException handleUniqueName(HandleExceptionUnique uq){
-//        HandleException errors = new HandleException();
-//        errors.setTimestamp(new Date());
-//        errors.setStatus(500);
-//        errors.setMessage("Bad Request");
-//        errors.setError(uq.getMessage());
-//        errors.setPath("/api/users");
-//        return  errors;
-//    }
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(HandleExceptionUnique.class)
+    public HandleException handleUniqueName(HandleExceptionUnique uq){
+        HandleException errors = new HandleException();
+        errors.setTimestamp(new Date());
+        errors.setStatus(500);
+        errors.setMessage("INTERNAL SERVER ERROR");
+        errors.setError(uq.getMessage());
+        errors.setPath("/api/users");
+        return  errors;
+    }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(HandleExceptionNotFound.class)

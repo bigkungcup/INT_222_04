@@ -1,5 +1,6 @@
 package int221.kw4.clinics.dtos;
 
+import int221.kw4.clinics.entities.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,7 @@ public class UserDTO {
     private Integer id;
     private String name;
     private String email;
-    private String role;
+    private Role role;
     private Instant createdOn;
     private Instant updatedOn;
 }

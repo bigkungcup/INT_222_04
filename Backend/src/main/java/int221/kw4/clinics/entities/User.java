@@ -26,9 +26,10 @@ public class User {
     @Column(name = "email", nullable = false, length = 50)
     private String email;
 
-    @Lob
+
     @Column(name = "role", nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Column(name = "createdOn", nullable = false, updatable = false, insertable = false)
     @CreationTimestamp
@@ -38,4 +39,5 @@ public class User {
     @CreationTimestamp
     @LastModifiedBy
     private Instant updatedOn;
+
 }

@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserPostDTO {
+public class UserEditDTO {
     @NotNull(message = "Name shouldn't be null")
     @Size(max = 100, min = 1, message = "Name should be between 1 and 100 characters in length.")
     private String name;

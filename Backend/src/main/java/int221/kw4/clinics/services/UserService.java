@@ -10,8 +10,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.lang.module.ResolutionException;
 import java.util.List;
 
 @Service
@@ -44,13 +48,13 @@ public class UserService {
         return modelMapper.map(userById, UserDTO.class);
     }
 
-    public User createUser(UserPostDTO newUser){
+    public User createUser(UserPostDTO newUser) throws HandleExceptionUnique{
         List<User> userList = repository.findAll();
         for (int i = 0; i < userList.size(); i++) {
             if(newUser.getName().equals(userList.get(i).getName())){
-                throw new RuntimeException("Name should be Unique");
+                throw new HandleExceptionUnique("Name should be Unique");
             } else if (newUser.getEmail().equals(userList.get(i).getEmail())) {
-                throw new RuntimeException("Email should be Unique");
+                throw new HandleExceptionUnique("Email should be Unique");
             }
         }
         User user = modelMapper.map(newUser, User.class);
@@ -63,5 +67,25 @@ public class UserService {
                         "User ID: " + userId + " does not exist !!!")
         );
         repository.deleteById(userId);
+    }
+
+    public ResponseEntity updateUser(UserEditDTO updateUser, Integer userId) throws HandleExceptionUnique{
+        List<UserDTO> userList = getAll();
+
+        for(int i = 0; i < userList.size(); i++){
+            if(userList.get(i).getId() != userId){
+                if(updateUser.getName().equals(userList.get(i).getName())){
+                    throw new HandleExceptionUnique("Name should be Unique");
+                } else if (updateUser.getEmail().equals(userList.get(i).getEmail())) {
+                    throw new HandleExceptionUnique("Email should be Unique");
+                }
+            }
+        }
+        User user = repository.findById(userId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST)
+        );
+        modelMapper.map(updateUser,user);
+        repository.saveAndFlush(user);
+        return ResponseEntity.status(200).body(user);
     }
 }
