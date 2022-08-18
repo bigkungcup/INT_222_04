@@ -6,6 +6,8 @@ import EventDetail from "../view/EventDetail.vue";
 import CategoryDetail from "../view/CategoryDetail.vue"
 import AboutUs from "../view/AboutUs.vue"
 import NotFound from "../view/NotFound.vue";
+import User from "../view/User.vue"
+import UserDetail from "../view/UserDetail.vue"
 
 const history = createWebHashHistory('/kw4');
 const routes = [
@@ -43,6 +45,16 @@ const routes = [
     path: "/aboutUs",
     name: "AboutUs",
     component: AboutUs,
+  },
+  {
+    path: "/user",
+    name: "User",
+    component: User,
+  },
+  {
+    path: "/user/:id",
+    name: "UserDetail",
+    component: UserDetail,
   },
 ];
 
