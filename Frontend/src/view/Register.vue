@@ -9,14 +9,14 @@ const validEmail = /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9
 const newUser = ref({
   name: "",
   email: "",
-  role: ""
+  role: "student"
 })
 
 const reset = () => {
   newUser.value = {
   name: "",
   email: "",
-  role: ""
+  role: "student"
   };
   showNameSame.value=false;
   showEmailSame.value=false;
@@ -61,7 +61,7 @@ onUpdated(async () => {
             <div class="grid grid-cols-4 gap-y-8">
             <div class="place-self-center"><svg width="32" height="32" viewBox="0 0 24 24"><path fill="#9f1239" d="M20 22H4v-2a5 5 0 0 1 5-5h6a5 5 0 0 1 5 5v2zm-8-9a6 6 0 1 1 0-12a6 6 0 0 1 0 12z"/></svg></div>
             <div class="col-span-3"><input type="text" class="bg-white border border-slate-300 rounded-lg h-10 w-4/5 text-3xl 
-        placeholder:italic placeholder:text-2xl " placeholder=" Enter Your Name" v-model.trim="newUser.name"
+        placeholder:italic placeholder:text-2xl " placeholder=" Enter Your Name" v-model.trim="newUser.name" @input="showNameSame=false"
             /><span class="text-gray-500 text-lg ml-0.5">{{newUser.name.length}}/100</span>
         <div v-if="newUser.name === '' || newUser.name === null || newUser.name.value === 0">
         <p v-show="user.textPopUp" class="text-lg text-red-500 absolute top-62">*Please enter your name.</p>
@@ -74,7 +74,7 @@ onUpdated(async () => {
 
             <div class="place-self-center"><svg width="32" height="32" viewBox="0 0 24 24"><path fill="#9f1239" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-.4 4.25l-7.07 4.42c-.32.2-.74.2-1.06 0L4.4 8.25a.85.85 0 1 1 .9-1.44L12 11l6.7-4.19a.85.85 0 1 1 .9 1.44z"/></svg></div>
             <div class="col-span-3"><input type="text" class="bg-white border border-slate-300 rounded-lg h-10 w-4/5 text-3xl 
-        placeholder:italic placeholder:text-2xl " placeholder=" Enter Your Email" v-model.trim="newUser.email"
+        placeholder:italic placeholder:text-2xl " placeholder=" Enter Your Email" v-model.trim="newUser.email" @input="showEmailSame=false"
             /><span class="text-gray-500 text-lg ml-0.5">{{newUser.email.length}}/50</span>
       <div v-if="newUser.email === '' || newUser.email.value === 0">
         <p v-show="user.textPopUp" class="text-lg text-red-500 absolute top-83">*Please enter your email.</p>
@@ -89,7 +89,7 @@ onUpdated(async () => {
             </div>
 
         <div class="col-span-4 place-self-center space-x-4 text-rose-800 text-2xl mt-2">
-            <input type="radio" id="1" value="student" v-model="newUser.role" />
+            <input type="radio" id="1" value="student" v-model="newUser.role" checked/>
             <label for="1">Student</label>
 
             <input type="radio" id="2" value="lecturer" v-model="newUser.role" />
@@ -98,9 +98,9 @@ onUpdated(async () => {
             <input type="radio" id="3" value="admin" v-model="newUser.role" />
             <label for="3">Admin</label>
 
-        <div v-if="newUser.role === '' || newUser.role.value === 0">
+        <!-- <div v-if="newUser.role === '' || newUser.role.value === 0">
         <p v-show="user.textPopUp" class="text-lg text-red-500 ml-10">*Please choose your role.</p>
-      </div>
+      </div> -->
         </div>
 
             <div class="col-span-4 place-self-center absolute bottom-56">
