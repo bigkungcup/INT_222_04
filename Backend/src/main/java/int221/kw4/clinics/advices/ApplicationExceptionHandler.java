@@ -2,6 +2,7 @@ package int221.kw4.clinics.advices;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -39,9 +40,21 @@ public class ApplicationExceptionHandler extends Exception {
         HandleException errors = new HandleException();
         errors.setTimestamp(new Date());
         errors.setStatus(400);
-        errors.setMessage("Bad Request");
+        errors.setMessage("BAD REQUEST");
         errors.setError("StartTime is Overlap");
         errors.setPath("/api/events");
+        return  errors;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public HandleException HandleRole(HttpMessageNotReadableException er){
+        HandleException errors = new HandleException();
+        errors.setTimestamp(new Date());
+        errors.setStatus(400);
+        errors.setMessage("BAD REQUEST");
+        errors.setError("This role does not exist");
+        errors.setPath("/api/users");
         return  errors;
     }
 

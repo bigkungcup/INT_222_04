@@ -1,7 +1,6 @@
 package int221.kw4.clinics.controllers;
 
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
-import int221.kw4.clinics.advices.HandleExceptionOverlap;
 import int221.kw4.clinics.advices.HandleExceptionUnique;
 import int221.kw4.clinics.dtos.*;
 import int221.kw4.clinics.entities.User;
@@ -42,7 +41,7 @@ public class UserController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public User create(@Valid @RequestBody UserPostDTO newUser) throws HandleExceptionUnique {
+    public User create(@Valid @RequestBody UserPostDTO newUser) throws HandleExceptionUnique{
         return service.createUser(newUser);
     }
 
