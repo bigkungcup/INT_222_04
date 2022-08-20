@@ -22,9 +22,9 @@ const saveUser = async (displayUser,editUser) => {
     method: "PUT",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
-      name: editUser.name,
-      email: editUser.email,
-      role: editUser.role === "" ? displayUser.role : editUser.role
+      name: editUser.name === "" ? displayUser.name : editUser.name  ,
+      email: editUser.email === "" ? displayUser.email : editUser.email ,
+      role: editUser.role === "" ? displayUser.role : editUser.role 
     }),
   });
   if (res.status === 200) {
@@ -88,23 +88,36 @@ const showEmailSame = ref(false)
 const checkName = (newName) => {
   showNameSame.value = false
     for (let i = 0; i < user.userAll.length; i++) {
-      if(newName !== displayUser.value.name){
-        if (newName !== user.userAll[i].name) {
-            showNameSame.value = true
+      // if(newName !== displayUser.value.name){
+        if (newName === user.userAll[i].name) {
+            showNameSame.value = true;
+            break;
         }
       }
-    }
+    // }
 }
 
 const checkEmail = (newEmail) => {
   showEmailSame.value = false
     for (let i = 0; i < user.userAll.length; i++) {
-      if(newEmail !== displayUser.value.email){
-        if (newEmail !== user.userAll[i].email) {
-            showEmailSame.value = true
+      // if(newEmail !== displayUser.value.email){
+        if (newEmail === user.userAll[i].email) {
+            showEmailSame.value = true;
+            break;
         }
-      }
+      // }
     }
+}
+
+const checkAll = (displayUser,editUser) => {
+  let check = false;
+  if(editUser.name === "" && editUser.email === "" && editUser.role === ""){
+          check = true;
+  }
+  else if(editUser.name === displayUser.name && editUser.email === displayUser.email && editUser.role === displayUser.role){
+    check = true;
+  }
+  return check;
 }
 
 
@@ -135,9 +148,9 @@ onBeforeMount(async () => {
         <p class="mx-36" v-show="popUp">Name : <input type="text" class="bg-white border border-slate-300 rounded-lg h-10 w-3/5 text-3xl 
         placeholder:italic placeholder:text-2xl " placeholder=" Enter your name" @input="showNameSame=false"
                         v-model.trim="editUser.name" /><span class="text-gray-500 text-lg ml-0.5">{{editUser.name.length}}/100</span>
-        <div v-if="editUser.name === '' || editUser.name === null || editUser.name.value === 0">
+        <!-- <div v-if="editUser.name === '' || editUser.name === null || editUser.name.value === 0">
         <p v-show="user.textPopUp" class="text-lg text-red-500 absolute">*Please enter your name.</p>
-      </div>
+      </div> -->
       <div v-if="editUser.name.length > 100">
         <p  class="text-lg text-red-500 absolute">*Name can't be longer than 100 characters.</p>
     </div>
@@ -148,9 +161,9 @@ onBeforeMount(async () => {
         <p class="mx-36" v-show="popUp">Email : <input type="text" class="bg-white border border-slate-300 rounded-lg h-10 w-3/5 text-3xl 
         placeholder:italic placeholder:text-2xl " placeholder=" Enter your email" @input="showEmailSame=false"
                         v-model.trim="editUser.email" /><span class="text-gray-500 text-lg ml-0.5">{{editUser.email.length}}/50</span>
-      <div v-if="editUser.email === '' || editUser.email.value === 0">
+      <!-- <div v-if="editUser.email === '' || editUser.email.value === 0">
         <p v-show="user.textPopUp" class="text-lg text-red-500 absolute">*Please enter your email.</p>
-      </div>
+      </div> -->
       <div v-if="editUser.email.match(validEmail) === null && editUser.email !== ''">
         <p v-show="user.textPopUp" class="text-lg text-red-500 absolute">*Invalid Email.</p>
       </div>
@@ -182,7 +195,7 @@ onBeforeMount(async () => {
                 Cancel
             </button>
             <button class="bg-green-500 rounded-3xl w-36 py-2 mx-2 drop-shadow-xl"
-                @click="displayUser.name == editUser.name && displayUser.email == editUser.email && editUser.role == '' ?(popUp = false, reset()):saveUser(displayUser, editUser), checkName(editUser.name),checkEmail(editUser.email)">
+                @click="checkAll(displayUser,editUser)?(popUp = false, reset()):saveUser(displayUser, editUser), checkName(editUser.name),checkEmail(editUser.email)">
                 Save
             </button>
         </div>

@@ -27,16 +27,18 @@ const showEmailSame = ref(false)
 
 const checkName = (newName) => {
     for (let i = 0; i < user.userAll.length; i++) {
-        if (newName !== user.userAll[i].name) {
-            showNameSame.value = true
-        }
+        if (newName === user.userAll[i].name) {
+            showNameSame.value = true;
+            break;
+        } 
     }
 }
 
 const checkEmail = (newEmail) => {
     for (let i = 0; i < user.userAll.length; i++) {
-        if (newEmail !== user.userAll[i].email) {
-            showEmailSame.value = true
+        if (newEmail === user.userAll[i].email) {
+            showEmailSame.value = true;
+            break;
         }
     }
 }

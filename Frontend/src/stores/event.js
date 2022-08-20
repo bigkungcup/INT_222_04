@@ -114,7 +114,7 @@ export const useEvent = defineStore("event", () => {
         bookingEmail: newEvent.bookingEmail.match(validEmail)
           ? newEvent.bookingEmail
           : null,
-        eventCategory: newEvent.eventCategory,
+        eventCategoryId: newEvent.eventCategory.id,
         eventStartTime: getOverlapTime(newEvent.eventStartTime,newEvent.eventCategory.id) ? newEvent.eventStartTime = "overlap" : newEvent.eventStartTime,
         eventNotes: newEvent.eventNotes,
         eventDuration: newEvent.eventDuration,
