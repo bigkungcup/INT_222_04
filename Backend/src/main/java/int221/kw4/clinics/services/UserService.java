@@ -84,9 +84,11 @@ public class UserService {
                     throw new HandleExceptionUnique("Email should be Unique");
                 }
             }
-            else if(updateUser.getName().equals(userList.get(i).getName()) ||
-                    updateUser.getEmail().equals(userList.get(i).getEmail())){
-                return ResponseEntity.status(200).body("Hello");
+            else if(updateUser.getName().equals(userList.get(i).getName()) &&
+                    updateUser.getEmail().equals(userList.get(i).getEmail()) &&
+                    updateUser.getRole().equals(userList.get(i).getRole())
+            ){
+                return ResponseEntity.status(200).body("The entered data has the same value.");
             }
         }
 
