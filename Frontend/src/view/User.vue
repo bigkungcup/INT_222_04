@@ -18,9 +18,6 @@ const user = useUser()
       user.userList.content = user.userList.content.filter(
         (user) => user.id !== userId
       );
-      if(user.page+1 > user.userList.totalPages){
-        user.page = user.page-1; 
-      }
       console.log("deleteted succesfully");
     } else console.log("error, cannot delete");
     user.getUserList();
@@ -34,6 +31,10 @@ onBeforeMount(async () => {
 onBeforeUpdate(async () => {
   await user.getEmptyUser();
 });
+
+// onUpdated(async () => {
+//    user.page = user.userList.pageNumber;
+// })
 
 </script>
  

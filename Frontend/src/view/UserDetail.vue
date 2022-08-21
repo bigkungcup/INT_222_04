@@ -114,9 +114,10 @@ const checkAll = (displayUser,editUser) => {
   if(editUser.name === "" && editUser.email === "" && editUser.role === ""){
           check = true;
   }
-  else if(editUser.name === displayUser.name && editUser.email === displayUser.email && editUser.role === displayUser.role){
+  else if((editUser.name === displayUser.name || editUser.name === "" )&& (editUser.email === displayUser.email|| editUser.email === "") && editUser.role === ""){
     check = true;
   }
+
   return check;
 }
 
