@@ -70,7 +70,7 @@ public class EventController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public Event create(@Valid @RequestBody EventPostDTO newEvent) throws HandleExceptionOverlap {
+    public ResponseEntity create(@Valid @RequestBody EventPostDTO newEvent) throws HandleExceptionOverlap {
         return service.addEvent(newEvent);
     }
 

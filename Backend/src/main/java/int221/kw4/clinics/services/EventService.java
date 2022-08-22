@@ -98,7 +98,7 @@ public class EventService {
     }
 
 
-    public Event addEvent(EventPostDTO newEvent) throws HandleExceptionOverlap {
+    public ResponseEntity addEvent(EventPostDTO newEvent) throws HandleExceptionOverlap {
         Date newEventStartTime = Date.from(newEvent.getEventStartTime());
         Date newEventEndTime = findEndDate(Date.from(newEvent.getEventStartTime()), newEvent.getEventDuration());
         List<EventDTO> eventList = getEventByCurrentTime(newEvent.getEventStartTime(),newEvent.getEventCategoryId());
@@ -113,7 +113,8 @@ public class EventService {
             }
         }
         Event event = mapEvent(newEvent);
-        return repository.saveAndFlush(event);
+        repository.saveAndFlush(event);
+        return ResponseEntity.status(201).body(event);
     }
 
 

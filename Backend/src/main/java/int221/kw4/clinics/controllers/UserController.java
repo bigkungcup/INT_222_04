@@ -41,16 +41,18 @@ public class UserController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public User create(@Valid @RequestBody UserPostDTO newUser) throws HandleExceptionUnique{
+    public ResponseEntity create(@Valid @RequestBody UserPostDTO newUser) throws HandleExceptionUnique{
         return service.createUser(newUser);
     }
 
     @DeleteMapping("/{userId}")
-    public void delete(@PathVariable Integer userId) throws HandleExceptionNotFound {
-        service.deleteUser(userId);
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity delete(@PathVariable Integer userId) throws HandleExceptionNotFound {
+        return service.deleteUser(userId);
     }
 
     @PutMapping("/{userId}")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity update(@Valid @RequestBody UserEditDTO updateEvent, @PathVariable Integer userId) throws HandleExceptionUnique {
         return service.updateUser(updateEvent, userId);
     }

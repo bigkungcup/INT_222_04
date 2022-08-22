@@ -1,5 +1,6 @@
 package int221.kw4.clinics.advices;
 
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -7,8 +8,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,47 +22,46 @@ import java.util.Map;
 @RestControllerAdvice
 public class ApplicationExceptionHandler extends Exception {
 
+    HandleValidationError errors = new HandleValidationError();
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public HandleValidationError handleInvalidArgument(MethodArgumentNotValidException ex) {
-        HandleValidationError errors = new HandleValidationError();
+    @ExceptionHandler(value = {MethodArgumentNotValidException.class})
+    public HandleValidationError handleInvalidArgument(MethodArgumentNotValidException ex,HandleExceptionOverlap exe, ServletWebRequest request) {
         Map<String, String> errorMap = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(
                 error ->{
                     errorMap.put(error.getField(),error.getDefaultMessage());
                 }
         );
-        errors.setStatus(400);
-        errors.setMessage("Bad Request");
-        errors.setError("Validation Error");
-        errors.setPath("/api/events");
-        errors.setFiledErrors(errorMap);
+
+        errors = new HandleValidationError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
+                "Bad Request","Validation Error", request.getRequest().getRequestURI(), errorMap);
+
         return  errors;
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(HandleExceptionOverlap.class)
-    public HandleException HandleOverlapError(HandleExceptionOverlap ol){
-        HandleException errors = new HandleException();
-        errors.setTimestamp(new Date());
-        errors.setStatus(400);
-        errors.setMessage("BAD REQUEST");
-        errors.setError("StartTime is Overlap");
-        errors.setPath("/api/events");
+    @ExceptionHandler(value = {HandleExceptionOverlap.class})
+    public HandleValidationError HandleOverlapError(HandleExceptionOverlap ol, ServletWebRequest request){
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("eventStartTime", ol.getMessage());
+
+        errors = new HandleValidationError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
+                "Bad Requestss","Validation Error", request.getRequest().getRequestURI(), errorMap);
+
         return  errors;
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public HandleException HandleRole(HttpMessageNotReadableException er){
-        HandleException errors = new HandleException();
-        errors.setTimestamp(new Date());
-        errors.setStatus(400);
-        errors.setMessage("BAD REQUEST");
-        errors.setError("This role does not exist");
-        errors.setPath("/api/users");
+    public HandleValidationError HandleRole(ServletWebRequest request){
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("role", "This role does not exist");
+
+        errors = new HandleValidationError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
+                "Bad Request","Validation Error", request.getRequest().getRequestURI(), errorMap);
         return  errors;
     }
+
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(DataIntegrityViolationException.class)

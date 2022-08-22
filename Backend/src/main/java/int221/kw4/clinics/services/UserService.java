@@ -3,6 +3,7 @@ package int221.kw4.clinics.services;
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.advices.HandleExceptionUnique;
 import int221.kw4.clinics.dtos.*;
+import int221.kw4.clinics.entities.Role;
 import int221.kw4.clinics.entities.User;
 import int221.kw4.clinics.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -21,14 +22,17 @@ import java.util.List;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository repository;
+    private final UserRepository repository;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
-    @Autowired
-    private ListMapper listMapper;
+    private final ListMapper listMapper;
+
+    public UserService(UserRepository repository, ModelMapper modelMapper, ListMapper listMapper) {
+        this.repository = repository;
+        this.modelMapper = modelMapper;
+        this.listMapper = listMapper;
+    }
 
     public UserPageDTO getAllUser(String sortBy, Integer page, Integer pageSize) {
         return modelMapper.map(repository.findAll(
@@ -48,29 +52,39 @@ public class UserService {
         return modelMapper.map(userById, UserDTO.class);
     }
 
-    public User createUser(UserPostDTO newUser) throws HandleExceptionUnique {
+    public ResponseEntity createUser(UserPostDTO newUser) throws HandleExceptionUnique {
         List<User> userList = repository.findAll();
+
+        newUser.setName(newUser.getName().trim());
+        newUser.setEmail(newUser.getEmail().trim());
+
         for (int i = 0; i < userList.size(); i++) {
             if (newUser.getName().equals(userList.get(i).getName())) {
                 throw new HandleExceptionUnique("Name should be Unique");
             } else if (newUser.getEmail().equals(userList.get(i).getEmail())) {
                 throw new HandleExceptionUnique("Email should be Unique");
             }
+
         }
         User user = modelMapper.map(newUser, User.class);
-        return repository.saveAndFlush(user);
+        repository.saveAndFlush(user);
+        return ResponseEntity.status(201).body(user);
     }
 
-    public void deleteUser(Integer userId) throws HandleExceptionNotFound {
+    public ResponseEntity deleteUser(Integer userId) throws HandleExceptionNotFound {
         repository.findById(userId).orElseThrow(
                 () -> new HandleExceptionNotFound(
                         "User ID: " + userId + " does not exist !!!")
         );
         repository.deleteById(userId);
+        return ResponseEntity.status(200).body("Delete UserID:" + userId);
     }
 
     public ResponseEntity updateUser(UserEditDTO updateUser, Integer userId) throws HandleExceptionUnique {
         List<UserDTO> userList = getAll();
+
+        updateUser.setName(updateUser.getName().trim());
+        updateUser.setEmail(updateUser.getEmail().trim());
 
         User user = repository.findById(userId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST)
@@ -83,11 +97,10 @@ public class UserService {
                 } else if (updateUser.getEmail().equals(userList.get(i).getEmail())) {
                     throw new HandleExceptionUnique("Email should be Unique");
                 }
-            }
-            else if(updateUser.getName().equals(userList.get(i).getName()) &&
+            } else if (updateUser.getName().equals(userList.get(i).getName()) &&
                     updateUser.getEmail().equals(userList.get(i).getEmail()) &&
                     updateUser.getRole().equals(userList.get(i).getRole())
-            ){
+            ) {
                 return ResponseEntity.status(200).body("The entered data has the same value.");
             }
         }
