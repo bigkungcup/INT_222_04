@@ -97,7 +97,7 @@ onBeforeMount(async () => {
 
                         <div class="place-self-center"><svg width="32" height="32" viewBox="0 0 24 24"><path fill="#9f1239" d="M4 22V8h3V6q0-2.075 1.463-3.538Q9.925 1 12 1t3.538 1.462Q17 3.925 17 6v2h3v14ZM9 8h6V6q0-1.25-.875-2.125T12 3q-1.25 0-2.125.875T9 6Zm3 9q.825 0 1.413-.587Q14 15.825 14 15q0-.825-.587-1.413Q12.825 13 12 13q-.825 0-1.412.587Q10 14.175 10 15q0 .825.588 1.413Q11.175 17 12 17Z"/></svg></div>
             <div class="col-span-3"><input type="password" class="password-mask bg-white border border-slate-300 rounded-lg h-10 w-4/5 text-3xl 
-        placeholder:italic placeholder:text-2xl" placeholder=" Enter Your Password" v-model="newUser.password"
+        placeholder:italic placeholder:text-2xl" placeholder=" Enter Your Password" minlength="8" maxlength="14" v-model="newUser.password" 
             /><span class="text-gray-500 text-lg ml-0.5">{{newUser.password.length}}/14</span>
             <p class="text-gray-400 text-lg absolute" v-show="!user.textPopUp && newUser.password === ''">Use 8-14 characters for password</p>
             <div v-if="newUser.password === '' || newUser.password.value === 0">
