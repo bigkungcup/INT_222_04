@@ -13,9 +13,9 @@ onBeforeMount(async () => {
   await event.getAllEventLists();
 });
 
-onUpdated(async () => {
-  await event.getAllEventLists();
-  });
+// onUpdated(async () => {
+//   await event.getAllEventLists();
+//   });
 </script>
 
 <template>
