@@ -3,20 +3,18 @@ package int221.kw4.clinics.services;
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.advices.HandleExceptionUnique;
 import int221.kw4.clinics.dtos.*;
-import int221.kw4.clinics.entities.Role;
 import int221.kw4.clinics.entities.User;
 import int221.kw4.clinics.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.lang.module.ResolutionException;
 import java.util.List;
 
 @Service
@@ -28,10 +26,13 @@ public class UserService {
 
     private final ListMapper listMapper;
 
-    public UserService(UserRepository repository, ModelMapper modelMapper, ListMapper listMapper) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(UserRepository repository, ModelMapper modelMapper, ListMapper listMapper, PasswordEncoder passwordEncoder) {
         this.repository = repository;
         this.modelMapper = modelMapper;
         this.listMapper = listMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserPageDTO getAllUser(String sortBy, Integer page, Integer pageSize) {
@@ -57,9 +58,12 @@ public class UserService {
 
         newUser.setName(newUser.getName().trim());
         newUser.setEmail(newUser.getEmail().trim());
+        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
 
         for (int i = 0; i < userList.size(); i++) {
-            if (newUser.getName().equals(userList.get(i).getName())) {
+            if (newUser.getName().equals(userList.get(i).getName()) && newUser.getEmail().equals(userList.get(i).getEmail())) {
+                throw new HandleExceptionUnique("Name should be unique and email should be unique");
+            } else if (newUser.getName().equals(userList.get(i).getName())) {
                 throw new HandleExceptionUnique("Name should be Unique");
             } else if (newUser.getEmail().equals(userList.get(i).getEmail())) {
                 throw new HandleExceptionUnique("Email should be Unique");
@@ -68,6 +72,7 @@ public class UserService {
         }
         User user = modelMapper.map(newUser, User.class);
         repository.saveAndFlush(user);
+        user.setPassword("**********");
         return ResponseEntity.status(201).body(user);
     }
 
@@ -92,7 +97,9 @@ public class UserService {
 
         for (int i = 0; i < userList.size(); i++) {
             if (userList.get(i).getId() != userId) {
-                if (updateUser.getName().equals(userList.get(i).getName())) {
+                if (updateUser.getName().equals(userList.get(i).getName()) && updateUser.getEmail().equals(userList.get(i).getEmail())) {
+                    throw new HandleExceptionUnique("Name should be unique and email should be unique");
+                } else if (updateUser.getName().equals(userList.get(i).getName())) {
                     throw new HandleExceptionUnique("Name should be Unique");
                 } else if (updateUser.getEmail().equals(userList.get(i).getEmail())) {
                     throw new HandleExceptionUnique("Email should be Unique");
@@ -108,5 +115,18 @@ public class UserService {
         modelMapper.map(updateUser, user);
         repository.saveAndFlush(user);
         return ResponseEntity.status(200).body(user);
+    }
+
+    public ResponseEntity Login(LoginDTO login) {
+        if (repository.findUserByEmail(login.getEmail()) != null) {
+            User user = repository.findUserByEmail(login.getEmail());
+            if (passwordEncoder.matches(login.getPassword(), user.getPassword())) {
+                throw new ResponseStatusException(HttpStatus.OK, "Login Successes");
+            } else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login Failed");
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User dose not exist");
+        }
     }
 }

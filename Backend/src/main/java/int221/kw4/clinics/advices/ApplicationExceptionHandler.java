@@ -77,13 +77,11 @@ public class ApplicationExceptionHandler extends Exception {
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(HandleExceptionUnique.class)
-    public HandleException handleUniqueName(HandleExceptionUnique uq){
-        HandleException errors = new HandleException();
-        errors.setTimestamp(new Date());
-        errors.setStatus(500);
-        errors.setMessage("INTERNAL SERVER ERROR");
-        errors.setError(uq.getMessage());
-        errors.setPath("/api/users");
+    public HandleValidationError handleUniqueName(HandleExceptionUnique uq,ServletWebRequest request){
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("Error:", uq.getMessage());
+        errors = new HandleValidationError(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error","Validation Error", request.getRequest().getRequestURI(), errorMap);
         return  errors;
     }
 

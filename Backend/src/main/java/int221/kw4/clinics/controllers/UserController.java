@@ -19,8 +19,11 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserController {
 
-    @Autowired
-    private UserService service;
+    private final UserService service;
+
+    public UserController(UserService service) {
+        this.service = service;
+    }
 
     @GetMapping("")
     public UserPageDTO getAllUser( @RequestParam(defaultValue = "name") String sortBy,

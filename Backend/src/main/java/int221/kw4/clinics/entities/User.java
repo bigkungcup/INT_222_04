@@ -40,4 +40,7 @@ public class User {
     @LastModifiedBy
     private Instant updatedOn;
 
+    @Column(name = "password", nullable = false)
+    private String password;
+
 }
