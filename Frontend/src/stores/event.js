@@ -124,6 +124,7 @@ export const useEvent = defineStore("event", () => {
       const addEvent = await res.json();
       listsNewEvent.value.push(addEvent);
       showPopUp();
+      getAllEventLists();
       console.log("created successfully");
     } else {
       console.log("error, cannot create");
@@ -291,6 +292,7 @@ export const useUser = defineStore("user", () => {
       if (res.status === 201) {
         const addUser = await res.json();
         listsNewUser.value.push(addUser);
+        getUserAll();
         showPopUp();
         console.log("created successfully");
       } else {

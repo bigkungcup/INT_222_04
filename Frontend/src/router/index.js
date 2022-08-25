@@ -9,6 +9,7 @@ import NotFound from "../view/NotFound.vue";
 import User from "../view/User.vue"
 import UserDetail from "../view/UserDetail.vue"
 import Register from "../view/Register.vue"
+import Login from "../view/Login.vue"
 
 const history = createWebHashHistory('/kw4');
 const routes = [
@@ -61,6 +62,11 @@ const routes = [
     path: "/register",
     name: "Register",
     component: Register
+  },
+  {
+    path: "/login",
+    name: "Login",
+    component: Login
   }
 ];
 

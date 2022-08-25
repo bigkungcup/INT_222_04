@@ -13,4 +13,4 @@ Insert into eventCategory
 value (4,"Client-side Clinic","ตารางนัดหมายนี้ใช้สำหรับนัดหมาย client-side clinic ในวิชา INT221 integrated project I",30);
 
 Insert into eventCategory
-value (5,"Server-side Clinic","ตารางนัดหมายนี้ใช้สำหรับนัดหมาย client-side clinic ในวิชา INT221 integrated project I",30);
+value (5,"Server-side Clinic","",30);
