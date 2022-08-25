@@ -9,7 +9,7 @@ const category = useEventCategory();
 onBeforeMount(async () => {
   event.textPopUp = false;
   await category.getEventCategory();
-  await event.getEventLists();
+  // await event.getEventLists();
   await event.getAllEventLists();
 });
 
