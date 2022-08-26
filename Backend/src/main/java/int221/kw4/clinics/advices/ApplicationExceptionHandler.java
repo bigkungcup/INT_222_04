@@ -23,90 +23,86 @@ import java.util.Map;
 public class ApplicationExceptionHandler extends Exception {
 
     HandleValidationError errors = new HandleValidationError();
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = {MethodArgumentNotValidException.class})
     public HandleValidationError handleInvalidArgument(MethodArgumentNotValidException ex, ServletWebRequest request) {
         Map<String, String> errorMap = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(
-                error ->{
-                    errorMap.put(error.getField(),error.getDefaultMessage());
+                error -> {
+                    errorMap.put(error.getField(), error.getDefaultMessage());
                 }
         );
 
         errors = new HandleValidationError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
-                "Bad Request","Validation Error", request.getRequest().getRequestURI(), errorMap);
+                "Bad Request", "Validation", request.getRequest().getRequestURI(), errorMap);
 
-        return  errors;
+        return errors;
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = {HandleExceptionOverlap.class})
-    public HandleValidationError HandleOverlapError(HandleExceptionOverlap ol, ServletWebRequest request){
+    public HandleValidationError HandleOverlapError(HandleExceptionOverlap ol, ServletWebRequest request) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("eventStartTime", ol.getMessage());
-
         errors = new HandleValidationError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
-                "Bad Requestss","Validation Error", request.getRequest().getRequestURI(), errorMap);
+                "Bad Requestss", "Validation", request.getRequest().getRequestURI(), errorMap);
 
-        return  errors;
+        return errors;
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public HandleValidationError HandleRole(ServletWebRequest request){
+    public HandleValidationError HandleRole(ServletWebRequest request) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("role", "This role does not exist");
-
         errors = new HandleValidationError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
-                "Bad Request","Validation Error", request.getRequest().getRequestURI(), errorMap);
-        return  errors;
+                "Bad Request", "Validation", request.getRequest().getRequestURI(), errorMap);
+
+        return errors;
     }
 
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public HandleException handleUniqueCategoryName(DataIntegrityViolationException ue){
-        HandleException errors = new HandleException();
-        errors.setTimestamp(new Date());
-        errors.setStatus(500);
-        errors.setMessage("INTERNAL SERVER ERROR");
-        errors.setError("CategoryName should be Unique");
-        errors.setPath("/api/eventCategories");
-        return  errors;
+    public HandleValidationError handleUniqueCategoryName(DataIntegrityViolationException ue, ServletWebRequest request) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("Error:", ue.getLocalizedMessage());
+        errors = new HandleValidationError(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error", "Validation", request.getRequest().getRequestURI(), errorMap);
+
+        return errors;
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(HandleExceptionUnique.class)
-    public HandleValidationError handleUniqueName(HandleExceptionUnique uq,ServletWebRequest request){
+    public HandleValidationError handleUniqueName(HandleExceptionUnique uq, ServletWebRequest request) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("Error:", uq.getMessage());
         errors = new HandleValidationError(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error","Validation Error", request.getRequest().getRequestURI(), errorMap);
-        return  errors;
+                "Internal Server Error", "Validation", request.getRequest().getRequestURI(), errorMap);
+        return errors;
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(HandleExceptionNotFound.class)
-    public HandleException handleExceptionNotFound(HandleExceptionNotFound nf){
-        HandleException errors = new HandleException();
-        errors.setTimestamp(new Date());
-        errors.setStatus(404);
-        errors.setMessage("NOT FOUND");
-        errors.setError(nf.getMessage());
-        errors.setPath("/api/events");
-        return  errors;
+    public HandleValidationError handleExceptionNotFound(HandleExceptionNotFound nf, ServletWebRequest request) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("Error:", nf.getMessage());
+        errors = new HandleValidationError(Instant.now(), HttpStatus.NOT_FOUND.value(),
+                "Not Found", "Validation", request.getRequest().getRequestURI(), errorMap);
+
+        return errors;
     }
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(HandleExceptionNotFoundCategory.class)
-    public HandleException handleExceptionNotFound(HandleExceptionNotFoundCategory nfc){
-        HandleException errors = new HandleException();
-        errors.setTimestamp(new Date());
-        errors.setStatus(404);
-        errors.setMessage("NOT FOUND");
-        errors.setError(nfc.getMessage());
-        errors.setPath("/api/eventCategories");
-        return  errors;
+    @ExceptionHandler(ResponseStatusException.class)
+    public HandleValidationError handleLoginNotFound(ResponseStatusException r, ServletWebRequest request) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("Error:", r.getReason());
+        errors = new HandleValidationError(Instant.now(), r.getStatus().value(),
+                r.getLocalizedMessage(), "Validation", request.getRequest().getRequestURI(), errorMap);
+
+        return errors;
     }
 
 }

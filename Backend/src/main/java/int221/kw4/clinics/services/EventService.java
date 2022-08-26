@@ -26,20 +26,18 @@ import java.util.List;
 @Service
 public class EventService {
 
-    @Autowired
-    private EventCategoryRepository eventCategoryRepository;
+    private final EventCategoryRepository eventCategoryRepository;
     private final EventRepository repository;
+    private final ModelMapper modelMapper;
+    private final ListMapper listMapper;
 
     @Autowired
-    public EventService(EventRepository repository) {
+    public EventService(EventRepository repository, EventCategoryRepository eventCategoryRepository, ModelMapper modelMapper, ListMapper listMapper) {
         this.repository = repository;
+        this.eventCategoryRepository = eventCategoryRepository;
+        this.modelMapper = modelMapper;
+        this.listMapper = listMapper;
     }
-
-    @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
-    private ListMapper listMapper;
 
     //    Get
     public EventPageDTO getAllEvent(String sortBy, Integer page, Integer pageSize) {

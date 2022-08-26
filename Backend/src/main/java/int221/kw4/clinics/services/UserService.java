@@ -116,16 +116,4 @@ public class UserService {
         return ResponseEntity.status(200).body(user);
     }
 
-    public ResponseEntity Login(LoginDTO login) {
-        if (repository.findUserByEmail(login.getEmail()) != null) {
-            User user = repository.findUserByEmail(login.getEmail());
-            if (passwordEncoder.matches(login.getPassword(), user.getPassword())) {
-                throw new ResponseStatusException(HttpStatus.OK, "Login Successes");
-            } else {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login Failed");
-            }
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User dose not exist");
-        }
-    }
 }

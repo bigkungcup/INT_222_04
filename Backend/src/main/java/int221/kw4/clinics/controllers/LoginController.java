@@ -1,7 +1,7 @@
 package int221.kw4.clinics.controllers;
 
 import int221.kw4.clinics.dtos.LoginDTO;
-import int221.kw4.clinics.services.UserService;
+import int221.kw4.clinics.services.LoginService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/match")
 public class LoginController {
 
-    private final UserService service;
+    private final LoginService service;
 
-    public LoginController(UserService service) {
+    public LoginController(LoginService service) {
         this.service = service;
     }
 

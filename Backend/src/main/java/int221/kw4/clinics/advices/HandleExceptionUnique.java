@@ -10,7 +10,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class HandleExceptionUnique extends Exception{
-
     public HandleExceptionUnique(String message){
         super(message);
     }
