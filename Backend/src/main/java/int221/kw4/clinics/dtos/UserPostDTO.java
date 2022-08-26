@@ -27,5 +27,7 @@ public class UserPostDTO {
 
     private Role role;
 
+    @NotBlank(message = "Email shouldn't be null or blank")
+    @Size(max = 90, message = "Email should be between 5 and 255 characters in length.")
     private String password;
 }
