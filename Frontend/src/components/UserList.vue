@@ -21,8 +21,8 @@ const deleteId = ref();
 const showPopUp = (id) => {
   popUp.value = true;
   deleteId.value = id;
-  console.log(popUp.value);
-  console.log(deleteId.value);
+  // console.log(popUp.value);
+  // console.log(deleteId.value);
 };
 
 </script>
