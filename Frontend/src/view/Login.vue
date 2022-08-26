@@ -40,6 +40,7 @@ const reset = () => {
     email: "",
     password: "",
   };
+  matchText.value=true;
 };
 
 onBeforeMount(async () => {

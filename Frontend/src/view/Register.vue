@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue";
-import {  onBeforeMount ,onUpdated } from "vue";
+import {  onBeforeMount,onMounted } from "vue";
 import { useUser } from "../stores/event.js";
 
 const user = useUser();
@@ -31,17 +31,19 @@ const showNameSame = ref(false)
 const showEmailSame = ref(false)
 
 const checkName = (newName) => {
+  console.log(newName);
     for (let i = 0; i < user.userAll.length; i++) {
-        if (newName.lowercase === user.userAll[i].name.lowercase) {
+        if (newName === user.userAll[i].name) {
+          console.log(user.userAll[i].name);
             showNameSame.value = true;
             break;
-        } 
-    }
+        }
+    }console.log(showNameSame.value);
 }
 
 const checkEmail = (newEmail) => {
     for (let i = 0; i < user.userAll.length; i++) {
-        if (newEmail.lowercase === user.userAll[i].email.lowercase) {
+        if (newEmail === user.userAll[i].email) {
             showEmailSame.value = true;
             break;
         }
@@ -72,9 +74,9 @@ onBeforeMount(async () => {
   user.textPopUp = false;
 });
 
-// onUpdated(async () => {
-//   await user.getUserAll();
-// });
+onMounted(async () => {
+  user.getUserAll();
+});
 
 </script>
  
@@ -162,7 +164,7 @@ onBeforeMount(async () => {
 
             <div class="col-span-4 place-self-center ">
                 <button class="bg-rose-400 text-white rounded-3xl w-36 py-2 mx-2 drop-shadow-xl hover:bg-white hover:text-rose-800" 
-                @click="checkPassword(passwordConfirm)? resetPassword() : user.createUser(newUser),checkName(newUser.name),checkEmail(newUser.email) ">
+                @click="checkName(newUser.name),checkEmail(newUser.email),checkPassword(passwordConfirm)? resetPassword() : user.createUser(newUser)">
                 Register
                 </button>
                 <!-- <button class="bg-rose-400 text-white rounded-3xl w-36 py-2 mx-2 drop-shadow-xl hover:bg-white hover:text-rose-800" 
