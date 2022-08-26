@@ -96,12 +96,14 @@ onBeforeMount(async () => {
             </svg>
           </div>
           <div class="col-span-3">
+            <form>
             <input
               type="password"
               class="bg-white border border-slate-300 rounded-lg h-10 w-5/6 text-3xl placeholder:italic placeholder:text-2xl"
               placeholder=" Enter Your Password"
+              autocomplete="off"
               v-model="userAccount.password"
-            />
+            /></form>
             <div
               v-if="
                 userAccount.password === '' || userAccount.password.value === 0
