@@ -259,8 +259,7 @@ export const useUser = defineStore("user", () => {
     });
     if (res.status === 200) {
       userList.value = await res.json();
-      console.log("get category lists successfully");
-      console.log(userList.value);
+      console.log("get user lists successfully");
     } else console.log("error, cannot get user lists");
   };
 
@@ -271,8 +270,7 @@ export const useUser = defineStore("user", () => {
       });
       if (res.status === 200) {
         userAll.value = await res.json();
-        console.log("get category lists successfully");
-        console.log(userAll.value);
+        console.log("get all user lists successfully");
       } else console.log("error, cannot get user lists");
     };
 
@@ -286,7 +284,8 @@ export const useUser = defineStore("user", () => {
           email: newUser.email.match(validEmail)
           ? newUser.email
           : null,
-          role: newUser.role
+          role: newUser.role,
+          password: newUser.password
         }),
       });
       if (res.status === 201) {

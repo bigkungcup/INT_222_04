@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("/api/login")
+@RequestMapping("/api/match")
 public class LoginController {
 
     private final UserService service;
@@ -16,7 +16,7 @@ public class LoginController {
         this.service = service;
     }
 
-    @GetMapping("")
+    @PostMapping ("")
     public ResponseEntity login(@RequestBody LoginDTO login){
         return service.Login(login);
     }
