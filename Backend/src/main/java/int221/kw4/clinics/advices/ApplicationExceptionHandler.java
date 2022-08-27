@@ -95,14 +95,4 @@ public class ApplicationExceptionHandler extends Exception {
         return errors;
     }
 
-    @ExceptionHandler(ResponseStatusException.class)
-    public HandleValidationError handleLoginNotFound(ResponseStatusException r, ServletWebRequest request) {
-        Map<String, String> errorMap = new HashMap<>();
-        errorMap.put("Error:", r.getReason());
-        errors = new HandleValidationError(Instant.now(), r.getStatus().value(),
-                r.getLocalizedMessage(), "Validation", request.getRequest().getRequestURI(), errorMap);
-
-        return errors;
-    }
-
 }
