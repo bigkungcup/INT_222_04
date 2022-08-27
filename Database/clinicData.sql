@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS `clinic`.`user` (
   `role` ENUM('student', 'lecturer', 'admin') NOT NULL,
   `createdOn` DATETIME NOT NULL default current_timestamp,
   `updatedOn` DATETIME NOT NULL default current_timestamp on update current_timestamp,
-  `password` VARCHAR(90) NOT NULL default "aaa",
+  `password` VARCHAR(90) NOT NULL,
   PRIMARY KEY (`userId`),
   UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE,
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE)
