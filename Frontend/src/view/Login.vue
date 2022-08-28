@@ -5,7 +5,9 @@ import { useUser } from "../stores/event.js";
 
 const user = useUser();
 const popUp = ref(false);
-const matchText = ref(true);
+// const matchText = ref(true);
+const matchPassword = ref(true);
+const matchEmail = ref(true);
 
 //Match
 const passwordMatch = async (userAccount) => {
@@ -18,14 +20,20 @@ const passwordMatch = async (userAccount) => {
     }),
   });
   if (res.status === 200) {
-    matchText.value = true;
+    // matchText.value = true;
+    matchPassword.value=true;
+    matchEmail.value=true;
     popUp.value = true;
     console.log("Password Matched");
   } else if (res.status === 401) {
-    matchText.value = false;
+    // matchText.value = false;
+    matchPassword.value=false;
+    matchEmail.value=true;
     console.log("Password NOT Matched");
   }else if (res.status === 404) {
-    matchText.value = false;
+    // matchText.value = false;
+    matchEmail.value=false;
+    matchPassword.value=true;
     console.log("A user with the specified email DOES NOT exist");
   }
 };
@@ -40,7 +48,9 @@ const reset = () => {
     email: "",
     password: "",
   };
-  matchText.value=true;
+  // matchText.value=true;
+    matchPassword.value=true;
+    matchEmail.value=true;
 };
 
 onBeforeMount(async () => {
@@ -113,8 +123,14 @@ onBeforeMount(async () => {
                 *Please enter your password.
               </p>
             </div>
-              <p v-show="!matchText" class="text-lg text-red-500 absolute">
+              <!-- <p v-show="!matchText" class="text-lg text-red-500 absolute">
                 *Email or password did not match.
+              </p> -->
+                            <p v-show="!matchPassword" class="text-lg text-red-500 absolute">
+                *Password NOT Matched
+              </p>
+                            <p v-show="!matchEmail" class="text-lg text-red-500 -ml-8 absolute">
+                *A user with the specified email DOES NOT exist
               </p>
           </div>
 
