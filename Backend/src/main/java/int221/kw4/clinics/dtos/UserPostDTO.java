@@ -22,12 +22,12 @@ public class UserPostDTO {
 
     @Email(message = "email invalid syntax", regexp = "[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$")
     @NotBlank(message = "Email shouldn't be null or blank")
-    @Size(max = 50, message = "Email should be between 5 and 255 characters in length.")
+    @Size(max = 50, message = "Email should be between 1 and 50 characters in length.")
     private String email;
 
     private Role role;
 
     @NotBlank(message = "Password shouldn't be null or blank")
-    @Size(max = 90, message = "Email should be between 5 and 255 characters in length.")
+    @Size(min = 8,max = 14, message = "Password should be between 8 and 14 characters in length.")
     private String password;
 }

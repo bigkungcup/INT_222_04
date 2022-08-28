@@ -21,7 +21,7 @@ public class UserEditDTO {
 
     @Email(message = "email invalid syntax", regexp = "[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$")
     @NotNull(message = "Email shouldn't be null")
-    @Size(max = 255, min = 5, message = "Email should be between 5 and 255 characters in length.")
+    @Size(max = 50, message = "Email should be between 1 and 50 characters in length.")
     private String email;
 
     private Role role;
