@@ -33,8 +33,8 @@ public class LoginService {
     public ResponseEntity Login(LoginDTO login, ServletWebRequest request, HttpServletResponse httpStatus) {
         Map<String, String> errorMap = new HashMap<>();
         String status = "";
-        if (repository.findUserByEmail(login.getEmail()) != null) {
-            User user = repository.findUserByEmail(login.getEmail());
+        if (repository.findByEmail(login.getEmail()) != null) {
+            User user = repository.findByEmail(login.getEmail());
             if (passwordEncoder.matches(login.getPassword(), user.getPassword())) {
                 errorMap.put("Login: ", "Successes");
                 httpStatus.setStatus(HttpStatus.OK.value());
