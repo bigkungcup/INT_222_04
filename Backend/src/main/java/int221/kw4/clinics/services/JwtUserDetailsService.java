@@ -3,6 +3,7 @@ package int221.kw4.clinics.services;
 import java.util.ArrayList;
 
 
+import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.entities.User;
 import int221.kw4.clinics.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,8 +24,13 @@ public class JwtUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         User user = repository.findByEmail(email);
+
         if (user == null) {
-            throw new UsernameNotFoundException("User not found with username: " + email);
+            try {
+                throw new HandleExceptionNotFound("User not found with email: " + email);
+            } catch (HandleExceptionNotFound e) {
+                throw new RuntimeException(e);
+            }
         }
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
                 new ArrayList<>());
