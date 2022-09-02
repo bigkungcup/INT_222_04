@@ -9,8 +9,7 @@ services:
       - oasip-network
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./cert/ip21kw4.crt:/etc/nginx/ssl/ip21kw4.crt
-      - ./cert/ip21kw4.key:/etc/nginx/ssl/ip21kw4.key
+      - ./cert:/etc/nginx/ssl/
     restart: always
 
 networks:
