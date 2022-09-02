@@ -229,9 +229,17 @@ export const useEventCategory = defineStore("eventCategory", () => {
   const categoryLists = ref([]);
 
   //Get Category
-  const getEventCategory = async () => {
+  const getEventCategory = async (token) => {
+    console.log(token);
+    // const myHeaders = new Headers();
+    // myHeaders.append('Authorization',token);
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/eventCategories`, {
       method: "GET",
+      // headers: myHeaders
+      headers: {
+        "content-type": "application/json",
+        "Authorization":`bearer ${token}`},
+      // Authorization: Bearer + ' ' + token,
     });
     if (res.status === 200) {
       categoryLists.value = await res.json();
@@ -360,8 +368,69 @@ export const useUser = defineStore("user", () => {
 });
 
 //-----------------------------------------------------------------------------------
+export const useLogin = defineStore("login", () => {
+  const token = ref();
+  const popUp = ref(false);
+  const matchPassword = ref(true);
+  const matchEmail = ref(true);
+
+  const getJwtToken = () => {
+    return localStorage.getItem("jwt")
+}
+
+const setJwtToken = (token) => {
+  localStorage.setItem("jwt", token)
+}
+
+// Longer duration refresh token (30-60 min)
+// const getRefreshToken = () => {
+//     return sessionStorage.getItem("refreshToken")
+// }
+
+// const setRefreshToken = (token) => {
+//     sessionStorage.setItem("refreshToken", token)
+// }
+    
+  //Login
+    const handleLogin = async (userAccount) => {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          email: userAccount.email,
+          password: userAccount.password,
+        }),
+      });
+      if (res.status === 200) {
+        // matchText.value = true;
+        matchPassword.value=true;
+        matchEmail.value=true;
+        popUp.value = true;
+        token.value = await res.json()
+        setJwtToken(token.value)
+        console.log(token.value);
+        // setRefreshToken(refreshToken)
+        console.log("Password Matched");
+      } else if (res.status === 401) {
+        // matchText.value = false;
+        matchPassword.value=false;
+        matchEmail.value=true;
+        console.log("Password NOT Matched");
+      }else if (res.status === 404) {
+        // matchText.value = false;
+        matchEmail.value=false;
+        matchPassword.value=true;
+        console.log("A user with the specified email DOES NOT exist");
+      }
+    };
+
+    return { 
+      handleLogin, getJwtToken,popUp,matchEmail,matchPassword,token }
+});
+
+//-----------------------------------------------------------------------------------
 if (import.meta.hot) {
   import.meta.hot.accept(
-    acceptHMRUpdate(useEvent, useEventCategory, useUser, import.meta.hot)
+    acceptHMRUpdate(useEvent, useEventCategory, useUser, useLogin, import.meta.hot)
   );
 }

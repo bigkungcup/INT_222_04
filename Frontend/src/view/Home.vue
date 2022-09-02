@@ -1,12 +1,13 @@
 <script setup>
 import { onBeforeMount } from "vue";
 import EventCategoryList from "../components/EventCategoryList.vue";
-import { useEventCategory } from "../stores/event.js";
+import { useEventCategory,useLogin } from "../stores/event.js";
 
 const category = useEventCategory();
+const login = useLogin();
 
 onBeforeMount(async () => {
-  await category.getEventCategory();
+  await category.getEventCategory(login.token);
 });
 </script>
 

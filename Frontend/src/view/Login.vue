@@ -1,42 +1,44 @@
 <script setup>
 import { ref } from "vue";
 import { onBeforeMount } from "vue";
-import { useUser } from "../stores/event.js";
+import { useUser,useLogin } from "../stores/event.js";
 
 const user = useUser();
-const popUp = ref(false);
-// const matchText = ref(true);
-const matchPassword = ref(true);
-const matchEmail = ref(true);
+const login = useLogin();
 
-//Match
-const passwordMatch = async (userAccount) => {
-  const res = await fetch(`${import.meta.env.VITE_BASE_URL}/match`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      email: userAccount.email,
-      password: userAccount.password,
-    }),
-  });
-  if (res.status === 200) {
-    // matchText.value = true;
-    matchPassword.value=true;
-    matchEmail.value=true;
-    popUp.value = true;
-    console.log("Password Matched");
-  } else if (res.status === 401) {
-    // matchText.value = false;
-    matchPassword.value=false;
-    matchEmail.value=true;
-    console.log("Password NOT Matched");
-  }else if (res.status === 404) {
-    // matchText.value = false;
-    matchEmail.value=false;
-    matchPassword.value=true;
-    console.log("A user with the specified email DOES NOT exist");
-  }
-};
+// const popUp = ref(false);
+// // const matchText = ref(true);
+// const matchPassword = ref(true);
+// const matchEmail = ref(true);
+
+// //Match
+// const passwordMatch = async (userAccount) => {
+//   const res = await fetch(`${import.meta.env.VITE_BASE_URL}/match`, {
+//     method: "POST",
+//     headers: { "content-type": "application/json" },
+//     body: JSON.stringify({
+//       email: userAccount.email,
+//       password: userAccount.password,
+//     }),
+//   });
+//   if (res.status === 200) {
+//     // matchText.value = true;
+//     matchPassword.value=true;
+//     matchEmail.value=true;
+//     popUp.value = true;
+//     console.log("Password Matched");
+//   } else if (res.status === 401) {
+//     // matchText.value = false;
+//     matchPassword.value=false;
+//     matchEmail.value=true;
+//     console.log("Password NOT Matched");
+//   }else if (res.status === 404) {
+//     // matchText.value = false;
+//     matchEmail.value=false;
+//     matchPassword.value=true;
+//     console.log("A user with the specified email DOES NOT exist");
+//   }
+// };
 
 const userAccount = ref({
   email: "",
@@ -48,9 +50,11 @@ const reset = () => {
     email: "",
     password: "",
   };
-  // matchText.value=true;
-    matchPassword.value=true;
-    matchEmail.value=true;
+  // // matchText.value=true;
+  //   matchPassword.value=true;
+  //   matchEmail.value=true;
+  login.matchPassword=true;
+  login.matchEmail=true;
 };
 
 onBeforeMount(async () => {
@@ -126,10 +130,10 @@ onBeforeMount(async () => {
               <!-- <p v-show="!matchText" class="text-lg text-red-500 absolute">
                 *Email or password did not match.
               </p> -->
-                            <p v-show="!matchPassword" class="text-lg text-red-500 absolute">
+                            <p v-show="!login.matchPassword" class="text-lg text-red-500 absolute">
                 *Password NOT Matched
               </p>
-                            <p v-show="!matchEmail" class="text-lg text-red-500 -ml-8 absolute">
+                            <p v-show="!login.matchEmail" class="text-lg text-red-500 -ml-8 absolute">
                 *A user with the specified email DOES NOT exist
               </p>
           </div>
@@ -137,7 +141,7 @@ onBeforeMount(async () => {
           <div class="col-span-4 place-self-center">
             <button
               class="bg-rose-400 text-white rounded-3xl w-36 py-2 mx-2 drop-shadow-xl hover:bg-white hover:text-rose-800"
-              @click="passwordMatch(userAccount)"
+              @click="login.handleLogin(userAccount)"
             >
               Login
             </button>
@@ -153,7 +157,7 @@ onBeforeMount(async () => {
     </div>
 
     <div
-      v-show="popUp"
+      v-show="login.popUp"
       class="flex justify-center absolute bg-black/50 h-screen w-screen inset-0 top-0"
     >
       <div
@@ -183,7 +187,7 @@ onBeforeMount(async () => {
         <div class="grid place-items-center">
           <button
             class="text-4xl px-5 text-white bgPopUp rounded-3xl w-36 py-2 mx-2 hover:text-pink-700 hover:border-2 border-pink-700"
-            @click="reset(), (popUp = false)"
+            @click="reset(), (login.popUp = false)"
           >
             OK
           </button>
