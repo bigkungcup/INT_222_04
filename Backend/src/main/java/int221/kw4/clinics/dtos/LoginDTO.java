@@ -1,5 +1,6 @@
 package int221.kw4.clinics.dtos;
 
+import int221.kw4.clinics.entities.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,4 +19,6 @@ public class LoginDTO {
 
     @Size(min = 8,max = 14, message = "Password should be between 8 and 14 characters in length.")
     private String password;
+
+    private Role role;
 }

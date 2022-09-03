@@ -1,20 +1,23 @@
 package int221.kw4.clinics.controllers;
 
 import int221.kw4.clinics.dtos.LoginDTO;
-import int221.kw4.clinics.securities.JwtRequest;
 import int221.kw4.clinics.securities.JwtResponse;
 import int221.kw4.clinics.securities.JwtTokenUtil;
 import int221.kw4.clinics.services.JwtUserDetailsService;
-import org.springframework.http.HttpStatus;
+import io.jsonwebtoken.impl.DefaultClaims;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.token.Token;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -34,26 +37,38 @@ public class LoginController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody LoginDTO authenticationRequest) throws Exception {
-
-        authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
-
-        final UserDetails userDetails = userDetailsService
-                .loadUserByUsername(authenticationRequest.getEmail());
-
-        final String token = jwtTokenUtil.generateToken(userDetails);
-
-        return ResponseEntity.ok(new JwtResponse(token));
-//        return ResponseEntity.status(HttpStatus.OK).body(new JwtResponse(token));
-    }
-
-    private void authenticate(String email, String password) throws Exception {
+    public ResponseEntity<?> createAuthenticationToken(@Valid @RequestBody LoginDTO authenticationRequest)
+            throws Exception {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    authenticationRequest.getEmail(), authenticationRequest.getPassword()));
         } catch (DisabledException e) {
             throw new Exception("USER_DISABLED", e);
         } catch (BadCredentialsException e) {
             throw new Exception("INVALID_CREDENTIALS", e);
         }
+
+        UserDetails userdetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
+        String token =  jwtTokenUtil.generateToken(userdetails);
+        return ResponseEntity.ok(new JwtResponse(token));
     }
+
+    @GetMapping("/refreshtoken")
+    public ResponseEntity<?> refreshtoken(HttpServletRequest request) throws Exception {
+        // From the HttpRequest get the claims
+        DefaultClaims claims = (io.jsonwebtoken.impl.DefaultClaims) request.getAttribute("claims");
+
+        Map<String, Object> expectedMap = getMapFromIoJsonwebtokenClaims(claims);
+        String token = jwtTokenUtil.doGenerateRefreshToken(expectedMap, expectedMap.get("sub").toString());
+        return ResponseEntity.ok(new JwtResponse(token));
+    }
+
+    public Map<String, Object> getMapFromIoJsonwebtokenClaims(DefaultClaims claims) {
+        Map<String, Object> expectedMap = new HashMap<String, Object>();
+        for (Entry<String, Object> entry : claims.entrySet()) {
+            expectedMap.put(entry.getKey(), entry.getValue());
+        }
+        return expectedMap;
+    }
+
 }
