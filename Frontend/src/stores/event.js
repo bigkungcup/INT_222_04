@@ -17,11 +17,15 @@ export const useEvent = defineStore("event", () => {
   const validEmail = /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
   //Get Event
-  const getEventLists = async (page=0) => {
+  const getEventLists = async (page=0,token) => {
+    console.log(token);
     const res = await fetch(
         `${import.meta.env.VITE_BASE_URL}/events?page=${page}`,
         {
           method: "GET",
+          headers: {
+            // "content-type": "application/json",
+            "Authorization":`bearer ${token}`},
         }
       );
       if (res.status === 200) {
@@ -235,11 +239,11 @@ export const useEventCategory = defineStore("eventCategory", () => {
     // myHeaders.append('Authorization',token);
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/eventCategories`, {
       method: "GET",
-      // headers: myHeaders
+      // headers: token
       headers: {
-        "content-type": "application/json",
-        "Authorization":`bearer ${token}`},
-      // Authorization: Bearer + ' ' + token,
+        // "content-type": "application/json",
+        "authorization":`bearer ${token}`},
+      // Authorization: Bearer + ' ' + t  oken,
     });
     if (res.status === 200) {
       categoryLists.value = await res.json();

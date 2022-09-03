@@ -2,9 +2,10 @@
 import { onBeforeMount,onBeforeUpdate, onUpdated, ref } from "vue";
 import UserList from "../components/UserList.vue";
 import UserEmptyList from "../components/UserEmptyList.vue";
-import { useUser } from "../stores/event.js"
+import { useUser,useLogin } from "../stores/event.js"
 
 const user = useUser()
+const login = useLogin()
 
   //Delete User
   const removeUser = async (userId) => {

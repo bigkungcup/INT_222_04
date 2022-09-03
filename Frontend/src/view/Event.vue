@@ -2,10 +2,11 @@
 import { onBeforeMount, onBeforeUpdate } from "vue";
 import EventList from "../components/EventList.vue";
 import EventEmptyList from "../components/EventEmptyList.vue";
-import { useEvent,useEventCategory } from "../stores/event.js"
+import { useEvent,useEventCategory,useLogin } from "../stores/event.js"
 
 const event = useEvent()
 const category = useEventCategory()
+const login = useLogin()
 
   //Delete Event
   const removeEvent = async (eventId) => {
@@ -25,7 +26,7 @@ const category = useEventCategory()
   };
 
 onBeforeMount(async () => {
-  await event.getEventLists();
+  await event.getEventLists(0,login.token);
   await event.getFilterEvent();
   await category.getEventCategory();
   event.page = event.eventLists.pageNumber;
