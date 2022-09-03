@@ -25,7 +25,7 @@ public class ApplicationExceptionHandler extends Exception {
 
     HandleValidationError errors = new HandleValidationError();
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(value = {MethodArgumentNotValidException.class})
     public HandleValidationError handleInvalidArgument(MethodArgumentNotValidException ex, ServletWebRequest request) {
         Map<String, String> errorMap = new HashMap<>();
