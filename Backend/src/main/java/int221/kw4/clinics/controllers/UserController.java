@@ -42,7 +42,7 @@ public class UserController {
         return service.getUserById(userId);
     }
 
-    @PostMapping("")
+    @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity create(@Valid @RequestBody UserPostDTO newUser) throws HandleExceptionUnique{
         return service.createUser(newUser);

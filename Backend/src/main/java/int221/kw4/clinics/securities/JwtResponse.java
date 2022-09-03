@@ -1,17 +1,22 @@
 package int221.kw4.clinics.securities;
 
-import java.io.Serializable;
+public class JwtResponse{
 
-public class JwtResponse implements Serializable {
+    private String token;
 
-    private static final long serialVersionUID = -8091879091924046844L;
-    private final String jwttoken;
+    public JwtResponse(String token) {
+        this.token = token;
+    }
 
-    public JwtResponse(String jwttoken) {
-        this.jwttoken = jwttoken;
+    public JwtResponse() {
     }
 
     public String getToken() {
-        return this.jwttoken;
+        return token;
     }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
 }

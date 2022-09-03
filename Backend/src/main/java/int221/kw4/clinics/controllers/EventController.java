@@ -9,6 +9,7 @@ import int221.kw4.clinics.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -25,6 +26,7 @@ public class EventController {
     private EventService service;
 
     @GetMapping("")
+    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public EventPageDTO getAllEvent(
             @RequestParam(defaultValue = "eventStartTime") String sortBy,
             @RequestParam(defaultValue = "0") int page,

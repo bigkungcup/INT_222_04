@@ -52,6 +52,11 @@ public class UserService {
         return modelMapper.map(userById, UserDTO.class);
     }
 
+    public LoginDTO getUserByEmail(String email){
+        User userByEmail = repository.findByEmail(email);
+        return modelMapper.map(userByEmail, LoginDTO.class);
+    }
+
     public ResponseEntity createUser(UserPostDTO newUser) throws HandleExceptionUnique {
         List<User> userList = repository.findAll();
 
