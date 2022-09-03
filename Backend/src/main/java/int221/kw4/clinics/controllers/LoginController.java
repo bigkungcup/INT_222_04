@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/api/login")
 public class LoginController {
