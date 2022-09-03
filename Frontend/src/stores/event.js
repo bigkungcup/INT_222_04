@@ -235,15 +235,10 @@ export const useEventCategory = defineStore("eventCategory", () => {
   //Get Category
   const getEventCategory = async (token) => {
     console.log(token);
-    // const myHeaders = new Headers();
-    // myHeaders.append('Authorization',token);
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/eventCategories`, {
       method: "GET",
-      // headers: token
       headers: {
-        // "content-type": "application/json",
         "authorization":`bearer ${token}`},
-      // Authorization: Bearer + ' ' + t  oken,
     });
     if (res.status === 200) {
       categoryLists.value = await res.json();
@@ -288,7 +283,7 @@ export const useUser = defineStore("user", () => {
 
     //Create User
     const createUser = async (newUser) => {
-      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users`, {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/register`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({

@@ -47,7 +47,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http.csrf().disable().cors().and()
                 .authorizeRequests().antMatchers("/api/user/").hasRole("admin")
                 .antMatchers("/api/events","/api/eventCategories").hasAnyRole("student","admin","lecturer")
 //                .antMatchers("/api/login", "/api/users/register").permitAll().anyRequest().authenticated()
