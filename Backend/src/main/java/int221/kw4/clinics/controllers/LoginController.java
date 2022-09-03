@@ -42,22 +42,7 @@ public class LoginController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody LoginDTO authenticationRequest) throws Exception {
-        Map<String, String> errorMap = new HashMap<>();
-
-        errors = new HandleValidationError(Instant.now(),HttpStatus.NOT_FOUND.value(),
-                "Not_Found", "Validation", "/api/login", errorMap);
-//        if(authenticationRequest == null){
-            if(authenticationRequest.getPassword().length() < 8 || authenticationRequest.getPassword().length() > 14){
-                errorMap.put("Error: ", "Password should be between 8 and 14 characters in length.");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
-            }
-//            if (authenticationRequest.getEmail().length() > 50 || authenticationRequest.getEmail().length() == 0) {
-//                errorMap.put("Error :", "Email should be between 0 and 50 characters in length.");
-//            }
-//            return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
-//        }
-
+    public ResponseEntity<?> createAuthenticationToken(@Valid @RequestBody LoginDTO authenticationRequest) throws Exception {
 
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(

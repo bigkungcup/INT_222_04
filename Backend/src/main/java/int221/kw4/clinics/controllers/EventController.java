@@ -36,16 +36,19 @@ public class EventController {
     }
 
     @GetMapping("/eventAll")
+    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public List<EventDTO> getAll(){
         return service.getAll();
     }
 
     @GetMapping("/{eventId}")
+    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public EventDTO getEventById(@PathVariable Integer eventId) throws HandleExceptionNotFound {
         return service.getEvent(eventId);
     }
 
     @GetMapping("/eventByCategory/{eventCategoryId}")
+    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public  EventPageDTO getAllEventByCategory(
             @PathVariable EventCategory eventCategoryId,
             @RequestParam(defaultValue = "0") int page,
@@ -55,6 +58,7 @@ public class EventController {
     }
 
     @GetMapping("/pastEvents")
+    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public EventPageDTO getAllEventByPast(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int pageSize
@@ -63,6 +67,7 @@ public class EventController {
     }
 
     @GetMapping("/upComingEvents")
+    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public EventPageDTO getAllEventByUpComing(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int pageSize
@@ -72,16 +77,19 @@ public class EventController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public ResponseEntity create(@Valid @RequestBody EventPostDTO newEvent) throws HandleExceptionOverlap {
         return service.addEvent(newEvent);
     }
 
     @DeleteMapping("/{eventId}")
+    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public void delete(@PathVariable Integer eventId) throws HandleExceptionNotFound {
         service.deleteEvent(eventId);
     }
 
     @PutMapping("/{eventId}")
+    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public ResponseEntity update(@Valid @RequestBody EventEditDTO updateEvent, @PathVariable Integer eventId) throws HandleExceptionOverlap {
         return service.update(updateEvent, eventId);
     }
