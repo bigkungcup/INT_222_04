@@ -1,6 +1,7 @@
 <script setup>
 import {  onBeforeMount  } from "vue";
 import CreateEvent from "../components/CreateEvent.vue";
+import NoAuthentication from "../components/NoAuthentication.vue"
 import { useEvent, useEventCategory } from "../stores/event.js";
 
 const event = useEvent();
@@ -26,6 +27,9 @@ onBeforeMount(async () => {
       :popUp="event.popUp"
       :currentCategory="category.categoryLists"
     />
+    <div class="grid" v-show="!event.noAuthentication">
+      <NoAuthentication/>
+    </div>
   </div>
 </template>
 

@@ -1,10 +1,10 @@
 <script setup>
 import { onBeforeMount } from "vue";
 import EventCategoryList from "../components/EventCategoryList.vue";
-import { useEventCategory,useLogin } from "../stores/event.js";
+import NoAuthentication from "../components/NoAuthentication.vue"
+import { useEventCategory } from "../stores/event.js";
 
 const category = useEventCategory();
-const login = useLogin();
 
 onBeforeMount(async () => {
   await category.getEventCategory();
@@ -16,6 +16,9 @@ onBeforeMount(async () => {
     class="bg-home bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen"
   >
     <EventCategoryList :currentCategory="category.categoryLists" />
+    <div class="grid" v-show="!category.noAuthentication">
+      <NoAuthentication/>
+  </div>
   </div>
 </template>
 

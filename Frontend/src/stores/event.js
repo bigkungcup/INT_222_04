@@ -15,6 +15,7 @@ export const useEvent = defineStore("event", () => {
   const popUp = ref(false);
   const textPopUp = ref(false);
   const validEmail = /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+  const noAuthentication = ref(true);
 
   //Get Event
   const getEventLists = async (page=0) => {
@@ -26,9 +27,12 @@ export const useEvent = defineStore("event", () => {
             "Authorization":`Bearer ${localStorage.getItem('jwt')}`}
         })
       if (res.status === 200) {
+        noAuthentication.value = true
         eventLists.value = await res.json();
         console.log("get event lists successfully");
-      } else console.log("error, cannot get event lists");
+      }else if (res.status === 401) {
+        noAuthentication.value = false;
+      }  else console.log("error, cannot get event lists");
   };
 
     //Get All Event
@@ -236,13 +240,15 @@ export const useEvent = defineStore("event", () => {
     NextPage,
     BackPage,
     popUp,textPopUp,showPopUp,disShowPopUp,showText,filter,
-    getSortAsc,getSortDesc
+    getSortAsc,getSortDesc,
+    noAuthentication
   };
 });
 
 //-----------------------------------------------------------------------------------
 export const useEventCategory = defineStore("eventCategory", () => {
   const categoryLists = ref([]);
+  const noAuthentication = ref(true);
 
   //Get Category
   const getEventCategory = async () => {
@@ -253,15 +259,15 @@ export const useEventCategory = defineStore("eventCategory", () => {
         "Authorization":`Bearer ${localStorage.getItem('jwt')}`},
     })
     if (res.status === 200) {
+      noAuthentication.value = true;
       categoryLists.value = await res.json();
       console.log("get category lists successfully");
     }else if (res.status === 401) {
-      // window.alert('Please Login first to continue')
-      // window.location.href='/login'
+      noAuthentication.value = false;
     } 
     else console.log("error, cannot get event category lists");
   };
-  return { categoryLists, getEventCategory };
+  return { categoryLists, getEventCategory,noAuthentication };
 });
 
 //-----------------------------------------------------------------------------------
@@ -274,6 +280,7 @@ export const useUser = defineStore("user", () => {
   const popUp = ref(false);
   const textPopUp = ref(false);
   const validEmail = /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+  const noAuthentication = ref(true);
 
   //Get User
   const getUserList = async (page=0) => {
@@ -283,9 +290,12 @@ export const useUser = defineStore("user", () => {
         "Authorization":`Bearer ${localStorage.getItem('jwt')}`}
     })
     if (res.status === 200) {
+      noAuthentication.value = true;
       userList.value = await res.json();
       console.log("get user lists successfully");
-    } else console.log("error, cannot get user lists");
+    }else if (res.status === 401) {
+      noAuthentication.value = false;
+    }  else console.log("error, cannot get user lists");
   };
 
     //Get All User
@@ -384,7 +394,8 @@ export const useUser = defineStore("user", () => {
     showText,
     listsNewUser,
     popUp,
-    textPopUp };
+    textPopUp,
+    noAuthentication };
 });
 
 //-----------------------------------------------------------------------------------

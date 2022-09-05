@@ -1,11 +1,11 @@
 <script setup>
-import { onBeforeMount,onBeforeUpdate, onUpdated, ref } from "vue";
+import { onBeforeMount,onBeforeUpdate, ref } from "vue";
 import UserList from "../components/UserList.vue";
 import UserEmptyList from "../components/UserEmptyList.vue";
-import { useUser,useLogin } from "../stores/event.js"
+import NoAuthentication from "../components/NoAuthentication.vue"
+import { useUser } from "../stores/event.js"
 
 const user = useUser()
-const login = useLogin()
 
   //Delete User
   const removeUser = async (userId) => {
@@ -41,12 +41,15 @@ onBeforeUpdate(async () => {
  
 <template>
     <div class="bg-fixed bg-schedule bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen">
-    <div class="grid" v-show="!user.showEmptyUser">
+    <div class="grid" v-show="!user.showEmptyUser && user.noAuthentication">
       <UserList :currentUser="user.userList.content" @delete="removeUser" @next="user.NextPage"
         @back="user.BackPage" :page="user.page"/>
     </div>
     <div class="grid" v-show="user.showEmptyUser">
       <UserEmptyList />
+    </div>
+    <div class="grid" v-show="!user.noAuthentication">
+      <NoAuthentication/>
     </div>
     </div>
 </template>
