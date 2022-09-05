@@ -25,6 +25,7 @@ public class EventCategoryController {
     private EventCategoryService service;
 
     @GetMapping("")
+    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public List<EventCategoryDTO> getAllEventCategory() {
         return service.getAll();
     }
