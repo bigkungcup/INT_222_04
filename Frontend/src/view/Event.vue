@@ -2,11 +2,10 @@
 import { onBeforeMount, onBeforeUpdate } from "vue";
 import EventList from "../components/EventList.vue";
 import EventEmptyList from "../components/EventEmptyList.vue";
-import { useEvent,useEventCategory,useLogin } from "../stores/event.js"
+import { useEvent,useEventCategory } from "../stores/event.js"
 
 const event = useEvent()
 const category = useEventCategory()
-const login = useLogin()
 
   //Delete Event
   const removeEvent = async (eventId) => {
@@ -14,6 +13,9 @@ const login = useLogin()
       `${import.meta.env.VITE_BASE_URL}/events/${eventId}`,
       {
         method: "DELETE",
+        headers:{
+          "Authorization": `Bearer ${localStorage.getItem('jwt')}`
+        }
       }
     );
     if (res.status === 200) {
@@ -26,7 +28,7 @@ const login = useLogin()
   };
 
 onBeforeMount(async () => {
-  await event.getEventLists(0,login.token);
+  await event.getEventLists();
   await event.getFilterEvent();
   await category.getEventCategory();
   event.page = event.eventLists.pageNumber;

@@ -1,5 +1,18 @@
 <script setup>
 import Navbar from "./components/Navbar.vue";
+import router from "./router";
+import { onMounted } from "vue";
+
+const checkToken = () => {
+  if(localStorage.getItem('jwt') === null){
+    router.push("../login")
+  }
+}
+
+onMounted(async () => {
+  checkToken();
+});
+
 </script>
 
 <template>

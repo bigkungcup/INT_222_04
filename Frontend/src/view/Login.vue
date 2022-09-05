@@ -6,40 +6,6 @@ import { useUser,useLogin } from "../stores/event.js";
 const user = useUser();
 const login = useLogin();
 
-// const popUp = ref(false);
-// // const matchText = ref(true);
-// const matchPassword = ref(true);
-// const matchEmail = ref(true);
-
-// //Match
-// const passwordMatch = async (userAccount) => {
-//   const res = await fetch(`${import.meta.env.VITE_BASE_URL}/match`, {
-//     method: "POST",
-//     headers: { "content-type": "application/json" },
-//     body: JSON.stringify({
-//       email: userAccount.email,
-//       password: userAccount.password,
-//     }),
-//   });
-//   if (res.status === 200) {
-//     // matchText.value = true;
-//     matchPassword.value=true;
-//     matchEmail.value=true;
-//     popUp.value = true;
-//     console.log("Password Matched");
-//   } else if (res.status === 401) {
-//     // matchText.value = false;
-//     matchPassword.value=false;
-//     matchEmail.value=true;
-//     console.log("Password NOT Matched");
-//   }else if (res.status === 404) {
-//     // matchText.value = false;
-//     matchEmail.value=false;
-//     matchPassword.value=true;
-//     console.log("A user with the specified email DOES NOT exist");
-//   }
-// };
-
 const userAccount = ref({
   email: "",
   password: "",
@@ -50,9 +16,6 @@ const reset = () => {
     email: "",
     password: "",
   };
-  // // matchText.value=true;
-  //   matchPassword.value=true;
-  //   matchEmail.value=true;
   login.matchPassword=true;
   login.matchEmail=true;
 };
@@ -61,9 +24,6 @@ onBeforeMount(async () => {
   user.textPopUp = false;
 });
 
-// onUpdated(async () => {
-//   await user.getUserAll();
-// });
 </script>
 
 <template>

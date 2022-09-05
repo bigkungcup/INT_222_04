@@ -1,5 +1,5 @@
 <script setup>
-import {  onBeforeMount ,onUpdated } from "vue";
+import {  onBeforeMount  } from "vue";
 import CreateEvent from "../components/CreateEvent.vue";
 import { useEvent, useEventCategory } from "../stores/event.js";
 
@@ -13,9 +13,6 @@ onBeforeMount(async () => {
   await event.getAllEventLists();
 });
 
-// onUpdated(async () => {
-//   await event.getAllEventLists();
-//   });
 </script>
 
 <template>

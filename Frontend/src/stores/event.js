@@ -17,17 +17,14 @@ export const useEvent = defineStore("event", () => {
   const validEmail = /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
   //Get Event
-  const getEventLists = async (page=0,token) => {
-    console.log(token);
+  const getEventLists = async (page=0) => {
     const res = await fetch(
         `${import.meta.env.VITE_BASE_URL}/events?page=${page}`,
         {
           method: "GET",
           headers: {
-            // "content-type": "application/json",
-            "Authorization":`bearer ${token}`},
-        }
-      );
+            "Authorization":`Bearer ${localStorage.getItem('jwt')}`}
+        })
       if (res.status === 200) {
         eventLists.value = await res.json();
         console.log("get event lists successfully");
@@ -40,8 +37,9 @@ export const useEvent = defineStore("event", () => {
           `${import.meta.env.VITE_BASE_URL}/events/eventAll`,
           {
             method: "GET",
-          }
-        );
+            headers: {
+              "Authorization":`Bearer ${localStorage.getItem('jwt')}`},
+          })
         if (res.status === 200) {
           eventListAll.value = await res.json();
           console.log("get all event lists successfully");
@@ -56,22 +54,26 @@ export const useEvent = defineStore("event", () => {
         `${import.meta.env.VITE_BASE_URL}/events/pastEvents?page=${page}`,
         {
           method: "GET",
-        }
-      )
+          headers: {
+            "Authorization":`Bearer ${localStorage.getItem('jwt')}`},
+        })
     }
     else if(filter.value == 2){
       res = await fetch(
         `${import.meta.env.VITE_BASE_URL}/events/upComingEvents?page=${page}`,
         {
           method: "GET",
-        }
-      )
+          headers: {
+            "Authorization":`Bearer ${localStorage.getItem('jwt')}`},
+        })
     }
     else if(filter.value == 3){
       res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/events/eventByCategory/1?page=${page}`,
       {
         method: "GET",
+        headers: {
+          "Authorization":`Bearer ${localStorage.getItem('jwt')}`}
       })
     }
     else if(filter.value == 4){
@@ -79,6 +81,8 @@ export const useEvent = defineStore("event", () => {
       `${import.meta.env.VITE_BASE_URL}/events/eventByCategory/2?page=${page}`,
       {
         method: "GET",
+        headers: {
+          "Authorization":`Bearer ${localStorage.getItem('jwt')}`}
       })
     }
     else if(filter.value == 5){
@@ -86,6 +90,8 @@ export const useEvent = defineStore("event", () => {
       `${import.meta.env.VITE_BASE_URL}/events/eventByCategory/3?page=${page}`,
       {
         method: "GET",
+        headers: {
+          "Authorization":`Bearer ${localStorage.getItem('jwt')}`}
       })
     }
     else if(filter.value == 6){
@@ -93,6 +99,8 @@ export const useEvent = defineStore("event", () => {
       `${import.meta.env.VITE_BASE_URL}/events/eventByCategory/4?page=${page}`,
       {
         method: "GET",
+        headers: {
+          "Authorization":`Bearer ${localStorage.getItem('jwt')}`}
       })
     }
     else{
@@ -100,6 +108,8 @@ export const useEvent = defineStore("event", () => {
       `${import.meta.env.VITE_BASE_URL}/events/eventByCategory/5?page=${page}`,
       {
         method: "GET",
+        headers: {
+          "Authorization":`Bearer ${localStorage.getItem('jwt')}`}
       })
     }
     if (res.status === 200) {
@@ -112,7 +122,9 @@ export const useEvent = defineStore("event", () => {
   const createEvent = async (newEvent) => {
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events`, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { 
+        "content-type": "application/json",
+        "Authorization":`Bearer ${localStorage.getItem('jwt')}`},
       body: JSON.stringify({
         bookingName: newEvent.bookingName,
         bookingEmail: newEvent.bookingEmail.match(validEmail)
@@ -233,17 +245,21 @@ export const useEventCategory = defineStore("eventCategory", () => {
   const categoryLists = ref([]);
 
   //Get Category
-  const getEventCategory = async (token) => {
-    console.log(token);
+  const getEventCategory = async () => {
+    console.log(localStorage.getItem('jtw'));
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/eventCategories`, {
       method: "GET",
       headers: {
-        "authorization":`bearer ${token}`},
-    });
+        "Authorization":`Bearer ${localStorage.getItem('jwt')}`},
+    })
     if (res.status === 200) {
       categoryLists.value = await res.json();
       console.log("get category lists successfully");
-    } else console.log("error, cannot get event category lists");
+    }else if (res.status === 401) {
+      // window.alert('Please Login first to continue')
+      // window.location.href='/login'
+    } 
+    else console.log("error, cannot get event category lists");
   };
   return { categoryLists, getEventCategory };
 });
@@ -263,7 +279,9 @@ export const useUser = defineStore("user", () => {
   const getUserList = async (page=0) => {
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users?page=${page}`, {
       method: "GET",
-    });
+      headers: {
+        "Authorization":`Bearer ${localStorage.getItem('jwt')}`}
+    })
     if (res.status === 200) {
       userList.value = await res.json();
       console.log("get user lists successfully");
@@ -274,7 +292,9 @@ export const useUser = defineStore("user", () => {
     const getUserAll = async () => {
       const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/userAll`, {
         method: "GET",
-      });
+        headers: {
+          "Authorization":`Bearer ${localStorage.getItem('jwt')}`}
+      })
       if (res.status === 200) {
         userAll.value = await res.json();
         console.log("get all user lists successfully");
@@ -285,7 +305,8 @@ export const useUser = defineStore("user", () => {
     const createUser = async (newUser) => {
       const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/register`, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: { 
+          "content-type": "application/json"},
         body: JSON.stringify({
           name: newUser.name,
           email: newUser.email.match(validEmail)
@@ -381,14 +402,9 @@ const setJwtToken = (token) => {
   localStorage.setItem("jwt", token)
 }
 
-// Longer duration refresh token (30-60 min)
-// const getRefreshToken = () => {
-//     return sessionStorage.getItem("refreshToken")
-// }
-
-// const setRefreshToken = (token) => {
-//     sessionStorage.setItem("refreshToken", token)
-// }
+const resetJwtToken = () => {
+  localStorage.removeItem("jwt")
+}
     
   //Login
     const handleLogin = async (userAccount) => {
@@ -406,9 +422,8 @@ const setJwtToken = (token) => {
         matchEmail.value=true;
         popUp.value = true;
         token.value = await res.json()
-        setJwtToken(token.value)
-        console.log(token.value);
-        // setRefreshToken(refreshToken)
+        resetJwtToken()
+        setJwtToken(token.value.token)
         console.log("Password Matched");
       } else if (res.status === 401) {
         // matchText.value = false;

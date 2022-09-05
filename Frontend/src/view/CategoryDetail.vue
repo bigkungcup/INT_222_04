@@ -11,6 +11,9 @@ const getEventCategory = async () => {
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/eventCategories/${params.id}`,
         {
             method: "GET",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem('jwt')}`
+            }
         }
     );
     if (res.status === 200) {
@@ -23,7 +26,10 @@ const getEventCategory = async () => {
 const saveEventCategory = async (displayCategory, editCategory) => {
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/eventCategories/${params.id}`, {
         method: "PUT",
-        headers: { "content-type": "application/json" },
+        headers: {
+            "content-type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem('jwt')}`
+        },
         body: JSON.stringify({
             eventCategoryName: editCategory.eventCategoryName === "" ? displayCategory.eventCategoryName : editCategory.eventCategoryName,
             eventDuration: editCategory.eventDuration === null ? displayCategory.eventDuration : editCategory.eventDuration,
@@ -82,7 +88,7 @@ const reset = () => {
         eventDuration: null,
         eventCategoryDescription: ""
     },
-    showNameSame.value = false
+        showNameSame.value = false
 }
 
 const showNameSame = ref(false)
@@ -128,7 +134,8 @@ onBeforeMount(async () => {
         placeholder:italic placeholder:text-2xl " placeholder=" Enter Category Name"
                         v-model="editCategory.eventCategoryName" /></p>
 
-                <p v-if="showNameSame && editCategory.eventCategoryName !== ''" class="text-lg text-red-500 pl-36 -mt-4">*Category name is not unique.</p>
+                <p v-if="showNameSame && editCategory.eventCategoryName !== ''"
+                    class="text-lg text-red-500 pl-36 -mt-4">*Category name is not unique.</p>
                 <p v-if="editCategory.eventCategoryName.length > 100" class="text-lg text-red-500 pl-36 -mt-4">
                     *Description can't be longer than 100 characters.</p>
 
@@ -159,8 +166,8 @@ onBeforeMount(async () => {
             <div class="grid grid-rows-3.5 bg-white w-2/6 h-80 place-self-center rounded-3xl">
                 <div class="grid row-span-1.5 bgPopUp rounded-t-3xl place-items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                        aria-hidden="true" role="img" class="iconify iconify--ep animate-bounce" width="100" height="100"
-                        preserveAspectRatio="xMidYMid meet" viewBox="0 0 1024 1024">
+                        aria-hidden="true" role="img" class="iconify iconify--ep animate-bounce" width="100"
+                        height="100" preserveAspectRatio="xMidYMid meet" viewBox="0 0 1024 1024">
                         <path fill="#ffff"
                             d="M512 64a448 448 0 1 1 0 896a448 448 0 0 1 0-896zm-55.808 536.384l-99.52-99.584a38.4 38.4 0 1 0-54.336 54.336l126.72 126.72a38.272 38.272 0 0 0 54.336 0l262.4-262.464a38.4 38.4 0 1 0-54.272-54.336L456.192 600.384z">
                         </path>
@@ -170,7 +177,8 @@ onBeforeMount(async () => {
                     <p>Edit successfully</p>
                 </div>
                 <div class="grid place-items-center">
-                    <button class="text-4xl px-5 text-white bgPopUp rounded-3xl w-36 py-2 mx-2 hover:text-pink-700 hover:border-2 border-pink-700"
+                    <button
+                        class="text-4xl px-5 text-white bgPopUp rounded-3xl w-36 py-2 mx-2 hover:text-pink-700 hover:border-2 border-pink-700"
                         @click="editPopUp = false, popUp = false">
                         OK
                     </button>

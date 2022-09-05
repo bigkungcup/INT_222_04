@@ -7,7 +7,7 @@ const category = useEventCategory();
 const login = useLogin();
 
 onBeforeMount(async () => {
-  await category.getEventCategory(login.token);
+  await category.getEventCategory();
 });
 </script>
 
