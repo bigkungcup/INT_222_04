@@ -17,7 +17,7 @@ public class LoginDTO {
     @Size(max = 50, message = "Email should be between 1 and 50 characters in length.")
     private String email;
 
-    @Size(min = 8,max = 14, message = "Password should be between 8 and 14 characters in length.")
+    @Size(max = 14, message = "Password should be between 8 and 14 characters in length.")
     private String password;
 
     private Role role;
