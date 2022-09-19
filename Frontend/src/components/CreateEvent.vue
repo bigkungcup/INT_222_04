@@ -60,8 +60,8 @@ const validEmail = /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9
         <input type="text" class="bg-white border border-slate-300 rounded-lg h-10 w-3/5 text-3xl 
         placeholder:italic placeholder:text-2xl " placeholder=" Enter Your Name"
           v-model="newEvent.bookingName" /><span class="text-gray-500 text-lg">{{newEvent.bookingName.length}}/100</span>
-        <router-link :to="{ name: 'Home' }"><img src="../assets/images/Exit.png" width="60"
-            class="absolute top-3 right-36" /></router-link>
+        <!-- <router-link :to="{ name: 'Home' }"><img src="../assets/images/Exit.png" width="60"
+            class="absolute top-3 right-36" /></router-link> -->
       <div v-if="newEvent.bookingName === '' || newEvent.bookingName === null || newEvent.bookingName.value === 0">
         <p v-show="textPopUp" class="text-lg text-red-500 pl-28">*Please enter your name.</p>
       </div>

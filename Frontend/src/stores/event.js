@@ -405,6 +405,7 @@ export const useLogin = defineStore("login", () => {
   const matchPassword = ref(true);
   const matchEmail = ref(true);
   const logoutPopup = ref(false);
+  const checkLogout = ref(false);
 
   const getJwtToken = () => {
     return localStorage.getItem("jwt")
@@ -422,6 +423,7 @@ const logout = () => {
   resetJwtToken();
   logoutPopup.value = false;
 }
+
     
   //Login
     const handleLogin = async (userAccount) => {

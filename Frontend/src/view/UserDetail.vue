@@ -77,7 +77,7 @@ const showEditPopUp = () => {
 
 const goBack = () => {
   myRouter.go(-1);
-  window.localStorage.clear();
+  // window.localStorage.clear();
 };
 
 const reset = () => {
@@ -153,6 +153,7 @@ onBeforeMount(async () => {
           <button @click="goBack">
             <img src="../assets/images/Exit.png" width="60" class="absolute top-3 right-36" />
           </button>
+
         </p>
         <p class="mx-36" v-show="!popUp">Name : {{ displayUser.name }}</p>
         <p class="mx-36" v-show="popUp">Name : <input type="text" class="bg-white border border-slate-300 rounded-lg h-10 w-3/5 text-3xl 

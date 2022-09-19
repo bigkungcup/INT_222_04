@@ -71,7 +71,7 @@ const myRouter = useRouter();
 
 const goBack = () => {
   myRouter.go(-1);
-  window.localStorage.clear();
+  // window.localStorage.clear();
 };
 
 const editEvent = ref({
