@@ -2,10 +2,15 @@
 import Navbar from "./components/Navbar.vue";
 import router from "./router";
 import { onMounted } from "vue";
+import { useLogin } from "./stores/event.js"
+
+const login = useLogin();
 
 const checkToken = () => {
   if(localStorage.getItem('jwt') === null){
     router.push("../login")
+  }else{
+    login.logoutIcon = true;
   }
 }
 

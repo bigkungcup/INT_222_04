@@ -5,10 +5,12 @@ import { formatDate, formatTime } from "../main.js";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import moment from "moment"
-import { useEvent } from "../stores/event.js"
+import { useEvent,useLogin } from "../stores/event.js"
+import Logout from "../components/Logout.vue";
 const { params } = useRoute();
 
 const event = useEvent()
+const login = useLogin()
 
 //get event
 const getEvent = async () => {
@@ -113,6 +115,9 @@ onBeforeMount(async () => {
 
 <template>
   <div class="bg-fixed bg-detail bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen pt-12 px-36 pb-36">
+    <div class="grid" v-show="login.logoutPopup">
+      <Logout/>
+    </div>
     <div class="w-full h-full overflow-auto">
       <div class="grid grid-cols-2 text-4xl gap-y-10 break-all">
         <p class="text-8xl text-center col-span-2">

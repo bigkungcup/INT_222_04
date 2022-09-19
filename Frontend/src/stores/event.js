@@ -316,7 +316,8 @@ export const useUser = defineStore("user", () => {
       const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/register`, {
         method: "POST",
         headers: { 
-          "content-type": "application/json"},
+          "content-type": "application/json",
+          "Authorization":`Bearer ${localStorage.getItem('jwt')}`},
         body: JSON.stringify({
           name: newUser.name,
           email: newUser.email.match(validEmail)
@@ -405,7 +406,7 @@ export const useLogin = defineStore("login", () => {
   const matchPassword = ref(true);
   const matchEmail = ref(true);
   const logoutPopup = ref(false);
-  const checkLogout = ref(false);
+  const logoutIcon = ref(false);
 
   const getJwtToken = () => {
     return localStorage.getItem("jwt")
@@ -420,8 +421,9 @@ const resetJwtToken = () => {
 }
 
 const logout = () => {
-  resetJwtToken();
   logoutPopup.value = false;
+  logoutIcon.value = false;
+  resetJwtToken();
 }
 
     
@@ -439,8 +441,8 @@ const logout = () => {
         // matchText.value = true;
         matchPassword.value=true;
         matchEmail.value=true;
+        logoutIcon.value = true;
         popUp.value = true;
-        logoutPopup.value = true;
         token.value = await res.json()
         resetJwtToken()
         setJwtToken(token.value.token)
@@ -459,7 +461,7 @@ const logout = () => {
     };
 
     return { 
-      handleLogin, getJwtToken,logout,popUp,matchEmail,matchPassword,token,logoutPopup }
+      handleLogin, getJwtToken,logout,popUp,matchEmail,matchPassword,token,logoutPopup,logoutIcon }
 });
 
 //-----------------------------------------------------------------------------------

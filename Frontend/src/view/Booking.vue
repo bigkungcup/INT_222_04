@@ -2,10 +2,12 @@
 import {  onBeforeMount  } from "vue";
 import CreateEvent from "../components/CreateEvent.vue";
 import NoAuthentication from "../components/NoAuthentication.vue"
-import { useEvent, useEventCategory } from "../stores/event.js";
+import { useEvent, useEventCategory,useLogin } from "../stores/event.js";
+import Logout from "../components/Logout.vue";
 
 const event = useEvent();
 const category = useEventCategory();
+const login = useLogin()
 
 onBeforeMount(async () => {
   event.textPopUp = false;
@@ -29,6 +31,9 @@ onBeforeMount(async () => {
     />
     <div class="grid" v-show="!event.noAuthentication">
       <NoAuthentication/>
+    </div>
+    <div class="grid" v-show="login.logoutPopup">
+      <Logout/>
     </div>
   </div>
 </template>

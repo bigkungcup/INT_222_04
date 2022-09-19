@@ -2,11 +2,13 @@
 import { onBeforeMount, onBeforeUpdate } from "vue";
 import EventList from "../components/EventList.vue";
 import EventEmptyList from "../components/EventEmptyList.vue";
-import { useEvent,useEventCategory } from "../stores/event.js"
+import { useEvent,useEventCategory,useLogin } from "../stores/event.js"
 import NoAuthentication from "../components/NoAuthentication.vue"
+import Logout from "../components/Logout.vue";
 
 const event = useEvent()
 const category = useEventCategory()
+const login = useLogin()
 
   //Delete Event
   const removeEvent = async (eventId) => {
@@ -45,6 +47,9 @@ onBeforeUpdate(async () => {
 <template>
   <div
     class="grid bg-fixed bg-schedule bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen overflow-auto no-scrollbar">
+    <div class="grid absolute" v-show="login.logoutPopup">
+      <Logout/>
+    </div>
     <div class="absolute place-self-center top-10">      
       <select v-show="event.noAuthentication" v-model="event.filter" class="col-span-2 px-3 rounded-lg text-3xl -mt-8" @change="event.getFilterEvent(),event.page=0">
           <option default value="0">Lists All</option>
@@ -64,6 +69,9 @@ onBeforeUpdate(async () => {
     </div>
     <div class="grid" v-show="!event.noAuthentication">
       <NoAuthentication/>
+    </div>
+    <div class="grid" v-show="login.logoutPopup">
+      <Logout/>
     </div>
   </div>
 </template>

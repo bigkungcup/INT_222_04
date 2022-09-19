@@ -1,10 +1,12 @@
 <script setup>
 import { ref, onBeforeMount } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useEventCategory } from "../stores/event.js"
+import { useEventCategory,useLogin } from "../stores/event.js"
+import Logout from "../components/Logout.vue";
 const { params } = useRoute();
 
 const allCategory = useEventCategory();
+const login = useLogin()
 
 //get event
 const getEventCategory = async () => {
@@ -110,6 +112,9 @@ onBeforeMount(async () => {
 
 <template>
     <div class="bg-fixed bg-detail bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen pt-12 px-36 pb-36">
+        <div class="grid" v-show="login.logoutPopup">
+      <Logout/>
+    </div>
         <div class="w-full h-full overflow-auto">
             <div class="text-4xl gap-y-10 break-all">
                 <p class="text-8xl text-center col-span-2 ">

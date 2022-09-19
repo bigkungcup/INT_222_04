@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { onBeforeMount } from "vue";
 import { useUser,useLogin } from "../stores/event.js";
+import Logout from "../components/Logout.vue";
 
 const user = useUser();
 const login = useLogin();
@@ -28,6 +29,9 @@ onBeforeMount(async () => {
 
 <template>
   <div class="bg-rose-200 h-screen w-screen">
+    <div class="grid" v-show="login.logoutPopup">
+      <Logout/>
+    </div>
     <div class="grid place-items-center">
       <div class="bg-white/50 place-self-center my-24 pb-10 rounded-3xl">
         <div class="pt-4 pb-6 px-8 text-3xl text-rose-800">
@@ -100,13 +104,13 @@ onBeforeMount(async () => {
 
           <div class="col-span-4 place-self-center">
             <button
-              class="bg-rose-400 text-white rounded-3xl w-36 py-2 mx-2 drop-shadow-xl hover:bg-white hover:text-rose-800"
+              class="bg-rose-400 text-white rounded-3xl w-36 py-2 mx-2 hover:bg-white hover:text-rose-800"
               @click="login.handleLogin(userAccount)"
             >
               Login
             </button>
             <button
-              class="bg-white text-rose-800 rounded-3xl w-36 py-2 mx-2 drop-shadow-xl hover:bg-stone-200 hover:text-rose-400"
+              class="bg-white text-rose-800 rounded-3xl w-36 py-2 mx-2 hover:bg-stone-200 hover:text-rose-400"
               @click="reset()"
             >
               Cancel

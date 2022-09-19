@@ -3,9 +3,12 @@ import { onBeforeMount,onBeforeUpdate, ref } from "vue";
 import UserList from "../components/UserList.vue";
 import UserEmptyList from "../components/UserEmptyList.vue";
 import NoAuthentication from "../components/NoAuthentication.vue"
-import { useUser } from "../stores/event.js"
+import Logout from "../components/Logout.vue";
+import { useUser,useLogin } from "../stores/event.js"
+
 
 const user = useUser()
+const login = useLogin()
 
   //Delete User
   const removeUser = async (userId) => {
@@ -51,6 +54,9 @@ onBeforeUpdate(async () => {
     </div>
     <div class="grid" v-show="!user.noAuthentication">
       <NoAuthentication/>
+    </div>
+    <div class="grid" v-show="login.logoutPopup">
+      <Logout/>
     </div>
     </div>
 </template>

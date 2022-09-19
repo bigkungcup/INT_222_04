@@ -2,10 +2,12 @@
 import { ref, onBeforeMount } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { formatDate, formatTime } from "../main.js";
-import { useUser } from "../stores/event.js"
+import { useUser,useLogin } from "../stores/event.js"
+import Logout from "../components/Logout.vue";
 const { params } = useRoute();
 
 const user = useUser()
+const login = useLogin()
 
 //get user
 const getUser = async () => {
@@ -142,6 +144,9 @@ onBeforeMount(async () => {
  
 <template>
   <div class="bg-fixed bg-user bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen pt-12 px-36 pb-36">
+    <div class="grid" v-show="login.logoutPopup">
+      <Logout/>
+    </div>
     <div class="w-full h-full overflow-auto">
       <div class="grid text-4xl gap-y-10 break-all">
         <p class="text-8xl text-center">
@@ -214,10 +219,10 @@ onBeforeMount(async () => {
     </div>
 
     <div class="flex text-white justify-center text-2xl" v-show="popUp">
-      <button class="bg-red-500 rounded-3xl w-36 py-2 mx-2 drop-shadow-xl" @click="popUp = false, reset()">
+      <button class="bg-red-500 rounded-3xl w-36 py-2 mx-2" @click="popUp = false, reset()">
         Cancel
       </button>
-      <button class="bg-green-500 rounded-3xl w-36 py-2 mx-2 drop-shadow-xl"
+      <button class="bg-green-500 rounded-3xl w-36 py-2 mx-2"
         @click="checkAll(displayUser,editUser)?(popUp = false, reset()):saveUser(displayUser, editUser), checkName(editUser.name),checkEmail(editUser.email)">
         Save
       </button>
