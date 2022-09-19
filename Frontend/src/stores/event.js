@@ -404,6 +404,7 @@ export const useLogin = defineStore("login", () => {
   const popUp = ref(false);
   const matchPassword = ref(true);
   const matchEmail = ref(true);
+  const logoutPopup = ref(false);
 
   const getJwtToken = () => {
     return localStorage.getItem("jwt")
@@ -415,6 +416,11 @@ const setJwtToken = (token) => {
 
 const resetJwtToken = () => {
   localStorage.removeItem("jwt")
+}
+
+const logout = () => {
+  resetJwtToken();
+  logoutPopup.value = false;
 }
     
   //Login
@@ -432,6 +438,7 @@ const resetJwtToken = () => {
         matchPassword.value=true;
         matchEmail.value=true;
         popUp.value = true;
+        logoutPopup.value = true;
         token.value = await res.json()
         resetJwtToken()
         setJwtToken(token.value.token)
@@ -450,7 +457,7 @@ const resetJwtToken = () => {
     };
 
     return { 
-      handleLogin, getJwtToken,popUp,matchEmail,matchPassword,token }
+      handleLogin, getJwtToken,logout,popUp,matchEmail,matchPassword,token,logoutPopup }
 });
 
 //-----------------------------------------------------------------------------------
