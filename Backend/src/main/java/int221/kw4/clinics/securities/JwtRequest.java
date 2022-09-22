@@ -1,28 +1,34 @@
 package int221.kw4.clinics.securities;
 
-public class JwtRequest{
+import java.io.Serializable;
 
-    private String username;
+public class JwtRequest implements Serializable {
+
+    private static final long serialVersionUID = 5926468583005150707L;
+
+    private String email;
     private String password;
 
-    public JwtRequest(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
-
+    //need default constructor for JSON Parsing
     public JwtRequest() {
+
     }
 
-    public String getUsername() {
-        return username;
+    public JwtRequest(String email, String password) {
+        this.setEmail(email);
+        this.setPassword(password);
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public String getEmail() {
+        return this.email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
-        return password;
+        return this.password;
     }
 
     public void setPassword(String password) {

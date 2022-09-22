@@ -5,19 +5,27 @@ import int221.kw4.clinics.advices.HandleExceptionUnique;
 import int221.kw4.clinics.dtos.*;
 import int221.kw4.clinics.entities.User;
 import int221.kw4.clinics.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository repository;
 
@@ -52,9 +60,9 @@ public class UserService {
         return modelMapper.map(userById, UserDTO.class);
     }
 
-    public LoginDTO getUserByEmail(String email){
+    public User getUserByEmail(String email){
         User userByEmail = repository.findByEmail(email);
-        return modelMapper.map(userByEmail, LoginDTO.class);
+        return modelMapper.map(userByEmail, User.class);
     }
 
     public ResponseEntity createUser(UserPostDTO newUser) throws HandleExceptionUnique {
@@ -121,4 +129,17 @@ public class UserService {
         return ResponseEntity.status(200).body(user);
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = repository.findByEmail(email);
+        if(user == null){
+            System.out.println("Email not found in the database: " + email);
+            throw  new UsernameNotFoundException("Email not found in the database: " + email);
+        }else {
+            System.out.println("Email found in the database: " + email);
+        }
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
+    }
 }
