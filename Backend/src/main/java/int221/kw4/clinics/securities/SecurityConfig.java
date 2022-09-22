@@ -53,18 +53,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
         customAuthenticationFilter.setFilterProcessesUrl("/api/login");
-        http.csrf().disable();
-        http.cors();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().antMatchers(GET, "/api/users/**").hasAnyAuthority("admin")
+        http.cors().and().csrf().disable()
+                .authorizeRequests().antMatchers(GET, "/api/users/**").hasAnyAuthority("admin")
                 .antMatchers(DELETE, "/api/users/**").hasAnyAuthority("admin")
                 .antMatchers(PUT, "/api/users/**").hasAnyAuthority("admin")
                 .antMatchers("/api/events/", "/api/eventCategories/").hasAnyAuthority("student", "admin", "lecturer")
                 .antMatchers(POST, "/api/users/register/**").permitAll()
                 .antMatchers(GET,"/api/token/refresh/**").permitAll()
-                .anyRequest().authenticated();
-        http.exceptionHandling().authenticationEntryPoint(unauthorizedHandler);
-        http.addFilter(customAuthenticationFilter);
-        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .anyRequest().authenticated().and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                .addFilter(customAuthenticationFilter)
+                .addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 }

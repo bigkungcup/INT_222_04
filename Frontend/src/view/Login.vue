@@ -7,6 +7,10 @@ import Logout from "../components/Logout.vue";
 const user = useUser();
 const login = useLogin();
 
+const show = () => {
+  console.log(userAccount.value)
+}
+
 const userAccount = ref({
   email: "",
   password: "",
@@ -105,7 +109,7 @@ onBeforeMount(async () => {
           <div class="col-span-4 place-self-center">
             <button
               class="bg-rose-400 text-white rounded-3xl w-36 py-2 mx-2 hover:bg-white hover:text-rose-800"
-              @click="login.handleLogin(userAccount)"
+              @click="login.handleLogin(userAccount),show()"
             >
               Login
             </button>
