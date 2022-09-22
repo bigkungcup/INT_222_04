@@ -8,6 +8,7 @@ import int221.kw4.clinics.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -26,6 +27,7 @@ public class UserController {
     }
 
     @GetMapping("")
+    @PreAuthorize("hasRole('admin')")
     public UserPageDTO getAllUser( @RequestParam(defaultValue = "name") String sortBy,
                                    @RequestParam(defaultValue = "0") int page,
                                    @RequestParam(defaultValue = "6") int pageSize){
@@ -33,11 +35,13 @@ public class UserController {
     }
 
     @GetMapping("/userAll")
+    @PreAuthorize("hasRole('admin')")
     public List<UserDTO> getAllUsers(){
         return service.getAll();
     }
 
     @GetMapping("/{userId}")
+    @PreAuthorize("hasRole('admin')")
     public UserDTO getUserById(@PathVariable Integer userId) throws HandleExceptionNotFound{
         return service.getUserById(userId);
     }
@@ -49,12 +53,14 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
+    @PreAuthorize("hasRole('admin')")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity delete(@PathVariable Integer userId) throws HandleExceptionNotFound {
         return service.deleteUser(userId);
     }
 
     @PutMapping("/{userId}")
+    @PreAuthorize("hasRole('admin')")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity update(@Valid @RequestBody UserEditDTO updateEvent, @PathVariable Integer userId) throws HandleExceptionUnique {
         return service.updateUser(updateEvent, userId);
