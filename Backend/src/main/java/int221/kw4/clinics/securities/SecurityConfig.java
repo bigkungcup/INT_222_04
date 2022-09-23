@@ -59,7 +59,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests().antMatchers(GET, "/api/users/**").hasAnyAuthority("admin")
                 .antMatchers(DELETE, "/api/users/**").hasAnyAuthority("admin")
                 .antMatchers(PUT, "/api/users/**").hasAnyAuthority("admin")
-                .antMatchers(POST, "/api/match/**").hasAnyAuthority("admin")
+                .antMatchers(POST, "/api/users/match/**").hasAnyAuthority("admin")
                 .antMatchers("/api/events/", "/api/eventCategories/").hasAnyAuthority("student", "admin", "lecturer")
                 .antMatchers(POST, "/api/users/register/**").permitAll()
                 .antMatchers(GET,"/api/token/refresh/**").permitAll()

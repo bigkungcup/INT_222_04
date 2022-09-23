@@ -35,21 +35,12 @@ public class TokenController {
 
     private final UserService service;
 
-    private final LoginService loginService;
-
     private final String secret = "secret";
     private final Integer jwtExpirationInMs = 30 * 60 * 1000;
 
-    public TokenController(AuthenticationManager authenticationManager, UserService service, LoginService loginService) {
+    public TokenController(AuthenticationManager authenticationManager, UserService service) {
         this.authenticationManager = authenticationManager;
         this.service = service;
-        this.loginService = loginService;
-    }
-
-    @PostMapping("/match")
-    @PreAuthorize("hasRole('admin')")
-    public ResponseEntity login(@RequestBody LoginDTO login, ServletWebRequest request, HttpServletResponse httpStatus) {
-        return loginService.MatchPassword(login, request, httpStatus);
     }
 
     @GetMapping("/token/refresh")

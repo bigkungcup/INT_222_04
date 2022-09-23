@@ -4,13 +4,16 @@ import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.advices.HandleExceptionUnique;
 import int221.kw4.clinics.dtos.*;
 import int221.kw4.clinics.entities.User;
+import int221.kw4.clinics.services.LoginService;
 import int221.kw4.clinics.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.ServletWebRequest;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -22,8 +25,11 @@ public class UserController {
 
     private final UserService service;
 
-    public UserController(UserService service) {
+    private final LoginService loginService;
+
+    public UserController(UserService service,  LoginService loginService) {
         this.service = service;
+        this.loginService = loginService;
     }
 
     @GetMapping("")
@@ -64,5 +70,11 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity update(@Valid @RequestBody UserEditDTO updateEvent, @PathVariable Integer userId) throws HandleExceptionUnique {
         return service.updateUser(updateEvent, userId);
+    }
+
+    @PostMapping("/match")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity login(@RequestBody LoginDTO login, ServletWebRequest request, HttpServletResponse httpStatus) {
+        return loginService.MatchPassword(login, request, httpStatus);
     }
 }
