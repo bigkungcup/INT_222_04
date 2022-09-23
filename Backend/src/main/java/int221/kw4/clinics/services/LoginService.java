@@ -30,26 +30,21 @@ public class LoginService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public ResponseEntity Login(LoginDTO login, ServletWebRequest request, HttpServletResponse httpStatus) {
+    public ResponseEntity MatchPassword(LoginDTO login, ServletWebRequest request, HttpServletResponse httpStatus) {
         Map<String, String> errorMap = new HashMap<>();
         String status = "";
         if (repository.findByEmail(login.getEmail()) != null) {
             User user = repository.findByEmail(login.getEmail());
             if (passwordEncoder.matches(login.getPassword(), user.getPassword())) {
-                errorMap.put("Login: ", "Successes");
+                errorMap.put("Password: ", "Matched");
                 httpStatus.setStatus(HttpStatus.OK.value());
                 status = "Ok";
             } else {
-                errorMap.put("Login: ", "Failed");
+                errorMap.put("Password: ", "Not Matched");
                 httpStatus.setStatus(HttpStatus.UNAUTHORIZED.value());
                 status = "Unauthorized";
             }
-        } else {
-            errorMap.put("Error: ", "User dose not exist");
-            httpStatus.setStatus(HttpStatus.NOT_FOUND.value());
-            status = "Not Found";
         }
-
         errors = new HandleValidationError(Instant.now(), httpStatus.getStatus(),
                 status, "Validation", request.getRequest().getRequestURI(), errorMap);
 
