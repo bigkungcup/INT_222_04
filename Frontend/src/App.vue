@@ -7,12 +7,15 @@ import { useLogin } from "./stores/event.js"
 const login = useLogin();
 
 const checkToken = () => {
-  if(localStorage.getItem('jwt') === null){
-    router.push("../login")
-  }else{
-    login.logoutIcon = true;
+    if(localStorage.getItem('jwt') === null){
+      router.push("../login")
+    }else{
+      login.logoutIcon = true;
+      if(localStorage.getItem('role') == '[admin]'){
+        login.userPage = true;
+      }
+    }
   }
-}
 
 onMounted(async () => {
   checkToken();

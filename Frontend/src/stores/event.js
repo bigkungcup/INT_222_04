@@ -2,6 +2,7 @@ import { defineStore, acceptHMRUpdate } from "pinia";
 import { ref } from "vue";
 import "@vuepic/vue-datepicker/dist/main.css";
 import moment from "moment";
+import router from "../router";
 
 export const useEvent = defineStore("event", () => {
   const eventLists = ref([]);
@@ -297,7 +298,6 @@ export const useEventCategory = defineStore("eventCategory", () => {
 
   //Get Category
   const getEventCategory = async () => {
-    console.log(localStorage.getItem("jtw"));
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/eventCategories`,
       {
@@ -330,6 +330,8 @@ export const useUser = defineStore("user", () => {
   const validEmail =
     /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
   const noAuthentication = ref(true);
+  const passwordMatchText = ref(false);
+  const passwordNoMatchText = ref(false);
 
   //Get User
   const getUserList = async (page = 0) => {
@@ -348,7 +350,9 @@ export const useUser = defineStore("user", () => {
       console.log("get user lists successfully");
     } else if (res.status === 401) {
       noAuthentication.value = false;
-    } else console.log("error, cannot get user lists");
+    } 
+    // else if (res.status === 403) {} 
+    else console.log("error, cannot get user lists");
   };
 
   //Get All User
@@ -391,6 +395,35 @@ export const useUser = defineStore("user", () => {
       showText();
     }
   };
+
+  // Check Password(Admin)
+  const checkPassword = async (email,password) => {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/match`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
+    });
+    if (res.status === 200) {
+      passwordMatchText.value = true;
+      passwordNoMatchText.value = false
+      console.log("Password match");
+    } else {
+      passwordNoMatchText.value = true;
+      passwordMatchText.value = false;
+      console.log("Password did not match");
+    }
+  };
+
+  const resetMatchText = () => {
+    passwordNoMatchText.value = false;
+    passwordMatchText.value = false;
+  }
 
   //ShowEmpty
   const getEmptyUser = async () => {
@@ -449,6 +482,10 @@ export const useUser = defineStore("user", () => {
     popUp,
     textPopUp,
     noAuthentication,
+    checkPassword,
+    passwordMatchText,
+    passwordNoMatchText,
+    resetMatchText
   };
 });
 
@@ -460,6 +497,10 @@ export const useLogin = defineStore("login", () => {
   const matchEmail = ref(true);
   const logoutPopup = ref(false);
   const logoutIcon = ref(false);
+  const accessTimeLimit = ref();
+  const refreshTimeLimit = ref();
+  const timeCheck = ref();
+  const userPage = ref(false);
 
   const getJwtToken = () => {
     return localStorage.getItem("jwt");
@@ -477,15 +518,28 @@ export const useLogin = defineStore("login", () => {
     localStorage.setItem("refreshToken", token);
   };
 
+  const getRoleToken = () => {
+    return localStorage.getItem("role");
+  };
+
+  const setRoleToken = (token) => {
+    localStorage.setItem("role", token);
+  };
+
   const resetJwtToken = () => {
     localStorage.removeItem("jwt");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem("role");
   };
 
   const logout = () => {
+    userPage.value = false;
     logoutPopup.value = false;
     logoutIcon.value = false;
+    clearInterval(timeCheck.value);
     resetJwtToken();
+    resetTimeLimit();
+    router.push("../login");
   };
 
   //Login
@@ -506,7 +560,17 @@ export const useLogin = defineStore("login", () => {
       popUp.value = true;
       token.value = await res.json();
       resetJwtToken();
-      setJwtToken(token.value.token);
+      setJwtToken(token.value.access_token);
+      setRoleToken(token.value.role);
+      setRefreshToken(token.value.refresh_token);
+      setTimeLimit();
+      timeCheck.value = setInterval(() => {
+        checkTokenExpired();
+      }, 6000);
+      if(getRoleToken() == '[admin]'){
+        userPage.value = true;
+      }
+      console.log(token.value.role);
       console.log("Password Matched");
     } else if (res.status === 401) {
       // matchText.value = false;
@@ -521,6 +585,53 @@ export const useLogin = defineStore("login", () => {
     }
   };
 
+  const getRefresh = async () => {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/token/refresh`, {
+      method: "GET",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("refreshToken")}`,
+      },
+    });
+    if (res.status === 200) {
+      token.value = await res.json();
+      resetJwtToken();
+      setJwtToken(token.value.access_token);
+      setRefreshToken(token.value.refresh_token);
+      console.log("Refresh token success");
+    } else if (res.status === 401) {
+      console.log("Refresh token not success");
+    }
+  };
+
+  const setTimeLimit = () => {
+    const startTime = new Date();
+    accessTimeLimit.value = new Date(startTime.getTime() + 30 * 60 * 1000);
+    refreshTimeLimit.value = new Date(
+      startTime.getTime() + 24 * 60 * 60 * 1000
+    );
+  };
+
+  const resetTimeLimit = () => {
+    accessTimeLimit.value = null;
+    refreshTimeLimit.value = null;
+  };
+
+  const checkTokenExpired = () => {
+    const now = new Date();
+    const accessExpired = accessTimeLimit.value < now.getTime();
+    const refreshExpired = refreshTimeLimit.value < now.getTime();
+    if (token.value != null) {
+      if (accessExpired && !refreshExpired) {
+        console.log(accessExpired, refreshExpired);
+        getRefresh();
+      } else if (refreshExpired) {
+        console.log(refreshExpired);
+        logout();
+      }
+    }
+  };
+
   return {
     handleLogin,
     getJwtToken,
@@ -531,6 +642,7 @@ export const useLogin = defineStore("login", () => {
     token,
     logoutPopup,
     logoutIcon,
+    userPage
   };
 });
 

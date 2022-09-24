@@ -21,7 +21,7 @@ const login = useLogin();
           ></path>
         </svg>
       </router-link>
-      <router-link :to="{ name: 'User' }">
+      <router-link :to="{ name: 'User' }" v-show="login.userPage">
       <img src="../assets/images/aboutUs.png" width="50" class="pt-8 transition duration-150 ease-in-out hover:scale-125">
       </router-link>
       <router-link :to="{ name: 'AboutUs' }">

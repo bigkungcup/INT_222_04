@@ -6,7 +6,6 @@ import NoAuthentication from "../components/NoAuthentication.vue"
 import Logout from "../components/Logout.vue";
 import { useUser,useLogin } from "../stores/event.js"
 
-
 const user = useUser()
 const login = useLogin()
 
