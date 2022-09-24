@@ -58,6 +58,11 @@ public class EventService {
         return modelMapper.map(eventListById, EventDTO.class);
     }
 
+    public EventPageDTO getEventByEmail(String email, Integer page, Integer pageSize) {
+        return modelMapper.map(repository.findAllByBookingEmail(email, PageRequest.of(page, pageSize)),
+                EventPageDTO.class);
+    }
+
     public EventPageDTO getEventByCategoryId(EventCategory eventCategoryId, Integer page, Integer pageSize) {
         return modelMapper.map(repository.findAllByEventCategory(eventCategoryId, PageRequest.of(page, pageSize)),
                 EventPageDTO.class);
