@@ -539,7 +539,7 @@ export const useLogin = defineStore("login", () => {
     clearInterval(timeCheck.value);
     resetJwtToken();
     resetTimeLimit();
-    router.push("../login");
+    router.push({ name: 'Login'});
   };
 
   //Login
@@ -607,9 +607,7 @@ export const useLogin = defineStore("login", () => {
   const setTimeLimit = () => {
     const startTime = new Date();
     accessTimeLimit.value = new Date(startTime.getTime() + 30 * 60 * 1000);
-    refreshTimeLimit.value = new Date(
-      startTime.getTime() + 24 * 60 * 60 * 1000
-    );
+    refreshTimeLimit.value = new Date(startTime.getTime() + 24 * 60 * 60 * 1000);
   };
 
   const resetTimeLimit = () => {

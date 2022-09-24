@@ -216,7 +216,7 @@
           </p>
           <p class="mx-36">Updated on : {{formatDate(displayUser.updatedOn)}} | {{ formatTime(displayUser.updatedOn) }}
           </p>
-          <p class="mx-36">Password : <input type="password" class="bg-white border border-slate-300 rounded-lg h-10 w-2/5 text-3xl 
+          <form><p class="mx-36">Password : <input type="password" class="bg-white border border-slate-300 rounded-lg h-10 w-2/5 text-3xl 
         placeholder:italic placeholder:text-2xl " placeholder=" Enter password" v-model="passwordCheck" autocomplete="off" @input="user.resetMatchText()"/>
                <button class="text-2xl mx-2 text-white bgPopUp rounded-3xl w-28 py-2 hover:text-pink-700 hover:border-2 border-pink-700" @click="user.checkPassword(displayUser.email,passwordCheck)">
               Check
@@ -225,7 +225,7 @@
           class="text-lg text-green-700 pl-40">*Password match!!</p>
           <p v-if="passwordCheck !== '' && user.passwordNoMatchText"
           class="text-lg text-red-500 pl-40">*Password did not match!!</p>
-      </p>
+      </p></form>
 
         </div>
       </div>
