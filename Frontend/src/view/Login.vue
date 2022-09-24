@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { onBeforeMount } from "vue";
 import { useUser,useLogin } from "../stores/event.js";
 import Logout from "../components/Logout.vue";
+import router from "../router";
 
 const user = useUser();
 const login = useLogin();
@@ -151,7 +152,7 @@ onBeforeMount(async () => {
         <div class="grid place-items-center">
           <button
             class="text-4xl px-5 text-white bgPopUp rounded-3xl w-36 py-2 mx-2 hover:text-pink-700 hover:border-2 border-pink-700"
-            @click="reset(), (login.popUp = false)"
+            @click="reset(), (login.popUp = false) ,router.push({ name: 'Home'})"
           >
             OK
           </button>

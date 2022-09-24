@@ -145,11 +145,11 @@
    
   <template>
     <div class="bg-fixed bg-user bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen pt-12 px-36 pb-36">
-      <div class="grid" v-show="login.logoutPopup">
+      <div class="grid absolute z-40 top-0 left-0" v-show="login.logoutPopup">
         <Logout/>
       </div>
       <div class="w-full h-full overflow-auto">
-        <div class="grid text-4xl gap-y-8 break-all">
+        <div class="grid text-4xl gap-y-6 break-all">
           <p class="text-8xl text-center">
             Detail
             <button @click="showPopUp()">
@@ -216,16 +216,22 @@
           </p>
           <p class="mx-36">Updated on : {{formatDate(displayUser.updatedOn)}} | {{ formatTime(displayUser.updatedOn) }}
           </p>
-          <form><p class="mx-36">Password : <input type="password" class="bg-white border border-slate-300 rounded-lg h-10 w-2/5 text-3xl 
-        placeholder:italic placeholder:text-2xl " placeholder=" Enter password" v-model="passwordCheck" autocomplete="off" @input="user.resetMatchText()"/>
-               <button class="text-2xl mx-2 text-white bgPopUp rounded-3xl w-28 py-2 hover:text-pink-700 hover:border-2 border-pink-700" @click="user.checkPassword(displayUser.email,passwordCheck)">
+          <p class="mx-36"><form>Password : 
+          <input type="password" 
+          class="bg-white border border-slate-300 rounded-lg h-10 w-2/5 text-3xl placeholder:italic placeholder:text-2xl " 
+          placeholder=" Enter password" 
+          v-model="passwordCheck" 
+          autocomplete="off" 
+          @input="user.resetMatchText()"/>
+          </form>
+          <button class="text-2xl mx-2 text-white bgPopUp rounded-3xl w-28 py-2 hover:text-pink-700 hover:border-2 border-pink-700 absolute ml-100 -mt-11" @click="user.checkPassword(displayUser.email,passwordCheck)">
               Check
-            </button>
+          </button>
             <p v-if="passwordCheck !== '' && user.passwordMatchText"
           class="text-lg text-green-700 pl-40">*Password match!!</p>
           <p v-if="passwordCheck !== '' && user.passwordNoMatchText"
           class="text-lg text-red-500 pl-40">*Password did not match!!</p>
-      </p></form>
+      </p>
 
         </div>
       </div>

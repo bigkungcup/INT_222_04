@@ -532,6 +532,7 @@ export const useLogin = defineStore("login", () => {
     localStorage.removeItem("role");
   };
 
+  //log out
   const logout = () => {
     userPage.value = false;
     logoutPopup.value = false;
