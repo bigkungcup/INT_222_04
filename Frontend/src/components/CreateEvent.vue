@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue";
+import { useLogin } from "../stores/event.js"
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import moment from "moment"
@@ -19,6 +20,12 @@ defineProps({
     require: true,
   },
 });
+
+const login = useLogin();
+
+const userEmail = ref('')
+userEmail.value = login.getEmailToken();
+console.log(userEmail.value);
 
 const newEvent = ref({
   bookingName: "",
@@ -62,7 +69,7 @@ const validEmail = /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9
           v-model="newEvent.bookingName" /><span class="text-gray-500 text-lg">{{newEvent.bookingName.length}}/100</span>
         <!-- <router-link :to="{ name: 'Home' }"><img src="../assets/images/Exit.png" width="60"
             class="absolute top-3 right-36" /></router-link> -->
-      <div v-if="newEvent.bookingName === '' || newEvent.bookingName === null || newEvent.bookingName.value === 0">
+      <div v-if="newEvent.bookingName === '' || newEvent.bookingName === null || newEvent.bookingName.length === 0">
         <p v-show="textPopUp" class="text-lg text-red-500 pl-28">*Please enter your name.</p>
       </div>
       <div v-if="newEvent.bookingName.length > 100">
@@ -74,8 +81,9 @@ const validEmail = /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9
         Email :
         <input type="email" class="bg-white border border-slate-300 rounded-lg h-10 text-3xl 
         placeholder:italic placeholder:text-2xl" placeholder=" you@example.com"
-          v-model="newEvent.bookingEmail" /><span class="text-gray-500 text-lg">{{newEvent.bookingEmail.length}}/255</span>
-      <div v-if="newEvent.bookingEmail === '' || newEvent.bookingEmail.value === 0">
+          v-model="newEvent.bookingEmail" v-if="!(login.getRoleToken() == '[admin]')"/><span class="text-gray-500 text-lg" v-if="!(login.getRoleToken() == '[admin]')">{{newEvent.bookingEmail.length}}/255</span>
+         <span v-if="login.getRoleToken() === '[admin]'">{{ userEmail }}</span> 
+      <div v-if="newEvent.bookingEmail === '' || newEvent.bookingEmail.length === 0">
         <p v-show="textPopUp" class="text-lg text-red-500 pl-28">*Please enter your email.</p>
       </div>
       <div v-if="newEvent.bookingEmail.match(validEmail) === null && newEvent.bookingEmail !== '' ">

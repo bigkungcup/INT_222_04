@@ -526,10 +526,19 @@ export const useLogin = defineStore("login", () => {
     localStorage.setItem("role", token);
   };
 
+  const getEmailToken = () => {
+    return localStorage.getItem("email");
+  };
+
+  const setEmailToken = (token) => {
+    localStorage.setItem("email", token);
+  };
+
   const resetJwtToken = () => {
     localStorage.removeItem("jwt");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("role");
+    localStorage.removeItem("email");
   };
 
   //log out
@@ -564,6 +573,7 @@ export const useLogin = defineStore("login", () => {
       setJwtToken(token.value.access_token);
       setRoleToken(token.value.role);
       setRefreshToken(token.value.refresh_token);
+      setEmailToken(token.value.email);
       setTimeLimit();
       timeCheck.value = setInterval(() => {
         checkTokenExpired();
@@ -571,7 +581,6 @@ export const useLogin = defineStore("login", () => {
       if(getRoleToken() == '[admin]'){
         userPage.value = true;
       }
-      console.log(token.value.role);
       console.log("Password Matched");
     } else if (res.status === 401) {
       // matchText.value = false;
@@ -634,6 +643,8 @@ export const useLogin = defineStore("login", () => {
   return {
     handleLogin,
     getJwtToken,
+    getRoleToken,
+    getEmailToken,
     logout,
     popUp,
     matchEmail,
@@ -641,7 +652,7 @@ export const useLogin = defineStore("login", () => {
     token,
     logoutPopup,
     logoutIcon,
-    userPage
+    userPage,
   };
 });
 
