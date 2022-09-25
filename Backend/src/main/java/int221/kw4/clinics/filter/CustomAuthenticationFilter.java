@@ -5,8 +5,10 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import int221.kw4.clinics.advices.HandleExceptionLogin;
+import int221.kw4.clinics.repositories.UserRepository;
 import int221.kw4.clinics.securities.JwtRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,13 +43,14 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     private final Integer refreshExpirationDateInMs = 24 * 60 * 60 * 1000;
 
+
     public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        JwtRequest login = null;
+        JwtRequest login;
         try {
             login = new Gson().fromJson(request.getReader(), JwtRequest.class);
         } catch (IOException e) {
@@ -80,11 +83,12 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
 //        response.setHeader("access_token", access_token);
 //        response.setHeader("refresh_token", refresh_token);
-
+        
         Map<String, String> tokens = new HashMap<>();
+        tokens.put("email", user.getUsername());
+        tokens.put("role", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()).toString());
         tokens.put("access_token", access_token);
         tokens.put("refresh_token", refresh_token);
-        tokens.put("role", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()).toString());
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), tokens);
     }

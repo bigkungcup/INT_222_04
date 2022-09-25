@@ -1,22 +1,15 @@
 package int221.kw4.clinics.advices;
 
-import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -92,7 +85,26 @@ public class ApplicationExceptionHandler extends Exception {
         errorMap.put("Error:", nf.getMessage());
         errors = new HandleValidationError(Instant.now(), HttpStatus.NOT_FOUND.value(),
                 "Not Found", "Validation", request.getRequest().getRequestURI(), errorMap);
+        return errors;
+    }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HandleExceptionBadRequest.class)
+    public HandleValidationError handleExceptionBadRequest(HandleExceptionBadRequest br, ServletWebRequest request) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("Error:", br.getMessage());
+        errors = new HandleValidationError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
+                "Bad Request", "Validation", request.getRequest().getRequestURI(), errorMap);
+        return errors;
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(HandleExceptionForbidden.class)
+    public HandleValidationError handleExceptionForbidden(HandleExceptionForbidden fb, ServletWebRequest request) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("Error:", fb.getMessage());
+        errors = new HandleValidationError(Instant.now(), HttpStatus.FORBIDDEN.value(),
+                "Forbidden", "Validation", request.getRequest().getRequestURI(), errorMap);
         return errors;
     }
 
