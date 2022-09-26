@@ -5,10 +5,10 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import int221.kw4.clinics.advices.HandleExceptionLogin;
+import int221.kw4.clinics.dtos.securities.JwtRequest;
 import int221.kw4.clinics.repositories.UserRepository;
-import int221.kw4.clinics.securities.JwtRequest;
+import int221.kw4.clinics.services.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +17,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -28,6 +30,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -58,8 +61,8 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         }
 //        System.out.println("Email is: " + login.getEmail());
 //        System.out.println("Password is: " + login.getPassword());
+
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(login.getEmail(), login.getPassword());
-//        System.out.println(authenticationToken);
         return authenticationManager.authenticate(authenticationToken);
     }
 
@@ -83,7 +86,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
 //        response.setHeader("access_token", access_token);
 //        response.setHeader("refresh_token", refresh_token);
-        
+
         Map<String, String> tokens = new HashMap<>();
         tokens.put("email", user.getUsername());
         tokens.put("role", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()).toString());
@@ -96,6 +99,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed)
             throws IOException, ServletException {
+
         HandleExceptionLogin errors;
         Map<String, String> errorMap = new HashMap<>();
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());

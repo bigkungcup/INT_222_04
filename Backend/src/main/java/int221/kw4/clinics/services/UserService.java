@@ -2,7 +2,10 @@ package int221.kw4.clinics.services;
 
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.advices.HandleExceptionUnique;
-import int221.kw4.clinics.dtos.*;
+import int221.kw4.clinics.dtos.users.UserDTO;
+import int221.kw4.clinics.dtos.users.UserEditDTO;
+import int221.kw4.clinics.dtos.users.UserPageDTO;
+import int221.kw4.clinics.dtos.users.UserPostDTO;
 import int221.kw4.clinics.entities.User;
 import int221.kw4.clinics.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -56,7 +59,7 @@ public class UserService implements UserDetailsService {
         return modelMapper.map(userById, UserDTO.class);
     }
 
-    public User getUserByEmail(String email){
+    public User getUserByEmail(String email) {
         User userByEmail = repository.findByEmail(email);
         return modelMapper.map(userByEmail, User.class);
     }
@@ -128,10 +131,10 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = repository.findByEmail(email);
-        if(user == null){
+        if (user == null) {
             System.out.println("Email not found in the database: " + email);
             throw new UsernameNotFoundException("Email not found in the database: " + email);
-        }else {
+        } else {
             System.out.println("Email found in the database: " + email);
         }
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();

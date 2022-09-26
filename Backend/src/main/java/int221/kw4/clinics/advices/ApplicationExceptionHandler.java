@@ -3,6 +3,7 @@ package int221.kw4.clinics.advices;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -105,6 +106,16 @@ public class ApplicationExceptionHandler extends Exception {
         errorMap.put("Error:", fb.getMessage());
         errors = new HandleValidationError(Instant.now(), HttpStatus.FORBIDDEN.value(),
                 "Forbidden", "Validation", request.getRequest().getRequestURI(), errorMap);
+        return errors;
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public HandleValidationError handleExceptionUserNotFound(UsernameNotFoundException notFoundException, ServletWebRequest request) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("Error:", notFoundException.getMessage());
+        errors = new HandleValidationError(Instant.now(), HttpStatus.NOT_FOUND.value(),
+                "Not Found", "Validation", request.getRequest().getRequestURI(), errorMap);
         return errors;
     }
 

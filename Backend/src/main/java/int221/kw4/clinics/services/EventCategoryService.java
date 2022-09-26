@@ -1,9 +1,9 @@
 package int221.kw4.clinics.services;
 
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
-import int221.kw4.clinics.dtos.EventCategoryDTO;
-import int221.kw4.clinics.dtos.EventCategoryEditDTO;
-import int221.kw4.clinics.dtos.EventCategoryPostDTO;
+import int221.kw4.clinics.dtos.eventCategories.EventCategoryDTO;
+import int221.kw4.clinics.dtos.eventCategories.EventCategoryEditDTO;
+import int221.kw4.clinics.dtos.eventCategories.EventCategoryPostDTO;
 import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.repositories.EventCategoryRepository;
 import org.modelmapper.ModelMapper;

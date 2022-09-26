@@ -1,10 +1,9 @@
 package int221.kw4.clinics.services;
 
 import int221.kw4.clinics.advices.HandleValidationError;
-import int221.kw4.clinics.dtos.LoginDTO;
+import int221.kw4.clinics.dtos.securities.LoginDTO;
 import int221.kw4.clinics.entities.User;
 import int221.kw4.clinics.repositories.UserRepository;
-import org.springframework.http.HttpMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;

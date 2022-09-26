@@ -2,9 +2,9 @@ package int221.kw4.clinics.controllers;
 
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.advices.HandleExceptionUnique;
-import int221.kw4.clinics.dtos.EventCategoryDTO;
-import int221.kw4.clinics.dtos.EventCategoryEditDTO;
-import int221.kw4.clinics.dtos.EventCategoryPostDTO;
+import int221.kw4.clinics.dtos.eventCategories.EventCategoryDTO;
+import int221.kw4.clinics.dtos.eventCategories.EventCategoryEditDTO;
+import int221.kw4.clinics.dtos.eventCategories.EventCategoryPostDTO;
 import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.services.EventCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;

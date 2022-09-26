@@ -26,6 +26,7 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
 
     Page<Event> findAllByBookingEmail(String email, Pageable pageable);
 
+    Event findByIdAndAndBookingEmail(Integer eventId, String email);
 
 //    @Query(value = "SELECT * FROM event WHERE eventStartTime = :eventStartTime and bookingEmail = :bookingEmail ORDER BY")
     @Query(value = "SELECT * FROM event WHERE cast(eventStartTime as date) = cast(:currentTime as date) AND eventCategoryId = :eventCategoryId", nativeQuery = true)

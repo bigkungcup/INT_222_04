@@ -13,7 +13,14 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import static org.springframework.http.HttpMethod.*;
 
@@ -21,17 +28,17 @@ import static org.springframework.http.HttpMethod.*;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private static final RequestMatcher PROTECTED_URLS = new OrRequestMatcher(
+            new AntPathRequestMatcher("/users/**"));
     private final UserDetailsService userDetailsService;
 
     private final PasswordEncoder passwordEncoder;
 
-    private final JwtAuthenticationEntryPoint unauthorizedHandler;
-
     @Autowired
-    public SecurityConfig(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder, JwtAuthenticationEntryPoint unauthorizedHandler) {
+    public SecurityConfig(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
-        this.unauthorizedHandler = unauthorizedHandler;
     }
 
 
@@ -46,6 +53,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
@@ -55,12 +67,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(DELETE, "/api/users/**").hasAnyAuthority("admin")
                 .antMatchers(PUT, "/api/users/**").hasAnyAuthority("admin")
                 .antMatchers(POST, "/api/users/match/**").hasAnyAuthority("admin")
-                .antMatchers("/api/events/", "/api/eventCategories/").hasAnyAuthority("student", "admin", "lecturer")
+                .antMatchers("/api/events/**", "/api/eventCategories/**").hasAnyAuthority("student", "admin", "lecturer")
                 .antMatchers(POST, "/api/users/register/**").permitAll()
-                .antMatchers(GET,"/api/token/refresh/**").permitAll()
+                .antMatchers(GET, "/api/token/refresh/**").permitAll()
                 .anyRequest().authenticated().and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                .exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and()
                 .addFilter(customAuthenticationFilter)
                 .addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }

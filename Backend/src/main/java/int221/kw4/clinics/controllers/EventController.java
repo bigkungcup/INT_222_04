@@ -1,12 +1,13 @@
 package int221.kw4.clinics.controllers;
 
-//import int221.kw4.clinics.advices.HandleExceptionBadRequest;
-//import int221.kw4.clinics.advices.HandleExceptionForbidden;
 import int221.kw4.clinics.advices.HandleExceptionBadRequest;
 import int221.kw4.clinics.advices.HandleExceptionForbidden;
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.advices.HandleExceptionOverlap;
-import int221.kw4.clinics.dtos.*;
+import int221.kw4.clinics.dtos.events.EventDTO;
+import int221.kw4.clinics.dtos.events.EventEditDTO;
+import int221.kw4.clinics.dtos.events.EventPageDTO;
+import int221.kw4.clinics.dtos.events.EventPostDTO;
 import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,7 +93,8 @@ public class EventController {
 
     @PutMapping("/{eventId}")
     @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
-    public ResponseEntity update(@Valid @RequestBody EventEditDTO updateEvent, @PathVariable Integer eventId) throws HandleExceptionOverlap, HandleExceptionForbidden {
+    public ResponseEntity update(@Valid @RequestBody EventEditDTO updateEvent, @PathVariable Integer eventId)
+            throws HandleExceptionOverlap, HandleExceptionForbidden {
         return service.update(updateEvent, eventId);
     }
 }
