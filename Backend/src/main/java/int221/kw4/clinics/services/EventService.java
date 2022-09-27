@@ -78,6 +78,7 @@ public class EventService {
     public EventDTO getEventById(Integer eventId) throws HandleExceptionNotFound, HandleExceptionForbidden {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByEmail(auth.getPrincipal().toString());
+        Event event = repository.getById(eventId);
         System.out.println("User1: " + auth.getPrincipal());
         System.out.println("User2: " + user);
 
@@ -87,11 +88,12 @@ public class EventService {
                             "Event ID: " + eventId + " does not exist !!!"));
             return modelMapper.map(eventListById, EventDTO.class);
         } else if (user.getRole().toString().equals("student")) {
-            Event eventListById = repository.findByIdAndAndBookingEmail(eventId, user.getEmail());
-            if(eventListById == null){
-                throw new HandleExceptionNotFound("Event ID: " + eventId + " does not exist !!!");
+            if(user.getEmail().equals(event.getBookingEmail())){
+                Event eventListById = repository.findByIdAndAndBookingEmail(eventId, user.getEmail());
+                return modelMapper.map(eventListById, EventDTO.class);
+            } else {
+                throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
             }
-            return modelMapper.map(eventListById, EventDTO.class);
         } else {
             throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
         }
@@ -223,22 +225,33 @@ public class EventService {
         User user = userRepository.findByEmail(auth.getPrincipal().toString());
         Event event = repository.getById(eventId);
         System.out.println("User1: " + auth.getPrincipal());
-        System.out.println("User2: " + user.getEmail() + " " + event.getBookingEmail());
+        System.out.println("User2: " + user.getEmail() + " 55555555555555 " + event.getBookingEmail());
 
-        if (user.getEmail().equals(event.getBookingEmail())) {
+        if(user.getRole().toString().equals("admin")){
             repository.findById(eventId).orElseThrow(
                     () -> new HandleExceptionNotFound(
                             "Event ID: " + eventId + " does not exist !!!")
             );
             repository.deleteById(eventId);
             return ResponseEntity.status(200).body("Delete Event: " + eventId);
+        } else if (user.getRole().toString().equals("student")) {
+            if (user.getEmail().equals(event.getBookingEmail())) {
+                repository.findById(eventId).orElseThrow(
+                        () -> new HandleExceptionNotFound(
+                                "Event ID: " + eventId + " does not exist !!!")
+                );
+                repository.deleteById(eventId);
+                return ResponseEntity.status(200).body("Delete Event: " + eventId);
+        }else {
+                throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
+            }
         } else {
             throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
         }
     }
 
     //    Update
-    public ResponseEntity update(EventEditDTO updateEvent, Integer eventId) throws HandleExceptionOverlap, HandleExceptionForbidden {
+    public ResponseEntity update(EventEditDTO updateEvent, Integer eventId) throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByEmail(auth.getPrincipal().toString());
         Event eventById = repository.getById(eventId);
@@ -249,7 +262,7 @@ public class EventService {
         Date newEventEndTime = findEndDate(Date.from(updateEvent.getEventStartTime()), updateEvent.getEventDuration());
         List<EventDTO> eventList = getAllEvent();
 
-        if (user.getEmail().equals(eventById.getBookingEmail())) {
+        if(user.getRole().toString().equals("admin")){
             for (int i = 0; i < eventList.size(); i++) {
                 List errors = new ArrayList();
                 if (updateEvent.getEventCategory().getId() == eventList.get(i).getEventCategory().getId() && eventList.get(i).getId() != eventId) {
@@ -268,6 +281,29 @@ public class EventService {
             modelMapper.map(updateEvent, event);
             repository.saveAndFlush(event);
             return ResponseEntity.status(200).body(event);
+        } else if (user.getRole().toString().equals("student")) {
+            if (user.getEmail().equals(eventById.getBookingEmail())) {
+                for (int i = 0; i < eventList.size(); i++) {
+                    List errors = new ArrayList();
+                    if (updateEvent.getEventCategory().getId() == eventList.get(i).getEventCategory().getId() && eventList.get(i).getId() != eventId) {
+                        Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
+                        Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
+                        if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
+                                newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
+                                newEventEndTime.equals(eventStartTime)) {
+                            throw new HandleExceptionOverlap(errors.toString());
+                        }
+                    }
+                }
+                Event event = repository.findById(eventId).orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST)
+                );
+                modelMapper.map(updateEvent, event);
+                repository.saveAndFlush(event);
+                return ResponseEntity.status(200).body(event);
+        }else{
+                throw new HandleExceptionForbidden("The booking email must be the same as the student's email");
+            }
         } else {
             throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
         }

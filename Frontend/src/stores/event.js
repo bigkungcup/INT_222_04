@@ -577,7 +577,7 @@ export const useLogin = defineStore("login", () => {
       setTimeLimit();
       timeCheck.value = setInterval(() => {
         checkTokenExpired();
-      }, 6000);
+      }, 30 * 60 * 1000 + 1);
       if(getRoleToken() == '[admin]'){
         userPage.value = true;
       }

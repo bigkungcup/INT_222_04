@@ -27,7 +27,16 @@ const userEmail = ref('')
 userEmail.value = login.getEmailToken();
 console.log(userEmail.value);
 
-const newEvent = ref({
+const studentEvent = ref({
+  bookingName: "",
+  bookingEmail: userEmail.value,
+  eventCategory: {},
+  eventStartTime: "",
+  eventNotes: "",
+  eventDuration: 0,
+})
+
+const adminEvent = ref({
   bookingName: "",
   bookingEmail: "",
   eventCategory: {},
@@ -35,6 +44,18 @@ const newEvent = ref({
   eventNotes: "",
   eventDuration: 0,
 })
+
+const newEvent = ref();
+
+const check = () => {
+if(login.getRoleToken() == '[admin]'){
+  newEvent.value = adminEvent.value
+  console.log(adminEvent.value);
+}else{
+  newEvent.value = studentEvent.value;
+  console.log(studentEvent.value);
+}
+}
 
 const reset = () => {
   newEvent.value = {
@@ -56,6 +77,8 @@ const setMinTime = (eventStartTime) => {
 }
 
 const validEmail = /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+
+check();
 
 </script>
  
@@ -81,8 +104,8 @@ const validEmail = /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9
         Email :
         <input type="email" class="bg-white border border-slate-300 rounded-lg h-10 text-3xl 
         placeholder:italic placeholder:text-2xl" placeholder=" you@example.com"
-          v-model="newEvent.bookingEmail" v-if="!(login.getRoleToken() == '[admin]')"/><span class="text-gray-500 text-lg" v-if="!(login.getRoleToken() == '[admin]')">{{newEvent.bookingEmail.length}}/255</span>
-         <span v-if="login.getRoleToken() === '[admin]'">{{ userEmail }}</span> 
+          v-model="newEvent.bookingEmail" v-if="login.getRoleToken() == '[admin]'"/><span class="text-gray-500 text-lg" v-if="login.getRoleToken() == '[admin]'">{{newEvent.bookingEmail.length}}/255</span>
+         <span v-if="!(login.getRoleToken() === '[admin]')">{{ userEmail }}</span> 
       <div v-if="newEvent.bookingEmail === '' || newEvent.bookingEmail.length === 0">
         <p v-show="textPopUp" class="text-lg text-red-500 pl-28">*Please enter your email.</p>
       </div>

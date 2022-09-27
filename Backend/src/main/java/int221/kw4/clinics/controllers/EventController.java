@@ -94,7 +94,7 @@ public class EventController {
     @PutMapping("/{eventId}")
     @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public ResponseEntity update(@Valid @RequestBody EventEditDTO updateEvent, @PathVariable Integer eventId)
-            throws HandleExceptionOverlap, HandleExceptionForbidden {
+            throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest {
         return service.update(updateEvent, eventId);
     }
 }
