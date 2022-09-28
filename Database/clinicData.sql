@@ -48,6 +48,11 @@ CREATE TABLE IF NOT EXISTS `clinic`.`event` (
     FOREIGN KEY (`eventCategoryId`)
     REFERENCES `clinic`.`eventCategory` (`eventCategoryId`)
     ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_event_user1`
+    FOREIGN KEY (`user_userId`)
+    REFERENCES `clinic`.`user` (`userId`)
+    ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
@@ -67,6 +72,29 @@ CREATE TABLE IF NOT EXISTS `clinic`.`user` (
   PRIMARY KEY (`userId`),
   UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE,
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `clinic`.`event_category_owner`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `clinic`.`event_category_owner` ;
+
+CREATE TABLE IF NOT EXISTS `clinic`.`event_category_owner` (
+  `userId` INT NOT NULL,
+  `eventCategoryId` INT NOT NULL,
+  PRIMARY KEY (`userId`, `eventCategoryId`),
+  INDEX `fk_user_has_eventCategory_eventCategory1_idx` (`eventCategoryId` ASC) VISIBLE,
+  INDEX `fk_user_has_eventCategory_user1_idx` (`userId` ASC) VISIBLE,
+  CONSTRAINT `fk_user_has_eventCategory_user1`
+    FOREIGN KEY (`userId`)
+    REFERENCES `clinic`.`user` (`userId`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_user_has_eventCategory_eventCategory1`
+    FOREIGN KEY (`eventCategoryId`)
+    REFERENCES `clinic`.`eventCategory` (`eventCategoryId`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
