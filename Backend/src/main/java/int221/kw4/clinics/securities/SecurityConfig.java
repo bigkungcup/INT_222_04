@@ -28,9 +28,6 @@ import static org.springframework.http.HttpMethod.*;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-    private static final RequestMatcher PROTECTED_URLS = new OrRequestMatcher(
-            new AntPathRequestMatcher("/users/**"));
     private final UserDetailsService userDetailsService;
 
     private final PasswordEncoder passwordEncoder;
@@ -40,7 +37,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
     }
-
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {

@@ -10,7 +10,9 @@ import int221.kw4.clinics.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.WebUtils;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
@@ -40,13 +42,14 @@ public class TokenController {
 
     @GetMapping("/token/refresh")
     public void refreshtoken(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String authorizationHeader = request.getHeader(AUTHORIZATION);
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+//        String authorizationHeader = request.getHeader(AUTHORIZATION);
+        Cookie refresh_token = WebUtils.getCookie(request, "refresh_token");
+        if (refresh_token != null) {
             try {
-                String refresh_token = authorizationHeader.substring("Bearer ".length());
+//                String refresh_token = authorizationHeader.substring("Bearer ".length());
                 Algorithm algorithm = Algorithm.HMAC256(secret.getBytes(StandardCharsets.UTF_8));
                 JWTVerifier verifier = JWT.require(algorithm).build();
-                DecodedJWT decodedJWT = verifier.verify(refresh_token);
+                DecodedJWT decodedJWT = verifier.verify(refresh_token.getValue());
                 String email = decodedJWT.getSubject();
                 User user = service.getUserByEmail(email);
 
@@ -60,11 +63,17 @@ public class TokenController {
                         .withClaim("roles", roles)
                         .sign(algorithm);
 
-                Map<String, String> tokens = new HashMap<>();
-                tokens.put("access_token", access_token);
-                tokens.put("refresh_token", refresh_token);
-                response.setContentType(APPLICATION_JSON_VALUE);
-                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+                Cookie cookie_access = new Cookie("access_token", access_token);
+
+                cookie_access.setHttpOnly(true);
+
+                response.addCookie(cookie_access);
+                response.addCookie(refresh_token);
+//                Map<String, String> tokens = new HashMap<>();
+//                tokens.put("access_token", access_token);
+//                tokens.put("refresh_token", refresh_token);
+//                response.setContentType(APPLICATION_JSON_VALUE);
+//                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
 
             } catch (Exception exception) {
                 log.error("Error logging in: {}", exception.getMessage());

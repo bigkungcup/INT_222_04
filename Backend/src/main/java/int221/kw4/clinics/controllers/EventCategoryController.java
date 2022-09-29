@@ -25,32 +25,27 @@ public class EventCategoryController {
     private EventCategoryService service;
 
     @GetMapping("")
-    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public List<EventCategoryDTO> getAllEventCategory() {
         return service.getAll();
     }
 
     @GetMapping("/{eventCategoryId}")
-    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public EventCategoryDTO getById(@PathVariable Integer eventCategoryId) throws HandleExceptionNotFound {
         return service.getById(eventCategoryId);
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public EventCategory create(@Valid @RequestBody EventCategoryPostDTO newEventCategory) {
         return service.addCategory(newEventCategory);
     }
 
     @DeleteMapping("/{eventCategoryId}")
-    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public void delete(@PathVariable Integer eventCategoryId) throws HandleExceptionNotFound {
         service.deleteEvent(eventCategoryId);
     }
 
     @PutMapping("/{eventCategoryId}")
-    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public ResponseEntity update(@Valid @RequestBody EventCategoryEditDTO updateEventCategory,
                                  @PathVariable Integer eventCategoryId) throws HandleExceptionNotFound, HandleExceptionUnique {
         return service.update(updateEventCategory, eventCategoryId);

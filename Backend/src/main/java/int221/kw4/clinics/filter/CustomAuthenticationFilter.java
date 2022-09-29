@@ -8,6 +8,7 @@ import int221.kw4.clinics.advices.HandleExceptionLogin;
 import int221.kw4.clinics.dtos.securities.JwtRequest;
 import int221.kw4.clinics.repositories.UserRepository;
 import int221.kw4.clinics.services.UserService;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -22,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -51,6 +54,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         this.authenticationManager = authenticationManager;
     }
 
+    @SneakyThrows
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         JwtRequest login;
@@ -61,6 +65,28 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         }
 //        System.out.println("Email is: " + login.getEmail());
 //        System.out.println("Password is: " + login.getPassword());
+
+        HandleExceptionLogin errors;
+        Map<String, String> errorMap = new HashMap<>();
+        if(login.getEmail() == null && login.getPassword() == null){
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            errorMap.put("error", "Email and Password is null");
+            errors = new HandleExceptionLogin(sdf3.format(timestamp), HttpStatus.BAD_REQUEST.value(),
+                    "Unauthorized", "Validation", request.getRequestURI(), errorMap);
+            response.setContentType(APPLICATION_JSON_VALUE);
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            new ObjectMapper().writeValue(response.getOutputStream(), errors);
+        }else if(login.getEmail() == null || login.getPassword() == null){
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            errorMap.put("error", "Email or Password is null");
+            errors = new HandleExceptionLogin(sdf3.format(timestamp), HttpStatus.BAD_REQUEST.value(),
+                    "Unauthorized", "Validation", request.getRequestURI(), errorMap);
+            response.setContentType(APPLICATION_JSON_VALUE);
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            new ObjectMapper().writeValue(response.getOutputStream(), errors);
+        }
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(login.getEmail(), login.getPassword());
         return authenticationManager.authenticate(authenticationToken);
@@ -84,16 +110,27 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 .withIssuer(request.getRequestURI().toString())
                 .sign(algorithm);
 
-//        response.setHeader("access_token", access_token);
-//        response.setHeader("refresh_token", refresh_token);
+        Cookie cookie_access = new Cookie("access_token", access_token);
+        Cookie cookie_refesh = new Cookie("refresh_token", refresh_token );
 
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("email", user.getUsername());
-        tokens.put("role", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()).toString());
-        tokens.put("access_token", access_token);
-        tokens.put("refresh_token", refresh_token);
-        response.setContentType(APPLICATION_JSON_VALUE);
-        new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+        cookie_access.setHttpOnly(true);
+        cookie_refesh.setHttpOnly(false);
+
+        response.addCookie(cookie_access);
+        response.addCookie(cookie_refesh);
+
+
+
+//        cookie_refesh.("access_token", cookie_access.toString());
+//        response.setHeader("refresh_token", cookie_refesh.toString());
+
+//        Map<String, String> tokens = new HashMap<>();
+//        tokens.put("email", user.getUsername());
+//        tokens.put("role", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()).toString());
+//        tokens.put("access_token", access_token);
+//        tokens.put("refresh_token", refresh_token);
+//        response.setContentType(APPLICATION_JSON_VALUE);
+//        new ObjectMapper().writeValue(response.getOutputStream(), tokens);
     }
 
     @Override
