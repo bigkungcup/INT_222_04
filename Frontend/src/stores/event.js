@@ -4,6 +4,7 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import moment from "moment";
 import router from "../router";
 
+
 export const useEvent = defineStore("event", () => {
   const eventLists = ref([]);
   const eventListAll = ref([]);
@@ -34,7 +35,8 @@ export const useEvent = defineStore("event", () => {
       noAuthentication.value = true;
       eventLists.value = await res.json();
       console.log("get event lists successfully");
-    } else if (res.status === 401) {
+    }
+    else if (res.status === 401) {
       noAuthentication.value = false;
     } else console.log("error, cannot get event lists");
   };
@@ -52,8 +54,12 @@ export const useEvent = defineStore("event", () => {
     );
     if (res.status === 200) {
       eventListAll.value = await res.json();
+      noAuthentication.value = true;
       console.log("get all event lists successfully");
-    } else console.log("error, cannot get event lists");
+    } else if(res.status === 401) {
+      noAuthentication.value = false;
+      console.log(noAuthentication.value);
+  }else console.log("error, cannot get event lists");
   };
 
   //  Get Filter Event
@@ -497,8 +503,8 @@ export const useLogin = defineStore("login", () => {
   const matchEmail = ref(true);
   const logoutPopup = ref(false);
   const logoutIcon = ref(false);
-  const accessTimeLimit = ref();
-  const refreshTimeLimit = ref();
+  // const accessTimeLimit = ref();
+  // const refreshTimeLimit = ref();
   const timeCheck = ref();
   const userPage = ref(false);
 
@@ -541,6 +547,11 @@ export const useLogin = defineStore("login", () => {
     localStorage.removeItem("email");
   };
 
+  const resetAccessToken = () => {
+    localStorage.removeItem("jwt");
+    localStorage.removeItem("refreshToken");
+  }
+
   //log out
   const logout = () => {
     userPage.value = false;
@@ -548,7 +559,7 @@ export const useLogin = defineStore("login", () => {
     logoutIcon.value = false;
     clearInterval(timeCheck.value);
     resetJwtToken();
-    resetTimeLimit();
+    // resetTimeLimit();
     router.push({ name: 'Login'});
   };
 
@@ -574,10 +585,10 @@ export const useLogin = defineStore("login", () => {
       setRoleToken(token.value.role);
       setRefreshToken(token.value.refresh_token);
       setEmailToken(token.value.email);
-      setTimeLimit();
+      // setTimeLimit();
       timeCheck.value = setInterval(() => {
-        checkTokenExpired();
-      }, 30 * 60 * 1000 + 1);
+        getRefresh();
+      }, 30*60*1000);
       if(getRoleToken() == '[admin]'){
         userPage.value = true;
       }
@@ -605,40 +616,43 @@ export const useLogin = defineStore("login", () => {
     });
     if (res.status === 200) {
       token.value = await res.json();
-      resetJwtToken();
+      resetAccessToken();
       setJwtToken(token.value.access_token);
       setRefreshToken(token.value.refresh_token);
       console.log("Refresh token success");
+      // console.log(getJwtToken()); 
     } else if (res.status === 401) {
+      logout();
       console.log("Refresh token not success");
-    }
+    } 
   };
 
-  const setTimeLimit = () => {
-    const startTime = new Date();
-    accessTimeLimit.value = new Date(startTime.getTime() + 30 * 60 * 1000);
-    refreshTimeLimit.value = new Date(startTime.getTime() + 24 * 60 * 60 * 1000);
-  };
+  // const setTimeLimit = () => {
+  //   const startTime = new Date();
+  //   accessTimeLimit.value = new Date(startTime.getTime() + 10 * 1000);
+  //   refreshTimeLimit.value = new Date(startTime.getTime() + 30 * 1000);
+  // };
 
-  const resetTimeLimit = () => {
-    accessTimeLimit.value = null;
-    refreshTimeLimit.value = null;
-  };
+  // const resetTimeLimit = () => {
+  //   accessTimeLimit.value = null;
+  //   refreshTimeLimit.value = null;
+  // };
 
-  const checkTokenExpired = () => {
-    const now = new Date();
-    const accessExpired = accessTimeLimit.value < now.getTime();
-    const refreshExpired = refreshTimeLimit.value < now.getTime();
-    if (token.value != null) {
-      if (accessExpired && !refreshExpired) {
-        console.log(accessExpired, refreshExpired);
-        getRefresh();
-      } else if (refreshExpired) {
-        console.log(refreshExpired);
-        logout();
-      }
-    }
-  };
+  // const checkTokenExpired = () => {
+  //   const now = new Date();
+  //   const accessExpired = accessTimeLimit.value < now.getTime();
+  //   const refreshExpired = refreshTimeLimit.value < now.getTime();
+  //   if (token.value != null) {
+  //     if (!refreshExpired) {
+  //       console.log(accessExpired, refreshExpired);
+  //       getRefresh();
+  //     } 
+  //     else if (refreshExpired) {
+  //       console.log(refreshExpired);
+  //       logout();
+  //     }
+  //   }
+  // };
 
   return {
     handleLogin,
@@ -646,6 +660,7 @@ export const useLogin = defineStore("login", () => {
     getRoleToken,
     getEmailToken,
     logout,
+    getRefresh,
     popUp,
     matchEmail,
     matchPassword,

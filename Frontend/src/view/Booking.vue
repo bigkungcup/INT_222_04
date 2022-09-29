@@ -22,6 +22,7 @@ onBeforeMount(async () => {
   <div
     class="bg-fixed bg-booking bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen"
   >
+  <div class="grid" v-if="event.noAuthentication">
     <CreateEvent
       @create="event.createEvent"
       @close="event.disShowPopUp"
@@ -29,6 +30,7 @@ onBeforeMount(async () => {
       :popUp="event.popUp"
       :currentCategory="category.categoryLists"
     />
+  </div>
     <div class="grid" v-show="!event.noAuthentication">
       <NoAuthentication/>
     </div>

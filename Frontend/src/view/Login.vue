@@ -56,6 +56,7 @@ onBeforeMount(async () => {
               class="bg-white border border-slate-300 rounded-lg h-10 w-5/6 text-3xl placeholder:italic placeholder:text-2xl"
               placeholder=" Enter Your Email"
               v-model.trim="userAccount.email"
+              @keyup.enter="login.handleLogin(userAccount)"
             />
             <!-- <div
               v-if="userAccount.email === '' || userAccount.email.value === 0"
@@ -82,6 +83,7 @@ onBeforeMount(async () => {
               placeholder=" Enter Your Password"
               autocomplete="off"
               v-model="userAccount.password"
+              @keyup.enter="login.handleLogin(userAccount)"
             /></form>
             <div
               v-if="
@@ -106,7 +108,8 @@ onBeforeMount(async () => {
           <div class="col-span-4 place-self-center">
             <button
               class="bg-rose-400 text-white rounded-3xl w-36 py-2 mx-2 hover:bg-white hover:text-rose-800"
-              @click="login.handleLogin(userAccount)"
+              @click="login.handleLogin(userAccount)" 
+              
             >
               Login
             </button>

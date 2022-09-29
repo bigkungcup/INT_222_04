@@ -28,7 +28,7 @@ const login = useLogin();
       <svg width="50" class="pt-8 transition duration-150 ease-in-out hover:scale-125" viewBox="0 0 32 32"><path fill="#ffffff" d="M17 22v-8h-4v2h2v6h-3v2h8v-2h-3zM16 8a1.5 1.5 0 1 0 1.5 1.5A1.5 1.5 0 0 0 16 8z"/><path fill="#ffffff" d="M16 30a14 14 0 1 1 14-14a14 14 0 0 1-14 14Zm0-26a12 12 0 1 0 12 12A12 12 0 0 0 16 4Z"/></svg>
       </router-link>
       <span>
-      <router-link :to="{ name: 'Login'}">
+      <router-link :to="{ name: login.logoutIcon?'Profile':'Login'}">
         <svg width="50" v-show="!login.logoutIcon" class="absolute bottom-36 transition duration-150 ease-in-out hover:scale-125" viewBox="0 0 15 15"><path fill="#ffffff" d="M5 5.5a2.5 2.5 0 1 1 5 0a2.5 2.5 0 0 1-5 0Z"/><path fill="#ffffff" fill-rule="evenodd" d="M7.5 0a7.5 7.5 0 1 0 0 15a7.5 7.5 0 0 0 0-15ZM1 7.5a6.5 6.5 0 1 1 10.988 4.702A3.5 3.5 0 0 0 8.5 9h-2a3.5 3.5 0 0 0-3.488 3.202A6.482 6.482 0 0 1 1 7.5Z" clip-rule="evenodd"/></svg>
         <svg width="50" v-show="login.logoutIcon" class="absolute bottom-36 transition duration-150 ease-in-out hover:scale-125" viewBox="0 0 24 24"><path fill="#ffffff" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88a9.947 9.947 0 0 1 12.28 0C16.43 19.18 14.03 20 12 20z"/></svg>
       </router-link>
