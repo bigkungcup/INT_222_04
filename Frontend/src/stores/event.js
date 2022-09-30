@@ -3,7 +3,7 @@ import { ref } from "vue";
 import "@vuepic/vue-datepicker/dist/main.css";
 import moment from "moment";
 import router from "../router";
-
+import { useLogin2 } from "./login.js";
 
 export const useEvent = defineStore("event", () => {
   const eventLists = ref([]);
@@ -19,6 +19,7 @@ export const useEvent = defineStore("event", () => {
   const validEmail =
     /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
   const noAuthentication = ref(true);
+  const login = useLogin2();
 
   //Get Event
   const getEventLists = async (page = 0) => {
@@ -37,6 +38,8 @@ export const useEvent = defineStore("event", () => {
       console.log("get event lists successfully");
     }
     else if (res.status === 401) {
+      login.getRefresh();
+      getEventLists();
       noAuthentication.value = false;
     } else console.log("error, cannot get event lists");
   };
@@ -314,7 +317,7 @@ export const useEventCategory = defineStore("eventCategory", () => {
       }
     );
     if (res.status === 200) {
-      noAuthentication.value = true;
+      // noAuthentication.value = true;
       categoryLists.value = await res.json();
       console.log("get category lists successfully");
     } else if (res.status === 401) {
@@ -505,7 +508,7 @@ export const useLogin = defineStore("login", () => {
   const logoutIcon = ref(false);
   // const accessTimeLimit = ref();
   // const refreshTimeLimit = ref();
-  const timeCheck = ref();
+  // const timeCheck = ref();
   const userPage = ref(false);
 
   const getJwtToken = () => {
@@ -557,7 +560,7 @@ export const useLogin = defineStore("login", () => {
     userPage.value = false;
     logoutPopup.value = false;
     logoutIcon.value = false;
-    clearInterval(timeCheck.value);
+    // window.clearInterval();
     resetJwtToken();
     // resetTimeLimit();
     router.push({ name: 'Login'});
@@ -586,9 +589,9 @@ export const useLogin = defineStore("login", () => {
       setRefreshToken(token.value.refresh_token);
       setEmailToken(token.value.email);
       // setTimeLimit();
-      timeCheck.value = setInterval(() => {
-        getRefresh();
-      }, 30*60*1000);
+      // timeCheck.value = setInterval(() => {
+      //   getRefresh();
+      // }, 10*1000);
       if(getRoleToken() == '[admin]'){
         userPage.value = true;
       }
