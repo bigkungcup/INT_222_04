@@ -5,13 +5,14 @@ import moment from "moment";
 import router from "../router";
 
 //-----------------------------------------------------------------------------------
-export const useLogin2 = defineStore("login", () => {
+export const useLogin = defineStore("login", () => {
     const token = ref();
     const popUp = ref(false);
     const matchPassword = ref(true);
     const matchEmail = ref(true);
     const logoutPopup = ref(false);
     const logoutIcon = ref(false);
+    const noAuthentication = ref(true);
     // const accessTimeLimit = ref();
     // const refreshTimeLimit = ref();
     // const timeCheck = ref();
@@ -115,7 +116,7 @@ export const useLogin2 = defineStore("login", () => {
       }
     };
   
-    const getRefresh = async () => {
+    const getRefresh = async (x) => {
       const res = await fetch(`${import.meta.env.VITE_BASE_URL}/token/refresh`, {
         method: "GET",
         headers: {
@@ -128,6 +129,7 @@ export const useLogin2 = defineStore("login", () => {
         resetAccessToken();
         setJwtToken(token.value.access_token);
         setRefreshToken(token.value.refresh_token);
+        x;
         console.log("Refresh token success");
         // console.log(getJwtToken()); 
       } else if (res.status === 401) {
@@ -177,6 +179,7 @@ export const useLogin2 = defineStore("login", () => {
       logoutPopup,
       logoutIcon,
       userPage,
+      noAuthentication
     };
   });
   
@@ -184,7 +187,7 @@ export const useLogin2 = defineStore("login", () => {
   if (import.meta.hot) {
     import.meta.hot.accept(
       acceptHMRUpdate(
-        useLogin2,
+        useLogin,
         import.meta.hot
       )
     );

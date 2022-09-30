@@ -20,6 +20,7 @@ module.exports = {
       },
       margin: {
         '100': '35rem',
+        '99' : '25rem'
       }
     },      
   },

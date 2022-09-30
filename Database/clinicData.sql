@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS `clinic`.`event` (
   `bookingEmail` VARCHAR(255) NULL,
   `eventStartTime` DATETIME NOT NULL,
   `eventNotes` VARCHAR(500) NULL,
+  `eventDuration` INT NOT NULL,
   `eventCategoryId` INT NOT NULL,
   `user_userId` INT NOT NULL,
   PRIMARY KEY (`eventId`),

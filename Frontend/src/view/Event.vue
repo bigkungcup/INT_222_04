@@ -2,7 +2,8 @@
 import { onBeforeMount, onBeforeUpdate } from "vue";
 import EventList from "../components/EventList.vue";
 import EventEmptyList from "../components/EventEmptyList.vue";
-import { useEvent,useEventCategory,useLogin } from "../stores/event.js"
+import { useEvent,useEventCategory } from "../stores/event.js"
+import { useLogin } from "../stores/login.js";
 import NoAuthentication from "../components/NoAuthentication.vue"
 import Logout from "../components/Logout.vue";
 
@@ -25,7 +26,13 @@ const login = useLogin()
       event.eventLists.content = event.eventLists.content.filter(
         (event) => event.id !== eventId
       );
+      login.noAuthentication = true;
       console.log("deleteted succesfully");
+    } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(getEventCategory());
+      login.noAuthentication = false;
+    } else if(res.status === 401 && login.logoutIcon == false){
+      login.noAuthentication = false;
     } else console.log("error, cannot delete");
     event.filter == 0 ? event.getEventLists() : event.getFilterEvent();
   };
@@ -67,7 +74,7 @@ onBeforeUpdate(async () => {
     <div class="grid" v-show="event.filter == 0 ? event.showEmptyEvent : event.showEmptyFilterEvent">
       <EventEmptyList />
     </div>
-    <div class="grid" v-show="!event.noAuthentication">
+    <div class="grid" v-show="!login.noAuthentication">
       <NoAuthentication/>
     </div>
     <div class="grid" v-show="login.logoutPopup">

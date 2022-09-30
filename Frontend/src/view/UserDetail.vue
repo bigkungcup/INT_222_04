@@ -2,7 +2,8 @@
   import { ref, onBeforeMount } from "vue";
   import { useRoute, useRouter } from "vue-router";
   import { formatDate, formatTime } from "../main.js";
-  import { useUser,useLogin } from "../stores/event.js"
+  import { useUser } from "../stores/event.js"
+  import { useLogin } from "../stores/login.js";
   import Logout from "../components/Logout.vue";
   const { params } = useRoute();
   
@@ -20,7 +21,13 @@
       })
     if (res.status === 200) {
       displayUser.value = await res.json();
+      login.noAuthentication = true;
       console.log("get successfully");
+    } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(getEventCategory());
+      login.noAuthentication = false;
+    } else if(res.status === 401 && login.logoutIcon == false){
+      login.noAuthentication = false;
     } else console.log("error, cannot get user");
   };
   
@@ -41,11 +48,17 @@
     if (res.status === 200) {
       let userEdit = await res.json();
       console.log(userEdit);
+      login.noAuthentication = true;
       showEditPopUp()
       popUp.value = false
       reset()
       getUser()
       console.log("edit successfully");
+    } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(getEventCategory());
+      login.noAuthentication = false;
+    } else if(res.status === 401 && login.logoutIcon == false){
+      login.noAuthentication = false;
     } else {
       console.log("error, cannot edit");
       user.showText();

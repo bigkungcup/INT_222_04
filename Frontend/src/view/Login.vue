@@ -1,7 +1,8 @@
 <script setup>
 import { ref } from "vue";
 import { onBeforeMount } from "vue";
-import { useUser,useLogin } from "../stores/event.js";
+import { useUser } from "../stores/event.js";
+import { useLogin } from "../stores/login.js";
 import Logout from "../components/Logout.vue";
 import router from "../router";
 

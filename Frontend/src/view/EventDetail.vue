@@ -5,7 +5,8 @@ import { formatDate, formatTime } from "../main.js";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import moment from "moment"
-import { useEvent,useLogin } from "../stores/event.js"
+import { useEvent } from "../stores/event.js"
+import { useLogin } from "../stores/login.js";
 import Logout from "../components/Logout.vue";
 const { params } = useRoute();
 
@@ -21,10 +22,14 @@ const getEvent = async () => {
   });
   if (res.status === 200) {
     displayEvent.value = await res.json();
+    login.noAuthentication = true;
     console.log("get successfully");
-  }
-  
-  else console.log("error, cannot get event");
+  } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(getEventCategory());
+      login.noAuthentication = false;
+    } else if(res.status === 401 && login.logoutIcon == false){
+      login.noAuthentication = false;
+    } else console.log("error, cannot get event");
 };
 
 //edit event
@@ -50,11 +55,17 @@ const saveEvent = async (displayEvent, editEvent) => {
     if (editEvent.eventStartTime !== "" || editEvent.eventNotes !== "") {
       showEditPopUp()
     }
+    login.noAuthentication = true;
     popUp.value = false
     reset()
     getEvent()
     console.log("edit successfully");
-  } else {
+  } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(getEventCategory());
+      login.noAuthentication = false;
+    } else if(res.status === 401 && login.logoutIcon == false){
+      login.noAuthentication = false;
+    } else {
     console.log("error, cannot edit");
     alert("error, cannot edit");
   }

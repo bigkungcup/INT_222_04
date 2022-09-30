@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue";
-import { useLogin } from "../stores/event.js"
+import { useLogin } from "../stores/login.js";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import moment from "moment"

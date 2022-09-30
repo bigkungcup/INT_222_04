@@ -1,6 +1,6 @@
 <script setup>
 import Logout from '../components/Logout.vue';
-import { useLogin } from "../stores/event.js"
+import { useLogin } from "../stores/login.js"
 
 const login = useLogin()
 </script>

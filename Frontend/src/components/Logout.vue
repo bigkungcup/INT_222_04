@@ -1,5 +1,5 @@
 <script setup>
-import { useLogin } from "../stores/event.js"
+import { useLogin } from "../stores/login.js";
 
 const login = useLogin();
 </script>

@@ -2,7 +2,8 @@
 import {  onBeforeMount  } from "vue";
 import CreateEvent from "../components/CreateEvent.vue";
 import NoAuthentication from "../components/NoAuthentication.vue"
-import { useEvent, useEventCategory,useLogin } from "../stores/event.js";
+import { useEvent, useEventCategory } from "../stores/event.js";
+import { useLogin } from "../stores/login.js";
 import Logout from "../components/Logout.vue";
 
 const event = useEvent();
@@ -22,7 +23,7 @@ onBeforeMount(async () => {
   <div
     class="bg-fixed bg-booking bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen"
   >
-  <div class="grid" v-if="event.noAuthentication">
+  <div class="grid" v-if="login.noAuthentication">
     <CreateEvent
       @create="event.createEvent"
       @close="event.disShowPopUp"
@@ -31,7 +32,7 @@ onBeforeMount(async () => {
       :currentCategory="category.categoryLists"
     />
   </div>
-    <div class="grid" v-show="!event.noAuthentication">
+    <div class="grid" v-show="!login.noAuthentication">
       <NoAuthentication/>
     </div>
     <div class="grid" v-show="login.logoutPopup">

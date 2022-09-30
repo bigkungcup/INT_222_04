@@ -1,7 +1,8 @@
 <script setup>
 import { ref, onBeforeMount } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useEventCategory,useLogin } from "../stores/event.js"
+import { useEventCategory } from "../stores/event.js"
+import { useLogin } from "../stores/login.js";
 import Logout from "../components/Logout.vue";
 const { params } = useRoute();
 
@@ -20,7 +21,13 @@ const getEventCategory = async () => {
     );
     if (res.status === 200) {
         displayCategory.value = await res.json();
+        login.noAuthentication = true;
         console.log("get successfully");
+    } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(getEventCategory());
+      login.noAuthentication = false;
+    } else if(res.status === 401 && login.logoutIcon == false){
+      login.noAuthentication = false;
     } else console.log("error, cannot get category");
 };
 
@@ -41,6 +48,7 @@ const saveEventCategory = async (displayCategory, editCategory) => {
     if (res.status === 200) {
         let category = await res.json();
         console.log(category);
+        login.noAuthentication = true;
         if (editCategory.eventCategoryName !== "" || editCategory.eventDuration !== null || editCategory.eventCategoryDescription !== "") {
             showEditPopUp()
         }
@@ -48,7 +56,12 @@ const saveEventCategory = async (displayCategory, editCategory) => {
         reset()
         getEventCategory()
         console.log("edit successfully");
-    } else {
+    } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(getEventCategory());
+      login.noAuthentication = false;
+    } else if(res.status === 401 && login.logoutIcon == false){
+      login.noAuthentication = false;
+    }  else {
         console.log("error, cannot edit");
         alert("error, cannot edit");
     }

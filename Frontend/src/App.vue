@@ -2,7 +2,7 @@
 import Navbar from "./components/Navbar.vue";
 import router from "./router";
 import { onMounted } from "vue";
-import { useLogin } from "./stores/event.js"
+import { useLogin } from "./stores/login.js";
 
 const login = useLogin();
 
