@@ -16,8 +16,7 @@ const login = useLogin()
       `${import.meta.env.VITE_BASE_URL}/users/${userId}`,
       {
         method: "DELETE",
-        headers: {"Authorization":`Bearer ${localStorage.getItem('jwt')}`
-      }}
+      }
     );
     if (res.status === 200) {
       user.userList.content = user.userList.content.filter(

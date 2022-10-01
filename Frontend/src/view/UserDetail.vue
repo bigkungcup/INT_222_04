@@ -15,9 +15,7 @@
   const getUser = async () => {
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/${params.id}`,
       {
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem('jwt')}`
-        }
+        method: "GET",
       })
     if (res.status === 200) {
       displayUser.value = await res.json();
@@ -37,7 +35,6 @@
       method: "PUT",
       headers: {
         "content-type": "application/json",
-        "Authorization": `Bearer ${localStorage.getItem('jwt')}`
       },
       body: JSON.stringify({
         name: editUser.name === "" ? displayUser.name : editUser.name,

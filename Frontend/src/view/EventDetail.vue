@@ -16,9 +16,7 @@ const login = useLogin()
 //get event
 const getEvent = async () => {
   const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events/${params.id}`, {
-    headers: {
-      "Authorization": `Bearer ${localStorage.getItem('jwt')}`
-    }
+    method: "GET",
   });
   if (res.status === 200) {
     displayEvent.value = await res.json();
@@ -38,7 +36,6 @@ const saveEvent = async (displayEvent, editEvent) => {
     method: "PUT",
     headers: {
       "content-type": "application/json",
-      "Authorization": `Bearer ${localStorage.getItem('jwt')}`
     },
     body: JSON.stringify({
       bookingName: displayEvent.bookingName,

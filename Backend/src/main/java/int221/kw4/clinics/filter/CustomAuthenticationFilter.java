@@ -88,6 +88,8 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
         access_cookie.setHttpOnly(true);
         refresh_cookie.setHttpOnly(true);
+        access_cookie.setPath("/");
+        refresh_cookie.setPath("/");
 
         response.addCookie(access_cookie);
         response.addCookie(refresh_cookie);

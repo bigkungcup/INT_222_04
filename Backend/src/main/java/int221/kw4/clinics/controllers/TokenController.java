@@ -71,6 +71,7 @@ public class TokenController {
 
                 Cookie access_cookie = new Cookie("access_token", access_token);
                 access_cookie.setHttpOnly(true);
+                access_cookie.setPath("/");
                 response.addCookie(access_cookie);
 
             } catch (Exception exception) {
@@ -93,8 +94,8 @@ public class TokenController {
         if (cookies != null)
             for (Cookie cookie : cookies) {
                 cookie.setValue("");
-                cookie.setPath("/api");
-                cookie.setMaxAge(-1);
+                cookie.setPath("/");
+//                cookie.setMaxAge(-1);
                 resp.addCookie(cookie);
             }
     }

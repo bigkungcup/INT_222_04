@@ -27,9 +27,6 @@ export const useEvent = defineStore("event", () => {
       `${import.meta.env.VITE_BASE_URL}/events?page=${page}`,
       {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-        },
       }
     );
     if (res.status === 200) {
@@ -51,9 +48,6 @@ export const useEvent = defineStore("event", () => {
       `${import.meta.env.VITE_BASE_URL}/events/eventAll`,
       {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-        },
       }
     );
     if (res.status === 200) {
@@ -76,9 +70,6 @@ export const useEvent = defineStore("event", () => {
         `${import.meta.env.VITE_BASE_URL}/events/pastEvents?page=${page}`,
         {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-          },
         }
       );
     } else if (filter.value == 2) {
@@ -86,9 +77,6 @@ export const useEvent = defineStore("event", () => {
         `${import.meta.env.VITE_BASE_URL}/events/upComingEvents?page=${page}`,
         {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-          },
         }
       );
     } else if (filter.value == 3) {
@@ -98,9 +86,6 @@ export const useEvent = defineStore("event", () => {
         }/events/eventByCategory/1?page=${page}`,
         {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-          },
         }
       );
     } else if (filter.value == 4) {
@@ -110,9 +95,6 @@ export const useEvent = defineStore("event", () => {
         }/events/eventByCategory/2?page=${page}`,
         {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-          },
         }
       );
     } else if (filter.value == 5) {
@@ -122,9 +104,6 @@ export const useEvent = defineStore("event", () => {
         }/events/eventByCategory/3?page=${page}`,
         {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-          },
         }
       );
     } else if (filter.value == 6) {
@@ -134,9 +113,6 @@ export const useEvent = defineStore("event", () => {
         }/events/eventByCategory/4?page=${page}`,
         {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-          },
         }
       );
     } else {
@@ -146,9 +122,6 @@ export const useEvent = defineStore("event", () => {
         }/events/eventByCategory/5?page=${page}`,
         {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-          },
         }
       );
     }
@@ -170,7 +143,6 @@ export const useEvent = defineStore("event", () => {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
       },
       body: JSON.stringify({
         bookingName: newEvent.bookingName,
@@ -367,9 +339,6 @@ export const useUser = defineStore("user", () => {
       `${import.meta.env.VITE_BASE_URL}/users?page=${page}`,
       {
         method: "GET",
-        // headers: {
-        //   withCredentials: true, credentials: 'include'
-        // },
       }
     );
     if (res.status === 200) {
@@ -390,9 +359,6 @@ export const useUser = defineStore("user", () => {
   const getUserAll = async () => {
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/userAll`, {
       method: "GET",
-      // headers: {
-      //   Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      // },
     });
     if (res.status === 200) {
       userAll.value = await res.json();
@@ -412,7 +378,6 @@ export const useUser = defineStore("user", () => {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        // Authorization: `Bearer ${localStorage.getItem("jwt")}`,
       },
       body: JSON.stringify({
         name: newUser.name,
@@ -445,7 +410,6 @@ export const useUser = defineStore("user", () => {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
       },
       body: JSON.stringify({
         email: email,

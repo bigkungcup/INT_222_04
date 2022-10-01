@@ -14,9 +14,6 @@ const getEventCategory = async () => {
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/eventCategories/${params.id}`,
         {
             method: "GET",
-            headers: {
-                "Authorization": `Bearer ${localStorage.getItem('jwt')}`
-            }
         }
     );
     if (res.status === 200) {
@@ -37,7 +34,6 @@ const saveEventCategory = async (displayCategory, editCategory) => {
         method: "PUT",
         headers: {
             "content-type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem('jwt')}`
         },
         body: JSON.stringify({
             eventCategoryName: editCategory.eventCategoryName === "" ? displayCategory.eventCategoryName : editCategory.eventCategoryName,

@@ -17,9 +17,6 @@ const login = useLogin()
       `${import.meta.env.VITE_BASE_URL}/events/${eventId}`,
       {
         method: "DELETE",
-        headers:{
-          "Authorization": `Bearer ${localStorage.getItem('jwt')}`
-        }
       }
     );
     if (res.status === 200) {

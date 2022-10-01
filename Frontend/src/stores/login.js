@@ -143,7 +143,6 @@ export const useLogin = defineStore("login", () => {
         method: "GET",
         headers: {
           "content-type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("refreshToken")}`,
         },
       });
       if (res.status === 200) {
