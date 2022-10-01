@@ -7,7 +7,7 @@ import { useLogin } from "./stores/login.js";
 const login = useLogin();
 
 const checkToken = () => {
-    if(localStorage.getItem('jwt') === null){
+    if(localStorage.getItem('role') === null){
       router.push("../login")
     }else{
       login.logoutIcon = true;

@@ -17,22 +17,23 @@ export const useLogin = defineStore("login", () => {
     // const refreshTimeLimit = ref();
     // const timeCheck = ref();
     const userPage = ref(false);
+    const checkLecture = ref(false);
   
-    const getJwtToken = () => {
-      return localStorage.getItem("jwt");
-    };
+    // const getJwtToken = () => {
+    //   return localStorage.getItem("jwt");
+    // };
   
-    const setJwtToken = (token) => {
-      localStorage.setItem("jwt", token);
-    };
+    // const setJwtToken = (token) => {
+    //   localStorage.setItem("jwt", token);
+    // };
   
-    const getRefreshToken = () => {
-      return localStorage.getItem("refreshToken");
-    };
+    // const getRefreshToken = () => {
+    //   return localStorage.getItem("refreshToken");
+    // };
   
-    const setRefreshToken = (token) => {
-      localStorage.setItem("refreshToken", token);
-    };
+    // const setRefreshToken = (token) => {
+    //   localStorage.setItem("refreshToken", token);
+    // };
   
     const getRoleToken = () => {
       return localStorage.getItem("role");
@@ -50,33 +51,52 @@ export const useLogin = defineStore("login", () => {
       localStorage.setItem("email", token);
     };
   
-    const resetJwtToken = () => {
-      localStorage.removeItem("jwt");
-      localStorage.removeItem("refreshToken");
+    const resetToken = () => {
+      // localStorage.removeItem("jwt");
+      // localStorage.removeItem("refreshToken");
       localStorage.removeItem("role");
       localStorage.removeItem("email");
     };
   
-    const resetAccessToken = () => {
-      localStorage.removeItem("jwt");
-      localStorage.removeItem("refreshToken");
-    }
+    // const resetAccessToken = () => {
+    //   localStorage.removeItem("jwt");
+    //   localStorage.removeItem("refreshToken");
+    // }
   
     //log out
-    const logout = () => {
-      userPage.value = false;
-      logoutPopup.value = false;
-      logoutIcon.value = false;
-      // window.clearInterval();
-      resetJwtToken();
-      // resetTimeLimit();
-      router.push({ name: 'Login'});
+    // const logout = () => {
+    //   userPage.value = false;
+    //   logoutPopup.value = false;
+    //   logoutIcon.value = false;
+    //   checkLecture.value = false;
+    //   // window.clearInterval();
+    //   resetToken();
+    //   // resetTimeLimit();
+    //   router.push({ name: 'Login'});
+    // };
+
+    //log out
+    const logout = async () => {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/token/remove`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+      });
+      if (res.status === 200) {
+        userPage.value = false;
+        logoutPopup.value = false;
+        logoutIcon.value = false;
+        checkLecture.value = false;
+        resetToken();
+        router.push({ name: 'Login'});
+      }
+    else console.log();
     };
   
     //Login
     const handleLogin = async (userAccount) => {
       const res = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
         method: "POST",
+        // credentials: 'include',
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           email: userAccount.email,
@@ -90,10 +110,10 @@ export const useLogin = defineStore("login", () => {
         logoutIcon.value = true;
         popUp.value = true;
         token.value = await res.json();
-        resetJwtToken();
-        setJwtToken(token.value.access_token);
+        resetToken();
+        // setJwtToken(token.value.access_token);
         setRoleToken(token.value.role);
-        setRefreshToken(token.value.refresh_token);
+        // setRefreshToken(token.value.refresh_token);
         setEmailToken(token.value.email);
         // setTimeLimit();
         // window.setInterval(() => {
@@ -101,7 +121,9 @@ export const useLogin = defineStore("login", () => {
         // }, 10*1000);
         if(getRoleToken() == '[admin]'){
           userPage.value = true;
-        }
+        }else if(getRoleToken() == '[lecturer]'){
+        checkLecture.value = true;
+      }
         console.log("Password Matched");
       } else if (res.status === 401) {
         // matchText.value = false;
@@ -126,9 +148,9 @@ export const useLogin = defineStore("login", () => {
       });
       if (res.status === 200) {
         token.value = await res.json();
-        resetAccessToken();
-        setJwtToken(token.value.access_token);
-        setRefreshToken(token.value.refresh_token);
+        // resetAccessToken();
+        // setJwtToken(token.value.access_token);
+        // setRefreshToken(token.value.refresh_token);
         x;
         console.log("Refresh token success");
         // console.log(getJwtToken()); 
@@ -167,7 +189,7 @@ export const useLogin = defineStore("login", () => {
   
     return {
       handleLogin,
-      getJwtToken,
+        // getJwtToken,
       getRoleToken,
       getEmailToken,
       logout,
@@ -179,7 +201,8 @@ export const useLogin = defineStore("login", () => {
       logoutPopup,
       logoutIcon,
       userPage,
-      noAuthentication
+      noAuthentication,
+      checkLecture
     };
   });
   
