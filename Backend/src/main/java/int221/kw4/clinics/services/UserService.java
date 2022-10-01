@@ -13,7 +13,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -53,11 +55,27 @@ public class UserService implements UserDetailsService {
         return listMapper.mapList(userList, UserDTO.class, modelMapper);
     }
 
-    public UserDTO getUserById(Integer userId) throws HandleExceptionNotFound {
-        User userById = repository.findById(userId).orElseThrow(
-                () -> new HandleExceptionNotFound(
-                        "User ID: " + userId + " does not exist !!!"));
-        return modelMapper.map(userById, UserDTO.class);
+    public UserDTO getUserById(Integer userId) throws HandleExceptionNotFound, HandleExceptionForbidden {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = repository.findByEmail(auth.getPrincipal().toString());
+
+        if (user.getRole().equals("admin")) {
+            return modelMapper.map(repository.findById(userId).orElseThrow(() -> new HandleExceptionNotFound("User not found")), UserDTO.class);
+        } else {
+//            throw new HandleExceptionForbidden("You don't have permission to access this resource");
+            userId = user.getId();
+            if (user.getId() == userId) {
+                return modelMapper.map(repository.findById(userId).orElseThrow(() -> new HandleExceptionNotFound("User not found")), UserDTO.class);
+            } else {
+                throw new HandleExceptionForbidden("You don't have permission to access this resource");
+            }
+        }
+
+
+//        User userById = repository.findById(userId).orElseThrow(
+//                () -> new HandleExceptionNotFound(
+//                        "User ID: " + userId + " does not exist !!!"));
+//        return modelMapper.map(userById, UserDTO.class);
     }
 
 //    public List<User> getUserByCategoryId(Integer eventCategoryId){

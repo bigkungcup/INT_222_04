@@ -13,6 +13,7 @@ import int221.kw4.clinics.services.LoginService;
 import int221.kw4.clinics.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.ServletWebRequest;
 
@@ -46,7 +47,8 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserDTO getUserById(@PathVariable Integer userId) throws HandleExceptionNotFound {
+//    @PreAuthorize("hasRole('admin') or hasRole('lecturer') or hasRole('student')")
+    public UserDTO getUserById(@PathVariable(required = false) Integer userId) throws HandleExceptionNotFound, HandleExceptionForbidden {
         return service.getUserById(userId);
     }
 

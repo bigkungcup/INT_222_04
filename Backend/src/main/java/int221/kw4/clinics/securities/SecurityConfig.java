@@ -69,7 +69,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/token/refresh","/api/token/remove").permitAll();
 
         http.authorizeRequests().antMatchers("/api/users/register/{userId}/eventCategory").hasAnyAuthority("lecturer", "admin")
-                .antMatchers("/api/users/{userId}/eventCategory/{eventCategoryId}").hasAnyAuthority("lecturer", "admin");
+                .antMatchers("/api/users/{userId}/eventCategory/{eventCategoryId}").hasAnyAuthority("lecturer", "admin")
+                .antMatchers("/api/users/{userId}").hasAnyAuthority("admin", "lecturer", "student");
 
         http.authorizeRequests().antMatchers( "/api/events/lecturer/{userId}").hasAnyAuthority("lecturer", "admin");
 
@@ -77,7 +78,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests().antMatchers("/api/events/**").hasAnyAuthority("student", "admin");
 
-        http.authorizeRequests().antMatchers("/api/eventCategories/**").hasAnyAuthority("admin", "lecturer", "student")
+        http.authorizeRequests().antMatchers("/api/eventCategories/**").permitAll()
                                 .anyRequest().authenticated();
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()

@@ -70,9 +70,13 @@ public class TokenController {
 //                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
 
                 Cookie access_cookie = new Cookie("access_token", access_token);
+                Cookie refresh_cookie = new Cookie("refresh_token", refresh_token.getValue());
                 access_cookie.setHttpOnly(true);
+                refresh_cookie.setHttpOnly(true);
                 access_cookie.setPath("/");
+                refresh_cookie.setPath("/");
                 response.addCookie(access_cookie);
+                response.addCookie(refresh_cookie);
 
             } catch (Exception exception) {
                 log.error("Error logging in: {}", exception.getMessage());
