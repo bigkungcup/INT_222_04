@@ -62,22 +62,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
         customAuthenticationFilter.setFilterProcessesUrl("/api/login");
-        http.csrf().disable().cors().and()
-                .authorizeRequests().antMatchers(GET, "/api/users/**").hasAnyAuthority("admin")
-                .antMatchers(POST,"/api/users/register/{userId}/eventCategory").hasAnyAuthority("lecturer", "admin")
-                .antMatchers(DELETE,"/api/users/{userId}/eventCategory/{eventCategoryId}").hasAnyAuthority("lecturer", "admin")
-                .antMatchers(DELETE, "/api/users/**").hasAnyAuthority("admin")
-                .antMatchers(PUT, "/api/users/**").hasAnyAuthority("admin")
-                .antMatchers(POST, "/api/users/**").hasAnyAuthority("admin")
-                .antMatchers(POST, "/api/users/match/**").hasAnyAuthority("admin")
-                .antMatchers("/api/events/**", "/api/eventCategories/**").hasAnyAuthority("student", "admin")
-                .antMatchers(GET,"/api/events/lecturer/{userId}").hasAnyAuthority( "lecturer", "admin")
-                .antMatchers(POST, "/api/users/register/**").permitAll()
-                .antMatchers(GET, "/api/token/refresh/**").permitAll()
-                .anyRequest().authenticated().and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+
+        http.csrf().disable().cors();
+
+        http.authorizeRequests().antMatchers( "/api/users/register/**").permitAll()
+                .antMatchers("/api/token/refresh","/api/token/remove").permitAll();
+
+        http.authorizeRequests().antMatchers("/api/users/register/{userId}/eventCategory").hasAnyAuthority("lecturer", "admin")
+                .antMatchers("/api/users/{userId}/eventCategory/{eventCategoryId}").hasAnyAuthority("lecturer", "admin");
+
+        http.authorizeRequests().antMatchers( "/api/events/lecturer/{userId}").hasAnyAuthority("lecturer", "admin");
+
+        http.authorizeRequests().antMatchers( "/api/users/**").hasAnyAuthority("admin");
+
+        http.authorizeRequests().antMatchers("/api/events/**").hasAnyAuthority("student", "admin");
+
+        http.authorizeRequests().antMatchers("/api/eventCategories/**").hasAnyAuthority("admin", "lecturer", "student")
+                                .anyRequest().authenticated();
+
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and()
                 .addFilter(customAuthenticationFilter)
                 .addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 }
+//                .antMatchers(POST, "/api/users/match/**").hasAnyAuthority("admin")
+//                .antMatchers(DELETE, "/api/users/**").hasAnyAuthority("admin")
+//                .antMatchers(PUT, "/api/users/**").hasAnyAuthority("admin")
+//                .antMatchers(POST, "/api/users/**").hasAnyAuthority("admin");

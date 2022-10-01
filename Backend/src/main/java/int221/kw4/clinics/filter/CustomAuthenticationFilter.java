@@ -87,7 +87,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         Cookie refresh_cookie = new Cookie("refresh_token", refresh_token);
 
         access_cookie.setHttpOnly(true);
-
         refresh_cookie.setHttpOnly(true);
 
         response.addCookie(access_cookie);

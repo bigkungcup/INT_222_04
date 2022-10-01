@@ -1,10 +1,7 @@
 package int221.kw4.clinics.dtos.events;
 
 import int221.kw4.clinics.entities.EventCategory;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.Instant;
@@ -13,7 +10,7 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
+@ToString
 public class EventPostDTO {
     @NotNull(message = "Name shouldn't be null")
     @Size(max = 100, min = 1, message = "Name should be between 1 and 100 characters in length.")

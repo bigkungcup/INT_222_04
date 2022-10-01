@@ -197,6 +197,9 @@ public class EventService {
         User user = userRepository.findByEmail(auth.getPrincipal().toString());
         System.out.println("User1: " + auth.getPrincipal());
         System.out.println("User2: " + user.getEmail() + user.getRole());
+        newEvent.setUserId(user.getId());
+
+        System.out.println("New Event: " + newEvent);
 
         Date newEventStartTime = Date.from(newEvent.getEventStartTime());
         Date newEventEndTime = findEndDate(Date.from(newEvent.getEventStartTime()), newEvent.getEventDuration());

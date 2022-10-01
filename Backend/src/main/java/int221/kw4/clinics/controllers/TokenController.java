@@ -19,8 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
@@ -87,6 +86,19 @@ public class TokenController {
             throw new RuntimeException("Refresh token is missing");
         }
     }
+
+    @PostMapping("/token/remove")
+    private void eraseCookie(HttpServletRequest req, HttpServletResponse resp) {
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null)
+            for (Cookie cookie : cookies) {
+                cookie.setValue("");
+                cookie.setPath("/api");
+                cookie.setMaxAge(-1);
+                resp.addCookie(cookie);
+            }
+    }
+
 }
 
 
