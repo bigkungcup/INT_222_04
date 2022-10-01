@@ -1,5 +1,6 @@
 package int221.kw4.clinics.dtos.events;
 
+import int221.kw4.clinics.entities.EventCategory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,5 +35,7 @@ public class EventPostDTO {
 
     @NotNull(message = "Category shouldn't be null")
     private Integer eventCategoryId;
+
+    private Integer userId;
 
 }

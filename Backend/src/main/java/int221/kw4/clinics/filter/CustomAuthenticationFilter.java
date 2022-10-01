@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -59,8 +60,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-//        System.out.println("Email is: " + login.getEmail());
-//        System.out.println("Password is: " + login.getPassword());
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(login.getEmail(), login.getPassword());
         return authenticationManager.authenticate(authenticationToken);
@@ -84,14 +83,19 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 .withIssuer(request.getRequestURI().toString())
                 .sign(algorithm);
 
-//        response.setHeader("access_token", access_token);
-//        response.setHeader("refresh_token", refresh_token);
+        Cookie access_cookie = new Cookie("access_token", access_token);
+        Cookie refresh_cookie = new Cookie("refresh_token", refresh_token);
+
+        access_cookie.setHttpOnly(true);
+
+        refresh_cookie.setHttpOnly(true);
+
+        response.addCookie(access_cookie);
+        response.addCookie(refresh_cookie);
 
         Map<String, String> tokens = new HashMap<>();
         tokens.put("email", user.getUsername());
         tokens.put("role", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()).toString());
-        tokens.put("access_token", access_token);
-        tokens.put("refresh_token", refresh_token);
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), tokens);
     }

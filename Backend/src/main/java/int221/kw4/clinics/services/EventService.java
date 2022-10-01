@@ -30,6 +30,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -75,6 +76,23 @@ public class EventService {
         return listMapper.mapList(eventList, EventDTO.class, modelMapper);
     }
 
+    public  EventPageDTO getEventByCategoryId(Integer userId, Integer page, Integer pageSize) throws HandleExceptionNotFound, HandleExceptionForbidden {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new HandleExceptionNotFound(
+                        "User ID: " + userId + " does not exist !!!")
+        );
+
+        if(user.getRole().toString().equals("student")) {
+            throw new HandleExceptionForbidden("Access denied for user:" + user.getEmail());
+        }else {
+            List<Integer> categoryIds = user.getEventCategories().stream().map(EventCategory::getId).collect(Collectors.toList());
+            System.out.println(categoryIds);
+            return modelMapper.map(repository.findByEventCategory_IdIn(categoryIds,
+                    PageRequest.of(page, pageSize)), EventPageDTO.class);
+        }
+
+    }
+
     public EventDTO getEventById(Integer eventId) throws HandleExceptionNotFound, HandleExceptionForbidden {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByEmail(auth.getPrincipal().toString());
@@ -89,7 +107,7 @@ public class EventService {
             return modelMapper.map(eventListById, EventDTO.class);
         } else if (user.getRole().toString().equals("student")) {
             if(user.getEmail().equals(event.getBookingEmail())){
-                Event eventListById = repository.findByIdAndAndBookingEmail(eventId, user.getEmail());
+                Event eventListById = repository.findByIdAndBookingEmail(eventId, user.getEmail());
                 return modelMapper.map(eventListById, EventDTO.class);
             } else {
                 throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
@@ -165,6 +183,7 @@ public class EventService {
         event.setEventNotes(newEvent.getEventNotes());
         event.setEventDuration(newEvent.getEventDuration());
         event.setEventCategory(eventCategoryRepository.findById(newEvent.getEventCategoryId()).get());
+        event.setUser(userRepository.findById(newEvent.getUserId()).get());
         return event;
     }
 
@@ -225,7 +244,7 @@ public class EventService {
         User user = userRepository.findByEmail(auth.getPrincipal().toString());
         Event event = repository.getById(eventId);
         System.out.println("User1: " + auth.getPrincipal());
-        System.out.println("User2: " + user.getEmail() + " 55555555555555 " + event.getBookingEmail());
+        System.out.println("User2: " + user.getEmail() + event.getBookingEmail());
 
         if(user.getRole().toString().equals("admin")){
             repository.findById(eventId).orElseThrow(

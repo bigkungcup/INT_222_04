@@ -1,11 +1,11 @@
 package int221.kw4.clinics.services;
 
+import int221.kw4.clinics.advices.HandleExceptionBadRequest;
+import int221.kw4.clinics.advices.HandleExceptionForbidden;
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.advices.HandleExceptionUnique;
-import int221.kw4.clinics.dtos.users.UserDTO;
-import int221.kw4.clinics.dtos.users.UserEditDTO;
-import int221.kw4.clinics.dtos.users.UserPageDTO;
-import int221.kw4.clinics.dtos.users.UserPostDTO;
+import int221.kw4.clinics.dtos.users.*;
+import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.entities.User;
 import int221.kw4.clinics.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -41,6 +41,7 @@ public class UserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    //GET
     public UserPageDTO getAllUser(String sortBy, Integer page, Integer pageSize) {
         return modelMapper.map(repository.findAll(
                         PageRequest.of(page, pageSize, Sort.by(Sort.Direction.ASC, sortBy))),
@@ -59,11 +60,17 @@ public class UserService implements UserDetailsService {
         return modelMapper.map(userById, UserDTO.class);
     }
 
+//    public List<User> getUserByCategoryId(Integer eventCategoryId){
+//        List<User> user = repository.findUsersByEventCategoriesId(eventCategoryId);
+//        return user;
+//    }
+
     public User getUserByEmail(String email) {
         User userByEmail = repository.findByEmail(email);
         return modelMapper.map(userByEmail, User.class);
     }
 
+    //POST
     public ResponseEntity createUser(UserPostDTO newUser) throws HandleExceptionUnique {
         List<User> userList = repository.findAll();
 
@@ -87,6 +94,28 @@ public class UserService implements UserDetailsService {
         return ResponseEntity.status(201).body(user);
     }
 
+    public ResponseEntity addEventCategoty(Integer userId, EventCategory eventCategory) throws HandleExceptionNotFound, HandleExceptionForbidden {
+        User user = repository.findById(userId).orElseThrow(
+                () -> new HandleExceptionNotFound(
+                        "User ID: " + userId + " does not exist !!!")
+        );
+
+        user.getEventCategories().stream().map(EventCategory::getId).forEach(id -> {
+            if (id.equals(eventCategory.getId())) {
+                try {
+                    throw new HandleExceptionBadRequest("Event Category ID: " + eventCategory.getId() + " already exists !!!");
+                } catch (HandleExceptionBadRequest e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+            user.addEventCategory(eventCategory);
+            repository.saveAndFlush(user);
+            UserLecteurDTO lecturer = modelMapper.map(user, UserLecteurDTO.class);
+            return ResponseEntity.status(200).body(lecturer);
+    }
+
+    //DELETE
     public ResponseEntity deleteUser(Integer userId) throws HandleExceptionNotFound {
         repository.findById(userId).orElseThrow(
                 () -> new HandleExceptionNotFound(
@@ -96,6 +125,24 @@ public class UserService implements UserDetailsService {
         return ResponseEntity.status(200).body("Delete UserID:" + userId);
     }
 
+    public ResponseEntity deleteEventCategoryUser(Integer userId, Integer eventCategoryId) throws HandleExceptionNotFound, HandleExceptionForbidden {
+        User user = repository.findById(userId).orElseThrow(
+                () -> new HandleExceptionNotFound(
+                        "User ID: " + userId + " does not exist !!!")
+        );
+
+            user.getEventCategories().stream().map(EventCategory::getId).forEach(id -> {
+                if (id.equals(eventCategoryId)) {
+                    user.getEventCategories().removeIf(eventCategory -> eventCategory.getId().equals(eventCategoryId));
+                    repository.saveAndFlush(user);
+                }
+            });
+            UserLecteurDTO lecturer = modelMapper.map(user, UserLecteurDTO.class);
+            return ResponseEntity.status(200).body(lecturer);
+    }
+
+
+    //UPDATE
     public ResponseEntity updateUser(UserEditDTO updateUser, Integer userId) throws HandleExceptionUnique {
         List<UserDTO> userList = getAll();
 
@@ -128,6 +175,8 @@ public class UserService implements UserDetailsService {
         return ResponseEntity.status(200).body(user);
     }
 
+
+    //AUTHENTICATION
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = repository.findByEmail(email);

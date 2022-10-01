@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 
 public interface EventRepository extends JpaRepository<Event, Integer> {
@@ -26,9 +27,10 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
 
     Page<Event> findAllByBookingEmail(String email, Pageable pageable);
 
-    Event findByIdAndAndBookingEmail(Integer eventId, String email);
+    Event findByIdAndBookingEmail(Integer eventId, String email);
 
-//    @Query(value = "SELECT * FROM event WHERE eventStartTime = :eventStartTime and bookingEmail = :bookingEmail ORDER BY")
+    Page<Event> findByEventCategory_IdIn(Collection<Integer> ids, Pageable pageable);
+
     @Query(value = "SELECT * FROM event WHERE cast(eventStartTime as date) = cast(:currentTime as date) AND eventCategoryId = :eventCategoryId", nativeQuery = true)
     List<Event> getEventByCurrentTime(@Param("currentTime") Instant currentTime, @Param("eventCategoryId") Integer eventCategoryId);
 }

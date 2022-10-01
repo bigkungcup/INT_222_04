@@ -8,6 +8,7 @@ import int221.kw4.clinics.dtos.events.EventDTO;
 import int221.kw4.clinics.dtos.events.EventEditDTO;
 import int221.kw4.clinics.dtos.events.EventPageDTO;
 import int221.kw4.clinics.dtos.events.EventPostDTO;
+import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class EventController {
     private EventService service;
 
     @GetMapping("")
-    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
+//    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public EventPageDTO getAllEvent(
             @RequestParam(defaultValue = "eventStartTime") String sortBy,
             @RequestParam(defaultValue = "0") int page,
@@ -38,21 +39,25 @@ public class EventController {
         return service.getAllEventPage(sortBy, page, pageSize);
     }
 
+    @GetMapping("/lecturer/{userId}")
+    public EventPageDTO getEventByCategories(@PathVariable Integer userId,
+                                             @RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "6") int pageSize) throws HandleExceptionNotFound, HandleExceptionForbidden {
+        return service.getEventByCategoryId(userId, page, pageSize);
+    }
+
     @GetMapping("/eventAll")
-    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public List<EventDTO> getAll() {
         return service.getAllEvent();
     }
 
     @GetMapping("/{eventId}")
-    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public EventDTO getEventById(@PathVariable Integer eventId) throws HandleExceptionNotFound, HandleExceptionForbidden {
         return service.getEventById(eventId);
     }
 
     @GetMapping("/eventByCategory/{eventCategoryId}")
-    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
-    public EventPageDTO getAllEventByCategory(
+    public EventPageDTO getAllEventByCategories(
             @PathVariable EventCategory eventCategoryId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int pageSize
@@ -61,7 +66,6 @@ public class EventController {
     }
 
     @GetMapping("/pastEvents")
-    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public EventPageDTO getAllEventByPast(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int pageSize
@@ -70,7 +74,6 @@ public class EventController {
     }
 
     @GetMapping("/upComingEvents")
-    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public EventPageDTO getAllEventByUpComing(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int pageSize
@@ -80,19 +83,16 @@ public class EventController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public ResponseEntity create(@Valid @RequestBody EventPostDTO newEvent) throws HandleExceptionOverlap, HandleExceptionBadRequest {
         return service.addEvent(newEvent);
     }
 
     @DeleteMapping("/{eventId}")
-    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public ResponseEntity delete(@PathVariable Integer eventId) throws HandleExceptionNotFound, HandleExceptionForbidden {
         return service.deleteEvent(eventId);
     }
 
     @PutMapping("/{eventId}")
-    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
     public ResponseEntity update(@Valid @RequestBody EventEditDTO updateEvent, @PathVariable Integer eventId)
             throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest {
         return service.update(updateEvent, eventId);
