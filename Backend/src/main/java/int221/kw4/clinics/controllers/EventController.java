@@ -87,6 +87,12 @@ public class EventController {
         return service.addEvent(newEvent);
     }
 
+    @PostMapping("/guest")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity guestCreate(@Valid @RequestBody EventPostDTO newEvent) throws HandleExceptionOverlap, HandleExceptionBadRequest {
+        return service.addEvent(newEvent);
+    }
+
     @DeleteMapping("/{eventId}")
     public ResponseEntity delete(@PathVariable Integer eventId) throws HandleExceptionNotFound, HandleExceptionForbidden {
         return service.deleteEvent(eventId);

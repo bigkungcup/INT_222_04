@@ -29,8 +29,6 @@ import static org.springframework.http.HttpMethod.*;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private static final RequestMatcher PROTECTED_URLS = new OrRequestMatcher(
-            new AntPathRequestMatcher("/users/**"));
     private final UserDetailsService userDetailsService;
 
     private final PasswordEncoder passwordEncoder;
@@ -67,7 +65,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests().antMatchers( "/api/users/register/**").permitAll()
                 .antMatchers("/api/token/refresh","/api/token/remove").permitAll()
-                .antMatchers("/api/login").permitAll();
+                .antMatchers("/api/login").permitAll()
+                .antMatchers("/api/events/guest").permitAll();
 
         http.authorizeRequests().antMatchers("/api/users/register/{userId}/eventCategory").hasAnyAuthority("lecturer", "admin")
                 .antMatchers("/api/users/{userId}/eventCategory/{eventCategoryId}").hasAnyAuthority("lecturer", "admin")

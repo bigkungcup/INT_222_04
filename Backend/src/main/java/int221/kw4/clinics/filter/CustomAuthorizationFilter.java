@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import int221.kw4.clinics.advices.HandleExceptionLogin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +20,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,7 +37,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getServletPath().equals("/api/login") || request.getServletPath().equals("/api/token/refresh") || request.getServletPath().equals("/api/users/register")) {
+        if (request.getServletPath().equals("/api/login") || request.getServletPath().equals("/api/token/refresh") ||
+                request.getServletPath().equals("/api/users/register") || request.getServletPath().equals("/api/events/guest")) {
             filterChain.doFilter(request, response);
         } else {
 //            String authorizationHeader = request.getHeader(AUTHORIZATION);
@@ -65,6 +69,16 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     new ObjectMapper().writeValue(response.getOutputStream(), error);
                 }
             } else {
+                HandleExceptionLogin errors;
+                Map<String, String> errorMap = new HashMap<>();
+                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                errorMap.put("Unauthorized", "Not Authentication");
+                errors = new HandleExceptionLogin(sdf3.format(timestamp), HttpStatus.UNAUTHORIZED.value(),
+                        "Unauthorized", "Validation", request.getRequestURI(), errorMap);
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                response.setContentType(APPLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), errors);
                 filterChain.doFilter(request, response);
             }
         }

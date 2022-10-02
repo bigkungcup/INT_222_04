@@ -57,11 +57,11 @@ public class UserController {
         return service.createUser(newUser);
     }
 
-    @PostMapping("/register/{userId}/eventCategory")
+    @PostMapping("/register/{userId}/{eventCategory}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity createCategory(@PathVariable Integer userId, @RequestBody EventCategory eventCategory)
+    public ResponseEntity createCategory(@PathVariable Integer userId, @PathVariable Integer eventCategory)
             throws HandleExceptionNotFound, HandleExceptionForbidden {
-        return service.addEventCategoty(userId, eventCategory);
+        return service.addEventCategoryToUser(userId, eventCategory);
     }
 
     @PostMapping("/match")

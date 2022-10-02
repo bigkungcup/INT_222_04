@@ -58,16 +58,4 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    public void addEventCategory(EventCategory eventCategory) {
-        this.eventCategories.add(eventCategory);
-        eventCategory.getUsers().add(this);
-    }
-
-//    public void removeEventCategory(long eventCategoryId) {
-//        EventCategory tag = this.eventCategories.stream().filter(t -> t.getId() == eventCategoryId).findFirst().orElse(null);
-//        if (tag != null) {
-//            this.eventCategories.remove(tag);
-//            tag.getUsers().remove(this);
-//        }
-//    }
 }

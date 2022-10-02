@@ -7,6 +7,7 @@ import int221.kw4.clinics.advices.HandleExceptionUnique;
 import int221.kw4.clinics.dtos.users.*;
 import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.entities.User;
+import int221.kw4.clinics.repositories.EventCategoryRepository;
 import int221.kw4.clinics.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
@@ -30,14 +31,17 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository repository;
 
+    private final EventCategoryRepository eventCategoryRepository;
+
     private final ModelMapper modelMapper;
 
     private final ListMapper listMapper;
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repository, ModelMapper modelMapper, ListMapper listMapper, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository repository, EventCategoryRepository eventCategoryRepository, ModelMapper modelMapper, ListMapper listMapper, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.eventCategoryRepository = eventCategoryRepository;
         this.modelMapper = modelMapper;
         this.listMapper = listMapper;
         this.passwordEncoder = passwordEncoder;
@@ -66,7 +70,6 @@ public class UserService implements UserDetailsService {
                             "User ID: " + finalUserId + " does not exist !!!"));
             return modelMapper.map(userById, UserDTO.class);
         } else {
-//            throw new HandleExceptionForbidden("You don't have permission to access this resource");
             userId = user.getId();
             if (user.getId() == userId) {
                 return modelMapper.map(repository.findById(userId).orElseThrow(() -> new HandleExceptionNotFound("User not found")), UserDTO.class);
@@ -113,25 +116,44 @@ public class UserService implements UserDetailsService {
         return ResponseEntity.status(201).body(user);
     }
 
-    public ResponseEntity addEventCategoty(Integer userId, EventCategory eventCategory) throws HandleExceptionNotFound, HandleExceptionForbidden {
-        User user = repository.findById(userId).orElseThrow(
-                () -> new HandleExceptionNotFound(
-                        "User ID: " + userId + " does not exist !!!")
-        );
+//    public ResponseEntity addEventCategoty(Integer userId, EventCategory eventCategory) throws HandleExceptionNotFound, HandleExceptionForbidden {
+//        User user = repository.findById(userId).orElseThrow(
+//                () -> new HandleExceptionNotFound(
+//                        "User ID: " + userId + " does not exist !!!")
+//        );
+//
+//        user.getEventCategories().stream().map(EventCategory::getId).forEach(id -> {
+//            if (id.equals(eventCategory.getId())) {
+//                try {
+//                    throw new HandleExceptionBadRequest("Event Category ID: " + eventCategory.getId() + " already exists !!!");
+//                } catch (HandleExceptionBadRequest e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//        });
+//            user.addEventCategory(eventCategory);
+//            repository.saveAndFlush(user);
+//            UserLecteurDTO lecturer = modelMapper.map(user, UserLecteurDTO.class);
+//            return ResponseEntity.status(200).body(lecturer);
+//    }
+
+    public ResponseEntity addEventCategoryToUser(Integer userId, Integer eventCategoryId) throws HandleExceptionNotFound {
+        User user = repository.findById(userId).orElseThrow(() -> new HandleExceptionNotFound("User not found"));
+        EventCategory eventCategory = eventCategoryRepository.findById(eventCategoryId).orElseThrow(() -> new HandleExceptionNotFound("Event Category not found"));
 
         user.getEventCategories().stream().map(EventCategory::getId).forEach(id -> {
-            if (id.equals(eventCategory.getId())) {
+            if (id.equals(eventCategoryId)) {
                 try {
-                    throw new HandleExceptionBadRequest("Event Category ID: " + eventCategory.getId() + " already exists !!!");
+                    throw new HandleExceptionBadRequest("Event Category ID: " + eventCategoryId + " already exists !!!");
                 } catch (HandleExceptionBadRequest e) {
                     throw new RuntimeException(e);
                 }
             }
         });
-            user.addEventCategory(eventCategory);
-            repository.saveAndFlush(user);
-            UserLecteurDTO lecturer = modelMapper.map(user, UserLecteurDTO.class);
-            return ResponseEntity.status(200).body(lecturer);
+        user.getEventCategories().add(eventCategory);
+        repository.saveAndFlush(user);
+        UserLecteurDTO lecturer = modelMapper.map(user, UserLecteurDTO.class);
+        return ResponseEntity.status(201).body(lecturer);
     }
 
     //DELETE
