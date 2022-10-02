@@ -60,7 +60,11 @@ public class UserService implements UserDetailsService {
         User user = repository.findByEmail(auth.getPrincipal().toString());
 
         if (user.getRole().equals("admin")) {
-            return modelMapper.map(repository.findById(userId).orElseThrow(() -> new HandleExceptionNotFound("User not found")), UserDTO.class);
+            Integer finalUserId = userId;
+            User userById = repository.findById(userId).orElseThrow(
+                    () -> new HandleExceptionNotFound(
+                            "User ID: " + finalUserId + " does not exist !!!"));
+            return modelMapper.map(userById, UserDTO.class);
         } else {
 //            throw new HandleExceptionForbidden("You don't have permission to access this resource");
             userId = user.getId();
@@ -72,10 +76,7 @@ public class UserService implements UserDetailsService {
         }
 
 
-//        User userById = repository.findById(userId).orElseThrow(
-//                () -> new HandleExceptionNotFound(
-//                        "User ID: " + userId + " does not exist !!!"));
-//        return modelMapper.map(userById, UserDTO.class);
+
     }
 
 //    public List<User> getUserByCategoryId(Integer eventCategoryId){

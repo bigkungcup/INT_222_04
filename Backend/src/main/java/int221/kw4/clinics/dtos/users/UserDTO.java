@@ -1,5 +1,6 @@
 package int221.kw4.clinics.dtos.users;
 
+import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.entities.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -19,4 +21,5 @@ public class UserDTO {
     private Role role;
     private Instant createdOn;
     private Instant updatedOn;
+    private Set<EventCategory> eventCategories;
 }
