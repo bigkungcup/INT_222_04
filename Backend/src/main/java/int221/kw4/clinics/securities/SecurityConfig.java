@@ -66,7 +66,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable().cors();
 
         http.authorizeRequests().antMatchers( "/api/users/register/**").permitAll()
-                .antMatchers("/api/token/refresh","/api/token/remove").permitAll();
+                .antMatchers("/api/token/refresh","/api/token/remove").permitAll()
+                .antMatchers("/api/login").permitAll();
 
         http.authorizeRequests().antMatchers("/api/users/register/{userId}/eventCategory").hasAnyAuthority("lecturer", "admin")
                 .antMatchers("/api/users/{userId}/eventCategory/{eventCategoryId}").hasAnyAuthority("lecturer", "admin")

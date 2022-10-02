@@ -23,17 +23,16 @@ import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
-
 @RestController
 @RequestMapping("/api")
 @Slf4j
 public class TokenController {
     private final AuthenticationManager authenticationManager;
-
     private final UserService service;
-
     private final String secret = "secret";
     private final Integer jwtExpirationInMs = 30 * 60 * 1000;
+    private final Integer refreshExpirationDateInMs = 24 * 60 * 60 * 1000;
+
 
     public TokenController(AuthenticationManager authenticationManager, UserService service) {
         this.authenticationManager = authenticationManager;
@@ -69,14 +68,29 @@ public class TokenController {
 //                response.setContentType(APPLICATION_JSON_VALUE);
 //                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
 
-                Cookie access_cookie = new Cookie("access_token", access_token);
-                Cookie refresh_cookie = new Cookie("refresh_token", refresh_token.getValue());
-                access_cookie.setHttpOnly(true);
-                refresh_cookie.setHttpOnly(true);
-                access_cookie.setPath("/");
-                refresh_cookie.setPath("/");
-                response.addCookie(access_cookie);
-                response.addCookie(refresh_cookie);
+//                Cookie access_cookie = new Cookie("access_token", access_token);
+//                Cookie refresh_cookie = new Cookie("refresh_token", refresh_token.getValue());
+//
+//                access_cookie.setHttpOnly(true);
+//                refresh_cookie.setHttpOnly(true);
+//
+//                access_cookie.setPath("/");
+//                refresh_cookie.setPath("/");
+//
+//                response.addCookie(access_cookie);
+//                response.addCookie(refresh_cookie);
+
+                response.addCookie(createCookie("access_token", access_token, jwtExpirationInMs));
+                response.addCookie(createCookie("refresh_token", refresh_token.getValue(), refreshExpirationDateInMs));
+
+
+                Map<String, String> userDetails = new HashMap<>();
+                userDetails.put("id", user.getId().toString());
+                userDetails.put("name",user.getName());
+                userDetails.put("email", user.getEmail());
+                userDetails.put("role", user.getRole().toString());
+                response.setContentType(APPLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), userDetails);
 
             } catch (Exception exception) {
                 log.error("Error logging in: {}", exception.getMessage());
@@ -102,6 +116,14 @@ public class TokenController {
 //                cookie.setMaxAge(-1);
                 resp.addCookie(cookie);
             }
+    }
+
+    public Cookie createCookie(String name, String value, Integer maxAge) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(maxAge);
+        cookie.setPath("/");
+        return cookie;
     }
 
 }

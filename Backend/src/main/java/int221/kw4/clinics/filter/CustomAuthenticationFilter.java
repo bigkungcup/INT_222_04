@@ -9,6 +9,7 @@ import int221.kw4.clinics.dtos.securities.JwtRequest;
 import int221.kw4.clinics.repositories.UserRepository;
 import int221.kw4.clinics.services.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -83,22 +84,26 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 .withIssuer(request.getRequestURI().toString())
                 .sign(algorithm);
 
-        Cookie access_cookie = new Cookie("access_token", access_token);
-        Cookie refresh_cookie = new Cookie("refresh_token", refresh_token);
+//        Cookie access_cookie = new Cookie("access_token", access_token);
+//        Cookie refresh_cookie = new Cookie("refresh_token", refresh_token);
+//
+//        access_cookie.setHttpOnly(true);
+//        refresh_cookie.setHttpOnly(true);
+//
+//        access_cookie.setPath("/");
+//        refresh_cookie.setPath("/");
 
-        access_cookie.setHttpOnly(true);
-        refresh_cookie.setHttpOnly(true);
-        access_cookie.setPath("/");
-        refresh_cookie.setPath("/");
+//        response.addCookie(access_cookie);
+//        response.addCookie(refresh_cookie);
 
-        response.addCookie(access_cookie);
-        response.addCookie(refresh_cookie);
+        response.addCookie(createCookie("access_token", access_token, jwtExpirationInMs));
+        response.addCookie(createCookie("refresh_token", refresh_token, refreshExpirationDateInMs));
 
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("email", user.getUsername());
-        tokens.put("role", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()).toString());
-        response.setContentType(APPLICATION_JSON_VALUE);
-        new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+//        Map<String, String> tokens = new HashMap<>();
+//        tokens.put("email", user.getUsername());
+//        tokens.put("role", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()).toString());
+//        response.setContentType(APPLICATION_JSON_VALUE);
+//        new ObjectMapper().writeValue(response.getOutputStream(), tokens);
     }
 
     @Override
@@ -116,4 +121,14 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), errors);
     }
+
+    public Cookie createCookie(String name, String value, Integer maxAge) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(maxAge);
+        cookie.setPath("/");
+        return cookie;
+    }
+
+
 }

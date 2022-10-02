@@ -47,8 +47,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-//    @PreAuthorize("hasRole('admin') or hasRole('lecturer') or hasRole('student')")
-    public UserDTO getUserById(@PathVariable(required = false) Integer userId) throws HandleExceptionNotFound, HandleExceptionForbidden {
+    public UserDTO getUserById(@PathVariable Integer userId) throws HandleExceptionNotFound, HandleExceptionForbidden {
         return service.getUserById(userId);
     }
 
