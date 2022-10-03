@@ -45,6 +45,9 @@ jobs:
           cd Frontend
           sudo docker-compose down
           sudo docker rmi -f frontend
+          sudo docker-compose up -d --build
+          sudo docker image prune -f
+          cd ..
 
       # - name: Front-end Create&Push Registry
       #   run: |
@@ -56,11 +59,11 @@ jobs:
       #   run: |
       #     sudo docker pull bigkungcup/frontend:latest
 
-      - name: Front-end Docker-compose Up
-        run: |
-          sudo docker-compose up -d --build
-          sudo docker image prune -f
-          cd ..
+#       - name: Front-end Docker-compose Up
+#         run: |
+#           sudo docker-compose up -d --build
+#           sudo docker image prune -f
+#           cd ..
 
       # Runs a Back-end
       - name: Back-end Docker Compose Down and Remove Images
@@ -68,6 +71,9 @@ jobs:
           cd Backend
           sudo docker-compose down
           sudo docker rmi -f backend
+          sudo docker-compose up -d --build
+          sudo docker image prune -f
+          cd ..
 
       # - name: Back-end Create&Push Registry
       #   run: |
@@ -79,11 +85,11 @@ jobs:
       #   run: |
       #     sudo docker pull bigkungcup/backend:latest
 
-      - name: Back-end Docker-compose Up
-        run: |
-          sudo docker-compose up -d --build
-          sudo docker image prune -f
-          cd ..
+#       - name: Back-end Docker-compose Up
+#         run: |
+#           sudo docker-compose up -d --build
+#           sudo docker image prune -f
+#           cd ..
       
       # Runs a Database  
       - name: Database Docker Compose Down and Remove Images
@@ -91,21 +97,28 @@ jobs:
           cd Database
           sudo docker-compose down
           sudo docker rmi -f mysql
-
-      - name: Database-end Docker-compose Up
-        run: |
           sudo docker-compose up -d --build
           sudo docker image prune -f
           cd ..
+
+#       - name: Database-end Docker-compose Up
+#         run: |
+#           sudo docker-compose up -d --build
+#           sudo docker image prune -f
+#           cd ..
 
       # Runs a Proxy
       - name: Proxy Docker Compose Down
         run: |
           cd Nginx
           sudo docker-compose down
-
-      - name: Proxy Docker-compose Up
-        run: |
           sudo docker-compose up -d --build
           sudo docker image prune -f
           cd ..
+
+
+#       - name: Proxy Docker-compose Up
+#         run: |
+#           sudo docker-compose up -d --build
+#           sudo docker image prune -f
+#           cd ..
