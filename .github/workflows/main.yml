@@ -1,0 +1,106 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # - name: Docker Login
+      #   run: |
+      #     docker login -u bigkungcup
+      #     dckr_pat_A9H8TN9k7tpNL_VpUzmwQ7pBFV8
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      # Runs a Front-end
+      - name: Front-end Docker Compose Down and Remove Images
+        run: |
+          cd Frontend
+          sudo docker-compose down
+          sudo docker rmi -f frontend
+
+      # - name: Front-end Create&Push Registry
+      #   run: |
+      #     sudo docker build -t frontend .
+      #     sudo docker tag frontend bigkungcup/frontend:latest
+      #     sudo docker push bigkungcup/frontend:latest
+
+      # - name: Front-end Pull Registry
+      #   run: |
+      #     sudo docker pull bigkungcup/frontend:latest
+
+      - name: Front-end Docker-compose Up
+        run: |
+          sudo docker-compose up -d --build
+          sudo docker image prune -f
+          cd ..
+
+      # Runs a Back-end
+      - name: Back-end Docker Compose Down and Remove Images
+        run: |
+          cd Backend
+          sudo docker-compose down
+          sudo docker rmi -f backend
+
+      # - name: Back-end Create&Push Registry
+      #   run: |
+      #     sudo docker build -t backend .
+      #     sudo docker tag backend bigkungcup/backend:latest
+      #     sudo docker push backend:latest
+
+      # - name: Back-end Pull Registry
+      #   run: |
+      #     sudo docker pull bigkungcup/backend:latest
+
+      - name: Back-end Docker-compose Up
+        run: |
+          sudo docker-compose up -d --build
+          sudo docker image prune -f
+          cd ..
+      
+      # Runs a Database  
+      - name: Database Docker Compose Down and Remove Images
+        run: |
+          cd Database
+          sudo docker-compose down
+          sudo docker rmi -f mysql
+
+      - name: Database-end Docker-compose Up
+        run: |
+          sudo docker-compose up -d --build
+          sudo docker image prune -f
+          cd ..
+
+      # Runs a Proxy
+      - name: Proxy Docker Compose Down
+        run: |
+          cd Nginx
+          sudo docker-compose down
+
+      - name: Proxy Docker-compose Up
+        run: |
+          sudo docker-compose up -d --build
+          sudo docker image prune -f
+          cd ..
