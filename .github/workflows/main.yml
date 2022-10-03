@@ -36,7 +36,8 @@ jobs:
       
       - name: Go to directory Github
         run: |
-          cd ../clinic/INT_222_04/
+          cd ~
+          cd clinic/INT_222_04/
           
       # Runs a Front-end
       - name: Front-end Docker Compose Down and Remove Images
