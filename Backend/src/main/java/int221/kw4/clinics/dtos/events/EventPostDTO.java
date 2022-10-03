@@ -1,6 +1,5 @@
 package int221.kw4.clinics.dtos.events;
 
-import int221.kw4.clinics.entities.EventCategory;
 import lombok.*;
 
 import javax.validation.constraints.*;

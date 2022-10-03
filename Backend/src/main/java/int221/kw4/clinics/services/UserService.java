@@ -33,15 +33,18 @@ public class UserService implements UserDetailsService {
 
     private final EventCategoryRepository eventCategoryRepository;
 
+    private final EmailService emailService;
+
     private final ModelMapper modelMapper;
 
     private final ListMapper listMapper;
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repository, EventCategoryRepository eventCategoryRepository, ModelMapper modelMapper, ListMapper listMapper, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository repository, EventCategoryRepository eventCategoryRepository, EmailService emailService, ModelMapper modelMapper, ListMapper listMapper, PasswordEncoder passwordEncoder) {
         this.repository = repository;
         this.eventCategoryRepository = eventCategoryRepository;
+        this.emailService = emailService;
         this.modelMapper = modelMapper;
         this.listMapper = listMapper;
         this.passwordEncoder = passwordEncoder;
@@ -79,7 +82,6 @@ public class UserService implements UserDetailsService {
         }
 
 
-
     }
 
 //    public List<User> getUserByCategoryId(Integer eventCategoryId){
@@ -113,6 +115,11 @@ public class UserService implements UserDetailsService {
         User user = modelMapper.map(newUser, User.class);
         repository.saveAndFlush(user);
         user.setPassword("**********");
+
+        emailService.sendSimpleMail(user.getEmail(), "Welcome to Clinic",
+                "Welcome User: " + user.getName() + "\n" + "Your email: " + user.getEmail() + "\n" +
+                        "Your role: " + user.getRole() + "\n" + "Create at: " + user.getCreatedOn(), new Date());
+
         return ResponseEntity.status(201).body(user);
     }
 
@@ -153,16 +160,23 @@ public class UserService implements UserDetailsService {
         user.getEventCategories().add(eventCategory);
         repository.saveAndFlush(user);
         UserLecteurDTO lecturer = modelMapper.map(user, UserLecteurDTO.class);
+        emailService.sendSimpleMail(user.getEmail(), "Add Category To User Successfully",
+                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
+                        "Your email: " + user.getEmail() + "\n" + "Category: " + eventCategory.getEventCategoryName() + "\n" +
+                        "Your role: " + user.getRole(), new Date());
         return ResponseEntity.status(201).body(lecturer);
     }
 
     //DELETE
     public ResponseEntity deleteUser(Integer userId) throws HandleExceptionNotFound {
-        repository.findById(userId).orElseThrow(
+        User user = repository.findById(userId).orElseThrow(
                 () -> new HandleExceptionNotFound(
                         "User ID: " + userId + " does not exist !!!")
         );
         repository.deleteById(userId);
+        emailService.sendSimpleMail(user.getEmail(), "Delete User Successfully",
+                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
+                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
         return ResponseEntity.status(200).body("Delete UserID:" + userId);
     }
 
@@ -172,14 +186,17 @@ public class UserService implements UserDetailsService {
                         "User ID: " + userId + " does not exist !!!")
         );
 
-            user.getEventCategories().stream().map(EventCategory::getId).forEach(id -> {
-                if (id.equals(eventCategoryId)) {
-                    user.getEventCategories().removeIf(eventCategory -> eventCategory.getId().equals(eventCategoryId));
-                    repository.saveAndFlush(user);
-                }
-            });
-            UserLecteurDTO lecturer = modelMapper.map(user, UserLecteurDTO.class);
-            return ResponseEntity.status(200).body(lecturer);
+        user.getEventCategories().stream().map(EventCategory::getId).forEach(id -> {
+            if (id.equals(eventCategoryId)) {
+                user.getEventCategories().removeIf(eventCategory -> eventCategory.getId().equals(eventCategoryId));
+                repository.saveAndFlush(user);
+            }
+        });
+        UserLecteurDTO lecturer = modelMapper.map(user, UserLecteurDTO.class);
+        emailService.sendSimpleMail(user.getEmail(), "Delete Category in User Successfully",
+                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
+                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
+        return ResponseEntity.status(200).body(lecturer);
     }
 
 
@@ -213,6 +230,9 @@ public class UserService implements UserDetailsService {
 
         modelMapper.map(updateUser, user);
         repository.saveAndFlush(user);
+        emailService.sendSimpleMail(user.getEmail(), "Update User Successfully",
+                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
+                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
         return ResponseEntity.status(200).body(user);
     }
 
