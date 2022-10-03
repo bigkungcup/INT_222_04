@@ -63,8 +63,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.csrf().disable().cors();
 
-        http.authorizeRequests().antMatchers( "/api/users/register/**").permitAll()
-                .antMatchers("/api/token/refresh","/api/token/remove").permitAll()
+        http.authorizeRequests().antMatchers("/api/users/register/**").permitAll()
+                .antMatchers("/api/token/refresh", "/api/token/remove").permitAll()
                 .antMatchers("/api/login").permitAll()
                 .antMatchers("/api/events/guest").permitAll();
 
@@ -72,14 +72,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/users/{userId}/eventCategory/{eventCategoryId}").hasAnyAuthority("lecturer", "admin")
                 .antMatchers("/api/users/{userId}").hasAnyAuthority("admin", "lecturer", "student");
 
-        http.authorizeRequests().antMatchers( "/api/events/lecturer/{userId}").hasAnyAuthority("lecturer", "admin");
+        http.authorizeRequests().antMatchers("/api/events/lecturer/{userId}").hasAnyAuthority("lecturer", "admin")
+                .antMatchers(GET, "/api/events/**").hasAnyAuthority("lecturer", "admin", "student");
 
-        http.authorizeRequests().antMatchers( "/api/users/**").hasAnyAuthority("admin");
+        http.authorizeRequests().antMatchers("/api/users/**").hasAnyAuthority("admin");
 
-        http.authorizeRequests().antMatchers("/api/events/**").hasAnyAuthority("student", "admin");
+        http.authorizeRequests().antMatchers(POST, "/api/events/**").hasAnyAuthority("student", "admin")
+                .antMatchers(PUT, "/api/events/**").hasAnyAuthority("student", "admin")
+                .antMatchers(DELETE, "/api/events/**").hasAnyAuthority("student", "admin");
 
         http.authorizeRequests().antMatchers("/api/eventCategories/**").permitAll()
-                                .anyRequest().authenticated();
+                .anyRequest().authenticated();
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and()

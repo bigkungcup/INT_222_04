@@ -61,7 +61,7 @@ public class EventController {
             @PathVariable EventCategory eventCategoryId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int pageSize
-    ) throws HandleExceptionNotFound {
+    ) throws HandleExceptionNotFound, HandleExceptionForbidden {
         return service.getEventByCategoryId(eventCategoryId, page, pageSize);
     }
 

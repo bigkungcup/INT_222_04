@@ -4,9 +4,9 @@ services:
     container_name: database
     image: mysql
     ports:
-     - 3307:3306
-    # networks:
-    #  - oasip-network
+     - 3306:3306
+    networks:
+     - oasip-network
     volumes:
       - ./clinicData.sql:/docker-entrypoint-initdb.d/clinic.sql
       - ./mysql-data:/var/lib/mysql
@@ -16,7 +16,7 @@ services:
       - LANG=en_US.UTF-8
     restart: always
 
-# networks:
-#  oasip-network:
-#    external:
-#     name: oasip-network
+networks:
+ oasip-network:
+   external:
+    name: oasip-network
