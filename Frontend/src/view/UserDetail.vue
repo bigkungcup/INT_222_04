@@ -22,7 +22,7 @@
       login.noAuthentication = true;
       console.log("get successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
-      login.getRefresh(getEventCategory());
+      login.getRefresh(getUser());
       login.noAuthentication = false;
     } else if(res.status === 401 && login.logoutIcon == false){
       login.noAuthentication = false;
@@ -52,7 +52,7 @@
       getUser()
       console.log("edit successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
-      login.getRefresh(getEventCategory());
+      login.getRefresh(saveUser());
       login.noAuthentication = false;
     } else if(res.status === 401 && login.logoutIcon == false){
       login.noAuthentication = false;

@@ -137,6 +137,27 @@ export const useEvent = defineStore("event", () => {
     } else console.log("error, cannot get event lists");
   };
 
+    //Get Lecturer Event
+    const getLecturerEventLists = async (page = 0) => {
+      const res = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/events/lecturer/${localStorage.getItem('id')}?page=${page}`,
+        {
+          method: "GET",
+        }
+      );
+      if (res.status === 200) {
+        login.noAuthentication = true;
+        eventLists.value = await res.json();
+        console.log("get event lists successfully");
+      } else if (res.status === 401 && login.logoutIcon == true) {
+        login.getRefresh(getEventLists((page = 0)));
+        login.noAuthentication = false;
+      } else if (res.status === 401 && login.logoutIcon == false) {
+        login.noAuthentication = false;
+      }
+      console.log("error, cannot get event lists");
+    };
+
   //Create Event
   const createEvent = async (newEvent) => {
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events`, {
@@ -265,6 +286,7 @@ export const useEvent = defineStore("event", () => {
     getEventLists,
     getAllEventLists,
     getFilterEvent,
+    getLecturerEventLists,
     listsNewEvent,
     createEvent,
     showEmptyEvent,
@@ -373,7 +395,7 @@ export const useUser = defineStore("user", () => {
   };
 
   //Create User
-  const createUser = async (newUser) => {
+  const createUser = async (newUser,newEventCategory) => {
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/register`, {
       method: "POST",
       headers: {
@@ -392,6 +414,7 @@ export const useUser = defineStore("user", () => {
       login.noAuthentication = true;
       getUserAll();
       showPopUp();
+      login.addLecturerCategory(addUser.id,newEventCategory)
       console.log("created successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(createUser(newUser));

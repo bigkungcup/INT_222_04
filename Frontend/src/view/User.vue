@@ -25,7 +25,7 @@ const login = useLogin()
       login.noAuthentication = true;
       console.log("deleteted succesfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
-      login.getRefresh(getEventCategory());
+      login.getRefresh(removeUser());
       login.noAuthentication = false;
     } else if(res.status === 401 && login.logoutIcon == false){
       login.noAuthentication = false;
@@ -34,6 +34,7 @@ const login = useLogin()
   };
 
 onBeforeMount(async () => {
+  await login.getRefresh();
   await user.getUserList();
   user.page = user.userList.pageNumber;
 });

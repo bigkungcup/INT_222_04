@@ -7,11 +7,9 @@ import { useLogin } from "./stores/login.js";
 const login = useLogin();
 
 const checkToken = () => {
-    if(localStorage.getItem('role') === null){
-      router.push("../login")
-    }else{
+    if(localStorage.getItem('role') !== null){
       login.logoutIcon = true;
-      if(localStorage.getItem('role') == '[admin]'){
+      if(localStorage.getItem('role') == 'admin'){
         login.userPage = true;
       }
     }

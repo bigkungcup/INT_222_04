@@ -26,7 +26,7 @@ const login = useLogin()
       login.noAuthentication = true;
       console.log("deleteted succesfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
-      login.getRefresh(getEventCategory());
+      login.getRefresh(removeEvent());
       login.noAuthentication = false;
     } else if(res.status === 401 && login.logoutIcon == false){
       login.noAuthentication = false;
@@ -34,8 +34,16 @@ const login = useLogin()
     event.filter == 0 ? event.getEventLists() : event.getFilterEvent();
   };
 
+  const checkRole = async () => {
+    if(localStorage.getItem('role') == 'lecturer'){
+      await event.getLecturerEventLists();
+    }
+      await event.getEventLists();
+  }
+
 onBeforeMount(async () => {
-  await event.getEventLists();
+  await checkRole();
+  // await event.getEventLists();
   await event.getFilterEvent();
   await category.getEventCategory();
   event.page = event.eventLists.pageNumber;
@@ -55,7 +63,7 @@ onBeforeUpdate(async () => {
       <Logout/>
     </div>
     <div class="absolute place-self-center top-10">      
-      <select v-show="event.noAuthentication" v-model="event.filter" class="col-span-2 px-3 rounded-lg text-3xl -mt-8" @change="event.getFilterEvent(),event.page=0">
+      <select v-show="login.noAuthentication" v-model="event.filter" class="col-span-2 px-3 rounded-lg text-3xl -mt-8" @change="event.getFilterEvent(),event.page=0">
           <option default value="0">Lists All</option>
           <option value="1">Past Events</option>
           <option value="2">Up-coming Events</option>

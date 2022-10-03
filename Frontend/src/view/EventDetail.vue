@@ -23,7 +23,7 @@ const getEvent = async () => {
     login.noAuthentication = true;
     console.log("get successfully");
   } else if (res.status === 401 && login.logoutIcon == true) {
-      login.getRefresh(getEventCategory());
+      login.getRefresh(getEvent());
       login.noAuthentication = false;
     } else if(res.status === 401 && login.logoutIcon == false){
       login.noAuthentication = false;
@@ -58,7 +58,7 @@ const saveEvent = async (displayEvent, editEvent) => {
     getEvent()
     console.log("edit successfully");
   } else if (res.status === 401 && login.logoutIcon == true) {
-      login.getRefresh(getEventCategory());
+      login.getRefresh(saveEvent());
       login.noAuthentication = false;
     } else if(res.status === 401 && login.logoutIcon == false){
       login.noAuthentication = false;
@@ -113,6 +113,9 @@ const setMinTime = (eventStartTime) => {
   console.log(editEvent.value.eventStartTime);
 }
 
+const editIcon = ref();
+editIcon.value = localStorage.getItem('role') == 'lecturer' ? false : true;
+
 onBeforeMount(async () => {
   await event.getAllEventLists();
   await getEvent();
@@ -130,7 +133,7 @@ onBeforeMount(async () => {
       <div class="grid grid-cols-2 text-4xl gap-y-10 break-all">
         <p class="text-8xl text-center col-span-2">
           Detail
-          <button @click="showPopUp()">
+          <button @click="showPopUp()" v-show="editIcon">
             <img src="../assets/images/Edit.png" width="40"
               class="transition duration-150 ease-in-out hover:scale-125" />
           </button>

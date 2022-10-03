@@ -19,9 +19,9 @@ onBeforeMount(async () => {
     class="bg-home bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen"
   >
     <EventCategoryList :currentCategory="category.categoryLists" />
-    <div class="grid" v-show="!login.noAuthentication">
+    <!-- <div class="grid" v-show="!login.noAuthentication">
       <NoAuthentication/>
-  </div>
+  </div> -->
   <div class="grid" v-show="login.logoutPopup">
       <Logout/>
     </div>

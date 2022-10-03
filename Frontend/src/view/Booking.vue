@@ -21,7 +21,7 @@ onBeforeMount(async () => {
 
 <template>
   <div
-    class="bg-fixed bg-booking bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen"
+    class="bg-fixed bg-booking bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen "
   >
   <div class="grid" v-if="login.noAuthentication">
     <CreateEvent

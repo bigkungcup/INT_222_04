@@ -53,7 +53,7 @@ const saveEventCategory = async (displayCategory, editCategory) => {
         getEventCategory()
         console.log("edit successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
-      login.getRefresh(getEventCategory());
+      login.getRefresh(saveEventCategory());
       login.noAuthentication = false;
     } else if(res.status === 401 && login.logoutIcon == false){
       login.noAuthentication = false;

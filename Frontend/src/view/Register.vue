@@ -1,9 +1,11 @@
 <script setup>
 import { ref } from "vue";
 import { onBeforeMount, onMounted } from "vue";
-import { useUser } from "../stores/event.js";
+import { useUser,useEventCategory } from "../stores/event.js";
 
 const user = useUser();
+const category = useEventCategory();
+const newEventCategory = ref()
 const validEmail =
   /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 const passwordConfirm = ref("");
@@ -72,18 +74,19 @@ const resetPassword = () => {
 };
 
 onBeforeMount(async () => {
+  await category.getEventCategory();
   user.textPopUp = false;
 });
 
-onMounted(async () => {
-  user.getUserAll();
-});
+// onMounted(async () => {
+//   user.getUserAll();
+// });
 </script>
 
 <template>
   <div class="bg-rose-200 h-screen w-screen">
     <div class="grid place-items-center">
-      <div class="bg-white/50 place-self-center my-24 pb-10 rounded-3xl">
+      <div class="bg-white/50 place-self-center my-12 pb-10 rounded-3xl">
         <div class="pt-4 pb-6 px-8 text-3xl text-rose-800">
           <router-link :to="{ name: 'Login' }">
             <span class="text-rose-800 hover:text-rose-500"> Login </span>
@@ -290,11 +293,13 @@ onMounted(async () => {
 
             <input type="radio" id="3" value="admin" v-model="newUser.role" />
             <label for="3">Admin</label>
-
-            <!-- <div v-if="newUser.role === '' || newUser.role.value === 0">
-        <p v-show="user.textPopUp" class="text-lg text-red-500 ml-10">*Please choose your role.</p>
-      </div> -->
           </div>
+
+          <select class="col-span-4 place-self-center px-3 rounded-lg text-3xl" v-model="newEventCategory" v-show="newUser.role == 'lecturer'">
+            <option v-for="list in category.categoryLists" :value="list.id">
+              {{ list.eventCategoryName }}            
+            </option>
+          </select>
 
           <div class="col-span-4 place-self-center">
             <button
@@ -304,7 +309,7 @@ onMounted(async () => {
                   checkEmail(newUser.email),
                   checkPassword(passwordConfirm)
                     ? resetPassword()
-                    : user.createUser(newUser)
+                    : user.createUser(newUser,newEventCategory)
               "
             >
               Register
