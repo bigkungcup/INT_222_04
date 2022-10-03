@@ -18,6 +18,8 @@ defineProps({
 const event = useEvent()
 const popUp = ref(false);
 const deleteId = ref();
+const deleteIcon = ref();
+deleteIcon.value = localStorage.getItem('role') == 'lecturer' ? false : true;
 
 const showPopUp = (id) => {
   popUp.value = true;
@@ -70,7 +72,7 @@ const showPopUp = (id) => {
               </p></router-link
             >
           </div>
-          <div class="grid col-span-1 pt-3">
+          <div class="grid col-span-1 pt-3" v-show="deleteIcon">
             <p>{{ list.eventDuration }} min.</p>
             <button @click="showPopUp(list.id)">
               <img

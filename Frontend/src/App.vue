@@ -1,5 +1,24 @@
 <script setup>
 import Navbar from "./components/Navbar.vue";
+import router from "./router";
+import { onMounted } from "vue";
+import { useLogin } from "./stores/login.js";
+
+const login = useLogin();
+
+const checkToken = () => {
+    if(localStorage.getItem('role') !== null){
+      login.logoutIcon = true;
+      if(localStorage.getItem('role') == 'admin'){
+        login.userPage = true;
+      }
+    }
+  }
+
+onMounted(async () => {
+  checkToken();
+});
+
 </script>
 
 <template>

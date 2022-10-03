@@ -9,15 +9,32 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 
 public interface EventRepository extends JpaRepository<Event, Integer> {
-    public Page<Event> findAllByEventStartTimeBeforeOrderByEventStartTimeDesc(Instant instantTime, Pageable pageable);
+    Page<Event> findAllByBookingEmailAndEventStartTimeBeforeOrderByEventStartTimeDesc(String email, Instant instantTime, Pageable pageable);
 
-    public Page<Event> findAllByEventStartTimeAfterOrderByEventStartTimeAsc(Instant instantTime, Pageable pageable);
+    Page<Event> findAllByEventStartTimeBeforeOrderByEventStartTimeDesc(Instant instantTime, Pageable pageable);
 
-    public Page<Event> findAllByEventCategory(EventCategory eventCategory, Pageable pageable);
+    Page<Event> findAllByBookingEmailAndEventStartTimeAfterOrderByEventStartTimeAsc(String email, Instant instantTime, Pageable pageable);
+
+    Page<Event> findAllByEventStartTimeAfterOrderByEventStartTimeAsc(Instant instantTime, Pageable pageable);
+
+    Page<Event> findAllByEventCategoryAndBookingEmail(EventCategory eventCategory, String email, Pageable pageable);
+
+    Page<Event> findAllByEventCategory(EventCategory eventCategory, Pageable pageable);
+
+    Page<Event> findAllByBookingEmail(String email, Pageable pageable);
+
+    Event findByIdAndBookingEmail(Integer eventId, String email);
+
+    Page<Event> findByEventCategory_IdIn(Collection<Integer> ids, Pageable pageable);
+
+    Page<Event> findAllByEventCategory_IdInAndEventStartTimeBeforeOrderByEventStartTimeDesc(Collection<Integer> ids, Instant instantTime, Pageable pageable);
+
+    Page<Event> findAllByEventCategory_IdInAndEventStartTimeAfterOrderByEventStartTimeAsc(Collection<Integer> ids, Instant instantTime, Pageable pageable);
 
     @Query(value = "SELECT * FROM event WHERE cast(eventStartTime as date) = cast(:currentTime as date) AND eventCategoryId = :eventCategoryId", nativeQuery = true)
-    public List<Event> getEventByCurrentTime(@Param("currentTime") Instant currentTime, @Param("eventCategoryId") Integer eventCategoryId);
+    List<Event> getEventByCurrentTime(@Param("currentTime") Instant currentTime, @Param("eventCategoryId") Integer eventCategoryId);
 }

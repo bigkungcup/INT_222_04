@@ -1,10 +1,18 @@
-<script setup></script>
+<script setup>
+import Logout from '../components/Logout.vue';
+import { useLogin } from "../stores/login.js"
+
+const login = useLogin()
+</script>
 
 <template>
   <div
     class="bg-aboutUs bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen"
   >
-    <div class="grid grid-cols-2 place-items-center gap-9 py-16 px-36 text-xl">
+  <div class="grid absolute z-40" v-show="login.logoutPopup">
+      <Logout/>
+    </div>
+    <div class="grid grid-cols-2 place-items-center gap-9 py-16 px-36 text-xl" >
       <p class="col-span-2 text-6xl text-amber-800">About Us</p>
       <div class="flex">
         <img src="../assets/images/Taradon.png" width="200" class="z-10" />
