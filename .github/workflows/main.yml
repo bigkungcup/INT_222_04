@@ -33,7 +33,11 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
+      
+      - name: Go to directory Github
+        run: |
+          cd clinic/INT_222_04/
+          
       # Runs a Front-end
       - name: Front-end Docker Compose Down and Remove Images
         run: |
