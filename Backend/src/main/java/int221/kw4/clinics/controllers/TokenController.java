@@ -24,7 +24,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/token")
 @Slf4j
 public class TokenController {
     private final AuthenticationManager authenticationManager;
@@ -39,7 +39,7 @@ public class TokenController {
         this.service = service;
     }
 
-    @GetMapping("/token/refresh")
+    @GetMapping("/refresh")
     public void refreshtoken(HttpServletRequest request, HttpServletResponse response) throws Exception {
 //        String authorizationHeader = request.getHeader(AUTHORIZATION);
         Cookie refresh_token = WebUtils.getCookie(request, "refresh_token");
@@ -106,7 +106,7 @@ public class TokenController {
         }
     }
 
-    @PostMapping("/token/remove")
+    @PostMapping("/remove")
     private void eraseCookie(HttpServletRequest req, HttpServletResponse resp) {
         Cookie[] cookies = req.getCookies();
         if (cookies != null)
