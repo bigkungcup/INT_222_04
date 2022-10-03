@@ -30,15 +30,15 @@ export const useEvent = defineStore("event", () => {
       }
     );
     if (res.status === 200) {
-      login.noAuthentication = true;
+      login.noAuthentication = false;
       eventLists.value = await res.json();
       console.log("get event lists successfully");
     }
     else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getEventLists(page = 0));
-      login.noAuthentication = false;
+      login.noAuthentication = true;
     } else if(res.status === 401 && login.logoutIcon == false){
-      login.noAuthentication = false;
+      login.noAuthentication = true;
     }console.log("error, cannot get event lists");
   };
 
@@ -52,13 +52,13 @@ export const useEvent = defineStore("event", () => {
     );
     if (res.status === 200) {
       eventListAll.value = await res.json();
-      login.noAuthentication = true;
+      login.noAuthentication = false;
       console.log("get all event lists successfully");
     }else if (res.status === 401 && login.logoutIcon == true) {
         login.getRefresh(getAllEventLists());
-        login.noAuthentication = false;
+        login.noAuthentication = true;
       } else if(res.status === 401 && login.logoutIcon == false){
-        login.noAuthentication = false;
+        login.noAuthentication = true;
       }else console.log("error, cannot get event lists");
   };
 
@@ -127,13 +127,13 @@ export const useEvent = defineStore("event", () => {
     }
     if (res.status === 200) {
       filterEventLists.value = await res.json();
-      login.noAuthentication = true;
+      login.noAuthentication = false;
       console.log("get filter event lists successfully");
     }else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getFilterEvent());
-      login.noAuthentication = false;
+      login.noAuthentication = true;
     } else if(res.status === 401 && login.logoutIcon == false){
-      login.noAuthentication = false;
+      login.noAuthentication = true;
     } else console.log("error, cannot get event lists");
   };
 
@@ -146,14 +146,14 @@ export const useEvent = defineStore("event", () => {
         }
       );
       if (res.status === 200) {
-        login.noAuthentication = true;
+        login.noAuthentication = false;
         eventLists.value = await res.json();
         console.log("get event lists successfully");
       } else if (res.status === 401 && login.logoutIcon == true) {
         login.getRefresh(getEventLists((page = 0)));
-        login.noAuthentication = false;
+        login.noAuthentication = true;
       } else if (res.status === 401 && login.logoutIcon == false) {
-        login.noAuthentication = false;
+        login.noAuthentication = true;
       }
       console.log("error, cannot get event lists");
     };
@@ -183,21 +183,62 @@ export const useEvent = defineStore("event", () => {
     });
     if (res.status === 201) {
       const addEvent = await res.json();
-      login.noAuthentication = true;
+      login.noAuthentication = false;
       listsNewEvent.value.push(addEvent);
       showPopUp();
       getAllEventLists();
       console.log("created successfully");
     }else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(createEvent(newEvent));
-      login.noAuthentication = false;
+      login.noAuthentication = true;
     } else if(res.status === 401 && login.logoutIcon == false){
-      login.noAuthentication = false;
+      login.noAuthentication = true;
     } else {
       console.log("error, cannot create");
       showText();
     }
   };
+
+    //Create Event
+    const createEventWithGuest = async (newEvent) => {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events/guest`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          bookingName: newEvent.bookingName,
+          bookingEmail: newEvent.bookingEmail.match(validEmail)
+            ? newEvent.bookingEmail
+            : null,
+          eventCategoryId: newEvent.eventCategory.id,
+          eventStartTime: getOverlapTime(
+            newEvent.eventStartTime,
+            newEvent.eventCategory.id
+          )
+            ? (newEvent.eventStartTime = "overlap")
+            : newEvent.eventStartTime,
+          eventNotes: newEvent.eventNotes,
+          eventDuration: newEvent.eventDuration,
+        }),
+      });
+      if (res.status === 201) {
+        const addEvent = await res.json();
+        login.noAuthentication = false;
+        listsNewEvent.value.push(addEvent);
+        showPopUp();
+        getAllEventLists();
+        console.log("created successfully");
+      }else if (res.status === 401 && login.logoutIcon == true) {
+        login.getRefresh(createEvent(newEvent));
+        login.noAuthentication = true;
+      } else if(res.status === 401 && login.logoutIcon == false){
+        login.noAuthentication = true;
+      } else {
+        console.log("error, cannot create");
+        showText();
+      }
+    };
 
   //ShowEmpty
   const getEmptyEvent = async () => {
@@ -289,6 +330,7 @@ export const useEvent = defineStore("event", () => {
     getLecturerEventLists,
     listsNewEvent,
     createEvent,
+    createEventWithGuest,
     showEmptyEvent,
     showEmptyFilterEvent,
     getEmptyEvent,
@@ -326,13 +368,10 @@ export const useEventCategory = defineStore("eventCategory", () => {
     if (res.status === 200) {
       // noAuthentication.value = true;
       categoryLists.value = await res.json();
-      login.noAuthentication = true;
       console.log("get category lists successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getEventCategory());
-      login.noAuthentication = false;
     } else if(res.status === 401 && login.logoutIcon == false){
-      login.noAuthentication = false;
     } else console.log("error, cannot get event category lists");
   };
   return { categoryLists, getEventCategory, 
@@ -354,6 +393,14 @@ export const useUser = defineStore("user", () => {
   const passwordMatchText = ref(false);
   const passwordNoMatchText = ref(false);
   const login = useLogin();
+  
+  const displayUser = ref({
+    id: 0,
+    name: "",
+    email: "",
+    role: "",
+    eventCategories: []
+  });
 
   //Get User
   const getUserList = async (page = 0) => {
@@ -364,14 +411,14 @@ export const useUser = defineStore("user", () => {
       }
     );
     if (res.status === 200) {
-      login.noAuthentication = true;
+      login.noAuthentication = false;
       userList.value = await res.json();
       console.log("get user lists successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getUserList());
-      login.noAuthentication = false;
+      login.noAuthentication = true;
     } else if(res.status === 401 && login.logoutIcon == false){
-      login.noAuthentication = false;
+      login.noAuthentication = true;
     } 
     // else if (res.status === 403) {} 
     else console.log("error, cannot get user lists");
@@ -384,15 +431,33 @@ export const useUser = defineStore("user", () => {
     });
     if (res.status === 200) {
       userAll.value = await res.json();
-      login.noAuthentication = true;
+      login.noAuthentication = false;
       console.log("get all user lists successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getUserAll());
-      login.noAuthentication = false;
+      login.noAuthentication = true;
     } else if(res.status === 401 && login.logoutIcon == false){
-      login.noAuthentication = false;
+      login.noAuthentication = true;
     } else console.log("error, cannot get user lists");
   };
+
+    // get user detail
+    const getUser = async () => {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/${login.getIdToken()}`,
+        {
+          method: "GET",
+        })
+      if (res.status === 200) {
+        displayUser.value = await res.json();
+        login.noAuthentication = false;
+        console.log("get successfully");
+      } else if (res.status === 401 && login.logoutIcon == true) {
+        login.getRefresh(getUser());
+        login.noAuthentication = true;
+      } else if(res.status === 401 && login.logoutIcon == false){
+        login.noAuthentication = true;
+      } else console.log("error, cannot get user");
+    };
 
   //Create User
   const createUser = async (newUser,newEventCategory) => {
@@ -411,16 +476,16 @@ export const useUser = defineStore("user", () => {
     if (res.status === 201) {
       const addUser = await res.json();
       listsNewUser.value.push(addUser);
-      login.noAuthentication = true;
+      login.noAuthentication = false;
       getUserAll();
       showPopUp();
       login.addLecturerCategory(addUser.id,newEventCategory)
       console.log("created successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(createUser(newUser));
-      login.noAuthentication = false;
+      login.noAuthentication = true;
     } else if(res.status === 401 && login.logoutIcon == false){
-      login.noAuthentication = false;
+      login.noAuthentication = true;
     } else {
       console.log("error, cannot create");
       showText();
@@ -442,13 +507,13 @@ export const useUser = defineStore("user", () => {
     if (res.status === 200) {
       passwordMatchText.value = true;
       passwordNoMatchText.value = false
-      login.noAuthentication = true;
+      login.noAuthentication = false;
       console.log("Password match");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(checkPassword(email,password));
-      login.noAuthentication = false;
+      login.noAuthentication = true;
     } else if(res.status === 401 && login.logoutIcon == false){
-      login.noAuthentication = false;
+      login.noAuthentication = true;
     } else {
       passwordNoMatchText.value = true;
       passwordMatchText.value = false;
@@ -463,9 +528,9 @@ export const useUser = defineStore("user", () => {
 
   //ShowEmpty
   const getEmptyUser = async () => {
-    if (userList.value.content.length === 0) {
+    if (userList.value.length === 0) {
       showEmptyUser.value = true;
-    } else if (userList.value.content.length !== 0) {
+    } else if (userList.value.length !== 0) {
       showEmptyUser.value = false;
     }
   };
@@ -505,6 +570,7 @@ export const useUser = defineStore("user", () => {
     getUserList,
     userAll,
     getUserAll,
+    getUser,
     page,
     NextPage,
     BackPage,
@@ -521,7 +587,8 @@ export const useUser = defineStore("user", () => {
     checkPassword,
     passwordMatchText,
     passwordNoMatchText,
-    resetMatchText
+    resetMatchText,
+    displayUser
   };
 });
 

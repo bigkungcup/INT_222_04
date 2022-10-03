@@ -3,6 +3,7 @@ import { ref } from "vue";
 import "@vuepic/vue-datepicker/dist/main.css";
 import moment from "moment";
 import router from "../router";
+import { useUser } from "../stores/event.js";
 
 //-----------------------------------------------------------------------------------
 export const useLogin = defineStore("login", () => {
@@ -12,10 +13,12 @@ export const useLogin = defineStore("login", () => {
   const matchEmail = ref(true);
   const logoutPopup = ref(false);
   const logoutIcon = ref(false);
-  const noAuthentication = ref(true);
+  const noAuthentication = ref();
   const userPage = ref(false);
-  const categoryList = ref();
-  const listsNewLecturerCategory = ref([]);
+  // const categoryList = ref();
+  // const listsNewLecturerCategory = ref([]);
+
+  const user = useUser();
 
   const getRoleToken = () => {
     return localStorage.getItem("role");
@@ -148,11 +151,11 @@ export const useLogin = defineStore("login", () => {
     );
     if (res.status === 200) {
       const addCategory = await res.json();
-      listsNewLecturerCategory.value.push(addCategory);
+      user.displayUser.eventCategories.push(addCategory);
       login.noAuthentication = true;
       console.log("created successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
-      login.getRefresh(addLecturerCategory(userId, eventCategory, x));
+      login.getRefresh(addLecturerCategory(userId,eventCategoryId));
       login.noAuthentication = false;
     } else if (res.status === 401 && login.logoutIcon == false) {
       login.noAuthentication = false;
@@ -171,17 +174,17 @@ export const useLogin = defineStore("login", () => {
       }
     );
     if (res.status === 200) {
-      categoryList.value.content = categoryList.value.content.filter(
+      user.displayUser = user.displayUser.eventCategories.filter(
         (category) => category.eventCategoryId !== eventCategoryId
       );
-      noAuthentication.value = true;
-      console.log("delete category success");
+      noAuthentication.value = false;
+      console.log("Delete category success");
     } else if (res.status === 401 && login.logoutIcon == true) {
-      login.getRefresh(removeUser());
-      noAuthentication.value = false;
+      login.getRefresh(deleteLecturerCategory(userId, eventCategoryId));
+      noAuthentication.value = true;
     } else if (res.status === 401 && login.logoutIcon == false) {
-      noAuthentication.value = false;
-    } else console.log("Get category list not success");
+      noAuthentication.value = true;
+    } else console.log("Delete category not success");
   };
 
   return {

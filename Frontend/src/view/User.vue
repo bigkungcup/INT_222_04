@@ -34,7 +34,6 @@ const login = useLogin()
   };
 
 onBeforeMount(async () => {
-  await login.getRefresh();
   await user.getUserList();
   user.page = user.userList.pageNumber;
 });
@@ -51,14 +50,14 @@ onBeforeUpdate(async () => {
  
 <template>
     <div class="bg-fixed bg-schedule bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen">
-    <div class="grid" v-show="!user.showEmptyUser && login.noAuthentication">
+    <div class="grid" v-show="!user.showEmptyUser && !login.noAuthentication">
       <UserList :currentUser="user.userList.content" @delete="removeUser" @next="user.NextPage"
         @back="user.BackPage" :page="user.page"/>
     </div>
     <div class="grid" v-show="user.showEmptyUser">
       <UserEmptyList />
     </div>
-    <div class="grid" v-show="!login.noAuthentication">
+    <div class="grid" v-show="login.noAuthentication">
       <NoAuthentication/>
     </div>
     <div class="grid" v-show="login.logoutPopup">

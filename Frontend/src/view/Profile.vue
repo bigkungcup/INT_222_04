@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onBeforeMount } from "vue";
+import { ref, onBeforeMount, onUpdated, onBeforeUpdate } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useEventCategory } from "../stores/event.js";
+import { useEventCategory,useUser } from "../stores/event.js";
 import { useLogin } from "../stores/login.js";
 import Logout from "../components/Logout.vue";
 
@@ -12,6 +12,7 @@ const goBack = () => {
 
 const login = useLogin();
 const category = useEventCategory();
+const user = useUser();
 const checkLecturer = ref('lecturer')
 const addPopUp = ref(false);
 const deletePopUp = ref(false)
@@ -37,51 +38,48 @@ const deleteCategory = (id) => {
         method: "GET",
       })
     if (res.status === 200) {
-      displayUser.value = await res.json();
-      login.noAuthentication = true;
-      checkLecturer.value = displayUser.value.role == 'lecturer' ? true : false;
+      user.displayUser = await res.json();
+      login.noAuthentication = false;
+      checkLecturer.value = user.displayUser.role == 'lecturer' ? true : false;
       console.log("get successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getUser());
-      login.noAuthentication = false;
+      login.noAuthentication = true;
     } else if(res.status === 401 && login.logoutIcon == false){
-      login.noAuthentication = false;
+      login.noAuthentication = true;
     } else console.log("error, cannot get user");
   };
 
-  const displayUser = ref({
-    id: 0,
-    name: "",
-    email: "",
-    role: "",
-    eventCategories: []
-  });
+
 
   const newEventCategory = ref()
-  // const categoryLists = ref([]);
+  const categoryLists = ref([]);
   // const userCategories = ref([]);
 
-  // const filterCategories = () => {
-  //   for(let i = 0; i <= categoryLists.length; i++ ) {
-  //     for (let j = 0; j < userCategories.length; j++) {
-  //       if(categoryLists[i].id == userCategories[j].id){
-  //         delete categoryLists[0];
-  //       }
-  //     }
-  // }
+  const filterCategories = (allCategoryLists,userCategoryLists) => {
+    allCategoryLists = category.categoryLists;
+    for(let i = 0; i < userCategoryLists.eventCategories.length; i++ ) {
+      allCategoryLists = allCategoryLists.filter(x => x.id != userCategoryLists.eventCategories[i].id);
+      }
+      return allCategoryLists
+  }
 
+  const getFilterCategories = () => {
+    categoryLists.value = filterCategories(categoryLists.value,user.displayUser)
+  }
 
 onBeforeMount(async () => {
   await getUser();
   await category.getEventCategory();
-  // console.log(displayUser.value.eventCategories);
-  // console.log(category.categoryLists);
-  // categoryLists.value = category.categoryLists;
-  // userCategories.value = displayUser.value.eventCategories;
-  // categoryLists.value = categoryLists.value.filter(userCategories.value);
-  // filterCategories();
-  // console.log(categoryLists.value);
+  console.log(user.displayUser);
+  getFilterCategories();
+  console.log(categoryLists.value);
 });
+
+onBeforeUpdate(async () => {
+  // await getUser();
+  getFilterCategories();
+})
 
 </script>
 
@@ -96,15 +94,15 @@ onBeforeMount(async () => {
       <div class="grid text-4xl gap-y-6 break-all">
         <p class="text-8xl text-center">Profile</p>
 
-        <p class="mx-36">Name : {{ displayUser.name }}</p>
+        <p class="mx-36">Name : {{ user.displayUser.name }}</p>
 
-        <p class="mx-36">Email : {{ displayUser.email }}</p>
+        <p class="mx-36">Email : {{ user.displayUser.email }}</p>
 
-        <p class="mx-36">Role : {{ displayUser.role }}</p>
+        <p class="mx-36">Role : {{ user.displayUser.role }}</p>
 
         <div class="mx-36" v-show="checkLecturer">
           <p>Clinics :</p>
-          <li v-for="category in displayUser.eventCategories" class="ml-36">
+          <li v-for="category in user.displayUser.eventCategories" class="ml-36">
               {{ category.eventCategoryName }}              
               <button @click="deleteCategory(category.id)" class="float-right mr-40">
                 <svg width="40" viewBox="0 0 24 24"><path fill="#FF3366" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z"/></svg>
@@ -112,12 +110,12 @@ onBeforeMount(async () => {
           </li>
 
           <select class="px-3 rounded-lg text-3xl mt-6 ml-36" v-model="newEventCategory">
-            <option v-for="list in category.categoryLists" :value="list.id">
+            <option v-for="list in categoryLists" :value="list.id">
               {{ list.eventCategoryName }}            
             </option>
           </select>
-          <button @click="login.addLecturerCategory(displayUser.id,newEventCategory),toggleAddPopUp()" class="absolute ml-8 mt-4">
-          <svg width="50" viewBox="0 0 24 24">
+          <button @click="login.addLecturerCategory(user.displayUser.id,newEventCategory),toggleAddPopUp()" class="ml-8 mb-4">
+          <svg width="50" viewBox="0 0 24 24" class="-mb-2">
             <path
               fill="#00CC66"
               d="M11 17h2v-4h4v-2h-4V7h-2v4H7v2h4Zm1 5q-2.075 0-3.9-.788q-1.825-.787-3.175-2.137q-1.35-1.35-2.137-3.175Q2 14.075 2 12t.788-3.9q.787-1.825 2.137-3.175q1.35-1.35 3.175-2.138Q9.925 2 12 2t3.9.787q1.825.788 3.175 2.138q1.35 1.35 2.137 3.175Q22 9.925 22 12t-.788 3.9q-.787 1.825-2.137 3.175q-1.35 1.35-3.175 2.137Q14.075 22 12 22Z"
@@ -174,7 +172,7 @@ onBeforeMount(async () => {
         <div class="flex justify-center mb-6">
           <button
             class="text-4xl px-5 text-green-500 hover:text-green-700"
-            @click="login.deleteLecturerCategory(displayUser.id,deleteCategoryId),getUser(),toggleDeletePopUp()"
+            @click="login.deleteLecturerCategory(user.displayUser.id,deleteCategoryId),getUser(),toggleDeletePopUp()"
           >
             Yes
           </button>

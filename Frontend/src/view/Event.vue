@@ -1,15 +1,17 @@
 <script setup>
-import { onBeforeMount, onBeforeUpdate } from "vue";
+import { ref,onBeforeMount, onBeforeUpdate } from "vue";
 import EventList from "../components/EventList.vue";
 import EventEmptyList from "../components/EventEmptyList.vue";
-import { useEvent,useEventCategory } from "../stores/event.js"
+import { useEvent,useEventCategory,useUser } from "../stores/event.js"
 import { useLogin } from "../stores/login.js";
 import NoAuthentication from "../components/NoAuthentication.vue"
 import Logout from "../components/Logout.vue";
 
-const event = useEvent()
-const category = useEventCategory()
-const login = useLogin()
+const event = useEvent();
+const category = useEventCategory();
+const login = useLogin();
+const user = useUser();
+const categoryFilter = ref();
 
   //Delete Event
   const removeEvent = async (eventId) => {
@@ -41,11 +43,14 @@ const login = useLogin()
       await event.getEventLists();
   }
 
+
 onBeforeMount(async () => {
   await checkRole();
+  await category.getEventCategory();
+  await user.getUser();
   // await event.getEventLists();
   await event.getFilterEvent();
-  await category.getEventCategory();
+  categoryFilter.value = login.getRoleToken() == 'admin' ? category.categoryLists : user.displayUser.eventCategories;
   event.page = event.eventLists.pageNumber;
 });
 
@@ -63,11 +68,11 @@ onBeforeUpdate(async () => {
       <Logout/>
     </div>
     <div class="absolute place-self-center top-10">      
-      <select v-show="login.noAuthentication" v-model="event.filter" class="col-span-2 px-3 rounded-lg text-3xl -mt-8" @change="event.getFilterEvent(),event.page=0">
+      <select v-show="!login.noAuthentication" v-model="event.filter" class="col-span-2 px-3 rounded-lg text-3xl -mt-8" @change="event.getFilterEvent(),event.page=0">
           <option default value="0">Lists All</option>
           <option value="1">Past Events</option>
           <option value="2">Up-coming Events</option>
-          <option v-for="list in category.categoryLists" :value="list.id + 2">
+          <option v-for="list in categoryFilter" :value="list.id + 2">
             {{ list.eventCategoryName }}
           </option>
         </select>
@@ -79,7 +84,7 @@ onBeforeUpdate(async () => {
     <div class="grid" v-show="event.filter == 0 ? event.showEmptyEvent : event.showEmptyFilterEvent">
       <EventEmptyList />
     </div>
-    <div class="grid" v-show="!login.noAuthentication">
+    <div class="grid" v-show="login.noAuthentication">
       <NoAuthentication/>
     </div>
     <div class="grid" v-show="login.logoutPopup">
