@@ -32,7 +32,7 @@ jobs:
       - name: Go to directory Github
         run: |
           cd ~
-          cd _work/INT_222_04/
+          cd /home/runner/work/INT_222_04
       
       # Runs a Database  
       - name: Database Docker Compose Down and Remove Images
