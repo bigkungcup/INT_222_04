@@ -23,11 +23,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      # - name: Docker Login
-      #   run: |
-      #     docker login -u bigkungcup
-      #     dckr_pat_A9H8TN9k7tpNL_VpUzmwQ7pBFV8
-
 #       - name: Login to Docker Hub
 #         uses: docker/login-action@v1
 #         with:
@@ -37,59 +32,7 @@ jobs:
       - name: Go to directory Github
         run: |
           cd ~
-          cd clinic/INT_222_04/
-          
-      # Runs a Front-end
-      - name: Front-end Docker Compose Down and Remove Images
-        run: |
-          cd Frontend
-          sudo docker-compose down
-          sudo docker rmi -f frontend
-          sudo docker-compose up -d --build
-          sudo docker image prune -f
-          cd ..
-
-      # - name: Front-end Create&Push Registry
-      #   run: |
-      #     sudo docker build -t frontend .
-      #     sudo docker tag frontend bigkungcup/frontend:latest
-      #     sudo docker push bigkungcup/frontend:latest
-
-      # - name: Front-end Pull Registry
-      #   run: |
-      #     sudo docker pull bigkungcup/frontend:latest
-
-#       - name: Front-end Docker-compose Up
-#         run: |
-#           sudo docker-compose up -d --build
-#           sudo docker image prune -f
-#           cd ..
-
-      # Runs a Back-end
-      - name: Back-end Docker Compose Down and Remove Images
-        run: |
-          cd Backend
-          sudo docker-compose down
-          sudo docker rmi -f backend
-          sudo docker-compose up -d --build
-          sudo docker image prune -f
-          cd ..
-
-      # - name: Back-end Create&Push Registry
-      #   run: |
-      #     sudo docker build -t backend .
-      #     sudo docker tag backend bigkungcup/backend:latest
-      #     sudo docker push backend:latest
-
-      # - name: Back-end Pull Registry
-      #   run: |
-      #     sudo docker pull bigkungcup/backend:latest
-
-#       - name: Back-end Docker-compose Up
-#         run: |
-#           sudo docker-compose up -d --build
-#           sudo docker image prune -f
-#           cd ..
+          cd /actions-runner/_work/INT_222_04/INT_222_04
       
       # Runs a Database  
       - name: Database Docker Compose Down and Remove Images
@@ -101,11 +44,25 @@ jobs:
           sudo docker image prune -f
           cd ..
 
-#       - name: Database-end Docker-compose Up
-#         run: |
-#           sudo docker-compose up -d --build
-#           sudo docker image prune -f
-#           cd ..
+      # Runs a Back-end
+      - name: Back-end Docker Compose Down and Remove Images
+        run: |
+          cd Backend
+          sudo docker-compose down
+          sudo docker rmi -f backend
+          sudo docker-compose up -d --build
+          sudo docker image prune -f
+          cd ..
+      
+      # Runs a Front-end
+      - name: Front-end Docker Compose Down and Remove Images
+        run: |
+          cd Frontend
+          sudo docker-compose down
+          sudo docker rmi -f frontend
+          sudo docker-compose up -d --build
+          sudo docker image prune -f
+          cd ..
 
       # Runs a Proxy
       - name: Proxy Docker Compose Down
@@ -115,10 +72,3 @@ jobs:
           sudo docker-compose up -d --build
           sudo docker image prune -f
           cd ..
-
-
-#       - name: Proxy Docker-compose Up
-#         run: |
-#           sudo docker-compose up -d --build
-#           sudo docker image prune -f
-#           cd ..
