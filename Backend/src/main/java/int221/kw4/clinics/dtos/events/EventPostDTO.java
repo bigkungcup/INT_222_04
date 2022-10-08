@@ -32,6 +32,6 @@ public class EventPostDTO {
     @NotNull(message = "Category shouldn't be null")
     private Integer eventCategoryId;
 
-    private Integer userId;
+//    private Integer userId;
 
 }

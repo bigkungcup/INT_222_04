@@ -9,14 +9,15 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer"})
+@Entity
 @Table(name = "eventCategory")
 public class EventCategory {
     @Id
@@ -24,7 +25,7 @@ public class EventCategory {
     @Column(name = "eventCategoryId", nullable = false)
     private Integer id;
 
-    @Column(name = "eventCategoryName", nullable = false, length = 100 ,unique = true)
+    @Column(name = "eventCategoryName", nullable = false, length = 100, unique = true)
     private String eventCategoryName;
 
     @Column(name = "eventCategoryDescription", length = 500)
@@ -33,12 +34,15 @@ public class EventCategory {
     @Column(name = "eventDuration", nullable = false)
     private Integer eventDuration;
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            },
-            mappedBy = "eventCategories")
     @JsonIgnore
-    private Set<User> users = new HashSet<>();
+    @ManyToMany
+    @JoinTable(name = "event_category_owner",
+            joinColumns = @JoinColumn(name = "eventCategoryId"),
+            inverseJoinColumns = @JoinColumn(name = "userId"))
+    private Set<User> users = new LinkedHashSet<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "eventCategory")
+    private Set<Event> events = new LinkedHashSet<>();
 }
+

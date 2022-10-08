@@ -8,7 +8,7 @@ import org.springframework.data.annotation.LastModifiedBy;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Getter
@@ -30,9 +30,8 @@ public class User {
     @Column(name = "email", nullable = false, length = 50)
     private String email;
 
-
-    @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
     private Role role;
 
     @Column(name = "createdOn", nullable = false, updatable = false, insertable = false)
@@ -44,18 +43,15 @@ public class User {
     @LastModifiedBy
     private Instant updatedOn;
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            })
-    @JoinTable(name = "event_category_owner",
-            joinColumns = { @JoinColumn(name = "userId") },
-            inverseJoinColumns = { @JoinColumn(name = "eventCategoryId") })
-    private Set<EventCategory> eventCategories = new HashSet<>();
-
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = false, length = 90)
     private String password;
 
+    @ManyToMany(mappedBy = "users")
+    private Set<EventCategory> eventCategories = new LinkedHashSet<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user")
+    private Set<Event> events = new LinkedHashSet<>();
 }
+
+

@@ -14,8 +14,8 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@Entity
 @Table(name = "event")
 public class Event {
     @Id
@@ -23,10 +23,10 @@ public class Event {
     @Column(name = "eventId", nullable = false)
     private Integer id;
 
-    @Column(name = "bookingName", nullable = false, length = 100)
+    @Column(name = "bookingName", nullable = false,length = 100)
     private String bookingName;
 
-    @Column(name = "bookingEmail", nullable = false)
+    @Column(name = "bookingEmail",  nullable = false)
     private String bookingEmail;
 
     @Column(name = "eventStartTime", nullable = false)
@@ -39,11 +39,13 @@ public class Event {
     private Integer eventDuration;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "eventCategoryId")
+    @JoinColumn(name = "eventCategoryId", nullable = false)
     private EventCategory eventCategory;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_userId")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", nullable = true)
     private User user;
+
 }
+

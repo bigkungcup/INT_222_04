@@ -28,17 +28,11 @@ import java.util.*;
 
 @Service
 public class UserService implements UserDetailsService {
-
     private final UserRepository repository;
-
     private final EventCategoryRepository eventCategoryRepository;
-
     private final EmailService emailService;
-
     private final ModelMapper modelMapper;
-
     private final ListMapper listMapper;
-
     private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository repository, EventCategoryRepository eventCategoryRepository, EmailService emailService, ModelMapper modelMapper, ListMapper listMapper, PasswordEncoder passwordEncoder) {
@@ -66,7 +60,7 @@ public class UserService implements UserDetailsService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = repository.findByEmail(auth.getPrincipal().toString());
 
-        if (user.getRole().equals("admin")) {
+        if (user.getRole().toString().equals("admin")) {
             Integer finalUserId = userId;
             User userById = repository.findById(userId).orElseThrow(
                     () -> new HandleExceptionNotFound(
@@ -80,14 +74,7 @@ public class UserService implements UserDetailsService {
                 throw new HandleExceptionForbidden("You don't have permission to access this resource");
             }
         }
-
-
     }
-
-//    public List<User> getUserByCategoryId(Integer eventCategoryId){
-//        List<User> user = repository.findUsersByEventCategoriesId(eventCategoryId);
-//        return user;
-//    }
 
     public User getUserByEmail(String email) {
         User userByEmail = repository.findByEmail(email);
@@ -118,31 +105,10 @@ public class UserService implements UserDetailsService {
 
         emailService.sendSimpleMail(user.getEmail(), "Welcome to Clinic",
                 "Welcome User: " + user.getName() + "\n" + "Your email: " + user.getEmail() + "\n" +
-                        "Your role: " + user.getRole() + "\n" + "Create at: " + user.getCreatedOn(), new Date());
+                        "Your role: " + user.getRole() + "\n" + "Create at: " + user.getCreatedOn());
 
         return ResponseEntity.status(201).body(user);
     }
-
-//    public ResponseEntity addEventCategoty(Integer userId, EventCategory eventCategory) throws HandleExceptionNotFound, HandleExceptionForbidden {
-//        User user = repository.findById(userId).orElseThrow(
-//                () -> new HandleExceptionNotFound(
-//                        "User ID: " + userId + " does not exist !!!")
-//        );
-//
-//        user.getEventCategories().stream().map(EventCategory::getId).forEach(id -> {
-//            if (id.equals(eventCategory.getId())) {
-//                try {
-//                    throw new HandleExceptionBadRequest("Event Category ID: " + eventCategory.getId() + " already exists !!!");
-//                } catch (HandleExceptionBadRequest e) {
-//                    throw new RuntimeException(e);
-//                }
-//            }
-//        });
-//            user.addEventCategory(eventCategory);
-//            repository.saveAndFlush(user);
-//            UserLecteurDTO lecturer = modelMapper.map(user, UserLecteurDTO.class);
-//            return ResponseEntity.status(200).body(lecturer);
-//    }
 
     public ResponseEntity addEventCategoryToUser(Integer userId, Integer eventCategoryId) throws HandleExceptionNotFound {
         User user = repository.findById(userId).orElseThrow(() -> new HandleExceptionNotFound("User not found"));
@@ -163,7 +129,7 @@ public class UserService implements UserDetailsService {
         emailService.sendSimpleMail(user.getEmail(), "Add Category To User Successfully",
                 "Time at: " + new Date() + "User: " + user.getName() + "\n" +
                         "Your email: " + user.getEmail() + "\n" + "Category: " + eventCategory.getEventCategoryName() + "\n" +
-                        "Your role: " + user.getRole(), new Date());
+                        "Your role: " + user.getRole());
         return ResponseEntity.status(201).body(lecturer);
     }
 
@@ -176,7 +142,7 @@ public class UserService implements UserDetailsService {
         repository.deleteById(userId);
         emailService.sendSimpleMail(user.getEmail(), "Delete User Successfully",
                 "Time at: " + new Date() + "User: " + user.getName() + "\n" +
-                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
+                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole());
         return ResponseEntity.status(200).body("Delete UserID:" + userId);
     }
 
@@ -195,10 +161,9 @@ public class UserService implements UserDetailsService {
         UserLecteurDTO lecturer = modelMapper.map(user, UserLecteurDTO.class);
         emailService.sendSimpleMail(user.getEmail(), "Delete Category in User Successfully",
                 "Time at: " + new Date() + "User: " + user.getName() + "\n" +
-                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
+                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole());
         return ResponseEntity.status(200).body(lecturer);
     }
-
 
     //UPDATE
     public ResponseEntity updateUser(UserEditDTO updateUser, Integer userId) throws HandleExceptionUnique {
@@ -232,10 +197,9 @@ public class UserService implements UserDetailsService {
         repository.saveAndFlush(user);
         emailService.sendSimpleMail(user.getEmail(), "Update User Successfully",
                 "Time at: " + new Date() + "User: " + user.getName() + "\n" +
-                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
+                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole());
         return ResponseEntity.status(200).body(user);
     }
-
 
     //AUTHENTICATION
     @Override

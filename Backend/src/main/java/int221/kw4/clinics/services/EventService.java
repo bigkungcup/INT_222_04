@@ -209,7 +209,6 @@ public class EventService {
         event.setEventNotes(newEvent.getEventNotes());
         event.setEventDuration(newEvent.getEventDuration());
         event.setEventCategory(eventCategoryRepository.findById(newEvent.getEventCategoryId()).get());
-        event.setUser(userRepository.findById(newEvent.getUserId()).get());
         return event;
     }
 
@@ -229,7 +228,6 @@ public class EventService {
 
         if (!auth.getPrincipal().toString().equals("anonymousUser")) {
             User user = userRepository.findByEmail(auth.getPrincipal().toString());
-            newEvent.setUserId(user.getId());
             System.out.println("User2: " + user.getEmail() + user.getRole());
 
             if (user.getRole().toString().equals("admin")) {
@@ -267,9 +265,6 @@ public class EventService {
                 throw new HandleExceptionBadRequest("The booking email must be the same as the student's email");
             }
         } else {
-            User user = userRepository.findByName("guest");
-            newEvent.setUserId(user.getId());
-            System.out.println("User2: " + user.getEmail() + user.getRole());
 
             for (int i = 0; i < eventList.size(); i++) {
                 Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
@@ -288,7 +283,7 @@ public class EventService {
                     "Your booking is confirmed" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
                             "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
                             "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
-                            "Category name: " + event.getEventCategory().getEventCategoryName(), new Date());
+                            "Category name: " + event.getEventCategory().getEventCategoryName());
             return ResponseEntity.status(201).body(event);
         }
     }
@@ -311,7 +306,7 @@ public class EventService {
                     "Your booking is deleted" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
                             "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
                             "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
-                            "Category name: " + event.getEventCategory().getEventCategoryName(), new Date());
+                            "Category name: " + event.getEventCategory().getEventCategoryName());
             return ResponseEntity.status(200).body("Delete Event: " + eventId);
         } else if (user.getRole().toString().equals("student")) {
             if (user.getEmail().equals(event.getBookingEmail())) {
@@ -324,7 +319,7 @@ public class EventService {
                         "Your booking is deleted" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
                                 "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
                                 "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
-                                "Category name: " + event.getEventCategory().getEventCategoryName(), new Date());
+                                "Category name: " + event.getEventCategory().getEventCategoryName());
                 return ResponseEntity.status(200).body("Delete Event: " + eventId);
             } else {
                 throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
@@ -368,7 +363,7 @@ public class EventService {
                     "Your booking is updated" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
                             "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
                             "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
-                            "Category name: " + event.getEventCategory().getEventCategoryName(), new Date());
+                            "Category name: " + event.getEventCategory().getEventCategoryName());
             return ResponseEntity.status(200).body(event);
         } else if (user.getRole().toString().equals("student")) {
             if (user.getEmail().equals(eventById.getBookingEmail())) {
@@ -393,7 +388,7 @@ public class EventService {
                         "Your booking is updated" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
                                 "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
                                 "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
-                                "Category name: " + event.getEventCategory().getEventCategoryName(), new Date());
+                                "Category name: " + event.getEventCategory().getEventCategoryName());
                 return ResponseEntity.status(200).body(event);
             } else {
                 throw new HandleExceptionForbidden("The booking email must be the same as the student's email");
