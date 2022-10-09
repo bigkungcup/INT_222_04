@@ -46,7 +46,12 @@ public class User {
     @Column(name = "password", nullable = false, length = 90)
     private String password;
 
-    @ManyToMany(mappedBy = "users")
+    //    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+//    private Set<EventCategory> eventCategories = new LinkedHashSet<>();
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "event_category_owner",
+            joinColumns = {@JoinColumn(name = "userId")},
+            inverseJoinColumns = {@JoinColumn(name = "eventCategoryId")})
     private Set<EventCategory> eventCategories = new LinkedHashSet<>();
 
     @JsonIgnore

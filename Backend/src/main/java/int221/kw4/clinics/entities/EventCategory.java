@@ -34,15 +34,19 @@ public class EventCategory {
     @Column(name = "eventDuration", nullable = false)
     private Integer eventDuration;
 
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(name = "event_category_owner",
-            joinColumns = @JoinColumn(name = "eventCategoryId"),
-            inverseJoinColumns = @JoinColumn(name = "userId"))
-    private Set<User> users = new LinkedHashSet<>();
+//    @JsonIgnore
+//    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+//    @JoinTable(name = "event_category_owner",
+//            joinColumns = @JoinColumn(name = "eventCategoryId"),
+//            inverseJoinColumns = @JoinColumn(name = "userId"))
+//    private Set<User> users = new LinkedHashSet<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "eventCategory")
     private Set<Event> events = new LinkedHashSet<>();
+
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "eventCategories")
+    private Set<User> users = new LinkedHashSet<>();
 }
 
