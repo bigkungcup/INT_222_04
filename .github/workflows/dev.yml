@@ -24,7 +24,6 @@ jobs:
       # Runs a Database  
       - name: Database Docker Compose Down and Remove Images
         run: |
-          sudo docker network create oasip-network
           cd Database
           sudo docker-compose down
           sudo docker rmi -f mysql
