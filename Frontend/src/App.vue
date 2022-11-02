@@ -1,63 +1,35 @@
 <script setup>
 import Navbar from "./components/Navbar.vue";
-import router from "./router";
-import { onMounted } from "vue";
-import { useLogin } from "./stores/login.js";
+import { useLogin } from "../src/stores/Login.js";
+import Logout from "./components/Logout.vue";
 
 const login = useLogin();
 
-const checkToken = () => {
-    if(localStorage.getItem('role') !== null){
-      login.logoutIcon = true;
-      if(localStorage.getItem('role') == 'admin'){
-        login.userPage = true;
-      }
-    }
-  }
+const togglePopup = () => {
+    login.logoutPopup = !login.logoutPopup
+}
 
-onMounted(async () => {
-  checkToken();
-});
+if(login.getIdToken != null){
+  login.logoutIcon = true;
+} 
+login.logoutIcon = false;
 
 </script>
 
 <template>
-  <div class="itim">
-    <Navbar />
+  <div class="inter">
+    <Navbar :logoutIcon="login.logoutIcon" @toggle="togglePopup()" @logout="login.logoutPopup"/>
     <router-view></router-view>
+    <div v-show="login.logoutPopup">
+        <Logout @toggle="togglePopup()" @logout="login.logout()"/>
+    </div>
   </div>
 </template>
 
 <style>
-@import url("https://fonts.googleapis.com/css2?family=Itim&display=swap");
-.itim {
-  font-family: "Itim", cursive;
-}
-
-.appBg {
-  background-color: #23162b;
-  background-attachment: fixed;
-  background-size: cover;
-}
-
-.projectManagement {
-  background-color: #7f8efa;
-}
-
-.devopInfra {
-  background-color: #af7afa;
-}
-
-.database {
-  background-color: #7fe0f7;
-}
-
-.clientSide {
-  background-color: #7fc987;
-}
-
-.serverSide {
-  background-color: #fc7a7b;
+@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap%27');
+.inter {
+  font-family: 'Inter', sans-serif;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -68,9 +40,4 @@ onMounted(async () => {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
-.bgPopUp {
-  background-color: #f5c6cd;
-}
-
 </style>

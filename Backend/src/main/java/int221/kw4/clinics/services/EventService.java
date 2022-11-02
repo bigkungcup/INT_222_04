@@ -279,11 +279,11 @@ public class EventService {
             Event event = mapEvent(newEvent);
             System.out.println("Event: " + event);
             repository.saveAndFlush(event);
-            emailService.sendSimpleMail(event.getBookingEmail(), "Booking Confirmation",
-                    "Your booking is confirmed" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
-                            "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
-                            "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
-                            "Category name: " + event.getEventCategory().getEventCategoryName());
+//            emailService.sendSimpleMail(event.getBookingEmail(), "Booking Confirmation",
+//                    "Your booking is confirmed" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
+//                            "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
+//                            "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
+//                            "Category name: " + event.getEventCategory().getEventCategoryName());
             return ResponseEntity.status(201).body(event);
         }
     }
@@ -302,11 +302,11 @@ public class EventService {
                             "Event ID: " + eventId + " does not exist !!!")
             );
             repository.deleteById(eventId);
-            emailService.sendSimpleMail(event.getBookingEmail(), "Delete Confirmation",
-                    "Your booking is deleted" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
-                            "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
-                            "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
-                            "Category name: " + event.getEventCategory().getEventCategoryName());
+//            emailService.sendSimpleMail(event.getBookingEmail(), "Delete Confirmation",
+//                    "Your booking is deleted" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
+//                            "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
+//                            "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
+//                            "Category name: " + event.getEventCategory().getEventCategoryName());
             return ResponseEntity.status(200).body("Delete Event: " + eventId);
         } else if (user.getRole().toString().equals("student")) {
             if (user.getEmail().equals(event.getBookingEmail())) {
@@ -315,11 +315,11 @@ public class EventService {
                                 "Event ID: " + eventId + " does not exist !!!")
                 );
                 repository.deleteById(eventId);
-                emailService.sendSimpleMail(event.getBookingEmail(), "Delete Confirmation",
-                        "Your booking is deleted" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
-                                "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
-                                "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
-                                "Category name: " + event.getEventCategory().getEventCategoryName());
+//                emailService.sendSimpleMail(event.getBookingEmail(), "Delete Confirmation",
+//                        "Your booking is deleted" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
+//                                "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
+//                                "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
+//                                "Category name: " + event.getEventCategory().getEventCategoryName());
                 return ResponseEntity.status(200).body("Delete Event: " + eventId);
             } else {
                 throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
@@ -359,11 +359,11 @@ public class EventService {
             );
             modelMapper.map(updateEvent, event);
             repository.saveAndFlush(event);
-            emailService.sendSimpleMail(event.getBookingEmail(), "Update Confirmation",
-                    "Your booking is updated" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
-                            "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
-                            "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
-                            "Category name: " + event.getEventCategory().getEventCategoryName());
+//            emailService.sendSimpleMail(event.getBookingEmail(), "Update Confirmation",
+//                    "Your booking is updated" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
+//                            "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
+//                            "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
+//                            "Category name: " + event.getEventCategory().getEventCategoryName());
             return ResponseEntity.status(200).body(event);
         } else if (user.getRole().toString().equals("student")) {
             if (user.getEmail().equals(eventById.getBookingEmail())) {
@@ -384,11 +384,11 @@ public class EventService {
                 );
                 modelMapper.map(updateEvent, event);
                 repository.saveAndFlush(event);
-                emailService.sendSimpleMail(event.getBookingEmail(), "Update Confirmation",
-                        "Your booking is updated" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
-                                "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
-                                "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
-                                "Category name: " + event.getEventCategory().getEventCategoryName());
+//                emailService.sendSimpleMail(event.getBookingEmail(), "Update Confirmation",
+//                        "Your booking is updated" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
+//                                "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
+//                                "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
+//                                "Category name: " + event.getEventCategory().getEventCategoryName());
                 return ResponseEntity.status(200).body(event);
             } else {
                 throw new HandleExceptionForbidden("The booking email must be the same as the student's email");

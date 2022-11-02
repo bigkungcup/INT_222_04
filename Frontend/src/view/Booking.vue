@@ -1,77 +1,102 @@
 <script setup>
-import {  ref,onBeforeMount  } from "vue";
-import CreateEvent from "../components/CreateEvent.vue";
-import NoAuthentication from "../components/NoAuthentication.vue"
-import { useEvent, useEventCategory } from "../stores/event.js";
-import { useLogin } from "../stores/login.js";
-import Logout from "../components/Logout.vue";
+import { ref,onBeforeMount } from "vue";
+import { useClinics } from "../stores/Clinics.js";
+import { useEvents } from "../stores/Events";
+import BookingSeccessfully from "../components/BookingSuccessfully.vue";
+import Datepicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
 
-const event = useEvent();
-const category = useEventCategory();
-const login = useLogin()
-const asGuest = ref();
-asGuest.value = localStorage.getItem('role') == null ? true : false;
+const clinic = useClinics();
+const event = useEvents();
+
 
 onBeforeMount(async () => {
-  event.textPopUp = false;
-  await category.getEventCategory();
-  // await event.getEventLists();
-  if(localStorage.getItem('role') !== null){
-  await event.getAllEventLists();
-  }
+    await clinic.getClinics();
 });
-
 </script>
 
 <template>
-  <div
-    class="bg-fixed bg-booking bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen "
-  >
-  <div class="grid">
-    <CreateEvent
-      @create="event.createEvent"
-      @createWithGuest="event.createEventWithGuest"
-      @close="event.disShowPopUp"
-      :textPopUp="event.textPopUp"
-      :popUp="event.popUp"
-      :currentCategory="category.categoryLists"
-    />
-  </div>
-    <!-- <div class="grid" v-show="login.noAuthentication">
-      <NoAuthentication/>
-    </div> -->
-    <div class="grid" v-show="login.logoutPopup">
-      <Logout/>
-    </div>
-
-    <div class="flex justify-center absolute bg-black/50 h-screen w-screen inset-0 top-0" v-show="asGuest">
-    <div class="grid grid-rows-3.5 bg-white w-2/6 h-80 place-self-center rounded-3xl">
-      <div class="grid row-span-1.5 bgPopUp rounded-t-3xl place-items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img"
-          class="iconify iconify--ep animate-bounce pt-2" width="100" height="100" preserveAspectRatio="xMidYMid meet"
-          viewBox="0 0 1024 1024">
-          <path fill="#ffff"
-            d="M512 64a448 448 0 1 1 0 896a448 448 0 0 1 0-896zm-55.808 536.384l-99.52-99.584a38.4 38.4 0 1 0-54.336 54.336l126.72 126.72a38.272 38.272 0 0 0 54.336 0l262.4-262.464a38.4 38.4 0 1 0-54.272-54.336L456.192 600.384z">
-          </path>
-        </svg>
+  <div class="bg-Bg bg-cover h-screen pt-24 px-32 overflow-auto no-scrollbar">
+      <p class="font-bold text-white text-2xl my-3">Add your details :</p>
+      <div class="grid grid-cols-2 bg-white rounded-2xl h-56">
+        <div class="grid grid-rows-2">
+          <div class="flex">
+            <p class="text-Web-violet text-xl font-bold my-10 ml-11 mr-3">Name :</p>
+            <input
+              type="text"
+              class="padding-input-detail bg-Bg-Plain rounded-lg h-16 w-9/12 text-1xl text-white placeholder:italic placeholder:text-1xl place-self-center"
+              v-model="event.newEvent.bookingName"
+              placeholder="Enter Your Name"
+            />
+          </div>
+          <div class="flex">
+            <p class="text-Web-violet text-xl font-bold my-10 ml-11 mr-4">Email :</p>
+            <input
+              type="text"
+              class="padding-input-detail bg-Bg-Plain rounded-lg h-16 w-9/12 text-1xl text-white placeholder:italic placeholder:text-1xl place-self-center"
+              v-model="event.newEvent.bookingEmail"
+              placeholder="Enter Your Email"
+            />
+          </div>
+        </div>
+        <div class="p-6">
+        <textarea
+          class="padding-input-note bg-Bg-Plain rounded-lg h-full w-full text-1xl text-white resize-none placeholder:italic placeholder:text-1xl"
+          v-model="event.newEvent.eventNotes"
+          placeholder="Add your note (optional)"></textarea>
+        </div>
       </div>
-      <div class="grid text-4xl place-items-center px-4 text-center">
-        <p>Do you want to create event as guest?</p>
-      </div>
-      <div class="flex justify-center mb-6">
-          <button
-            class="text-4xl px-5 text-green-500 hover:text-green-700"
-            @click="asGuest = false"
-          >
-            Yes
-          </button>
-          <button class="text-4xl px-5 text-red-500 hover:text-red-700" @click="$router.push('/')">
-            No
-          </button>
+    <div class="grid mt-6 text-white text-2xl">
+        <p class="font-bold my-3">Select clinic :</p>
+        <div class="grid grid-cols-2">
+        <div v-for="list in clinic.clinicList" class="grid">
+            <button :class="['text-left rounded-lg w-11/12 my-2 p-2',
+            list.id == 1 
+            ? `text-bg-projectManagement` 
+              : list.id == 2 
+              ? `text-bg-devopInfra`
+                : list.id == 3
+                  ? `text-bg-database`
+                  : list.id == 4
+                    ? `text-bg-clientSide`
+                    : `text-bg-serverSide` ,event.newEvent.eventCategory.id == list.id ? `bg-Web-pink`:'bg-white']" @click="event.newEvent.eventCategory = list">
+                  <p :class="['text-xl pl-6 font-bold',event.newEvent.eventCategory.id == list.id ? `text-white`:'']">
+                  {{ list.eventCategoryName }}
+                  </p>
+                  <p :class="['text-lg pl-6',event.newEvent.eventCategory.id == list.id ? 'text-white':'text-stone-600']">
+                    {{ list.eventDuration }} min.
+                  </p>
+            </button>
         </div>
     </div>
   </div>
+  <div class="grid mt-6 text-white text-2xl">
+        <p class="flex font-bold my-3">Select time : 
+          <Datepicker @closed="event.setMinTime(event.newEvent.eventStartTime)" :minDate="new Date()" 
+           class="ml-6" v-model="event.newEvent.eventStartTime"></Datepicker></p>
   </div>
+  <div class="flex my-12 text-2xl justify-center">
+    <button class="rounded-2xl bg-white py-2 w-1/5 text-Web-pink font-bold hover:bg-white hover:text-Web-pink mx-24" @click="event.resetNewEvent()">
+                    Cancle
+    </button>
+    <button class="rounded-2xl bg-Web-pink py-2 w-1/5 text-white font-bold hover:bg-Web-pink hover:text-white mx-24" @click="event.createEvent()">
+                    Book Now
+    </button>
+  </div>
+  <div v-show="event.bookingSeccessfully">
+    <BookingSeccessfully @reset="event.resetNewEvent()" @toggle="event.bookingSeccessfully = false"/>
+  </div>
+</div>
 </template>
 
-<style></style>
+<style>
+.padding-input-detail {
+    padding-left: 1rem;
+}
+
+.padding-input-note {
+    padding-left: 1rem;
+    padding-top: 0.5rem;
+}
+
+</style>
