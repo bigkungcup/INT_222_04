@@ -126,10 +126,10 @@ public class UserService implements UserDetailsService {
         user.getEventCategories().add(eventCategory);
         repository.saveAndFlush(user);
         UserLecteurDTO lecturer = modelMapper.map(user, UserLecteurDTO.class);
-        emailService.sendSimpleMail(user.getEmail(), "Add Category To User Successfully",
-                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
-                        "Your email: " + user.getEmail() + "\n" + "Category: " + eventCategory.getEventCategoryName() + "\n" +
-                        "Your role: " + user.getRole(), new Date());
+//        emailService.sendSimpleMail(user.getEmail(), "Add Category To User Successfully",
+//                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
+//                        "Your email: " + user.getEmail() + "\n" + "Category: " + eventCategory.getEventCategoryName() + "\n" +
+//                        "Your role: " + user.getRole(), new Date());
         return ResponseEntity.status(201).body(lecturer);
     }
 
@@ -140,9 +140,9 @@ public class UserService implements UserDetailsService {
                         "User ID: " + userId + " does not exist !!!")
         );
         repository.deleteById(userId);
-        emailService.sendSimpleMail(user.getEmail(), "Delete User Successfully",
-                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
-                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
+//        emailService.sendSimpleMail(user.getEmail(), "Delete User Successfully",
+//                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
+//                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
 
         return ResponseEntity.status(200).body("Delete UserID:" + userId);
     }
@@ -160,9 +160,9 @@ public class UserService implements UserDetailsService {
             }
         });
         UserLecteurDTO lecturer = modelMapper.map(user, UserLecteurDTO.class);
-        emailService.sendSimpleMail(user.getEmail(), "Delete Category in User Successfully",
-                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
-                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
+//        emailService.sendSimpleMail(user.getEmail(), "Delete Category in User Successfully",
+//                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
+//                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
         return ResponseEntity.status(200).body(lecturer);
     }
 
@@ -196,9 +196,7 @@ public class UserService implements UserDetailsService {
 
         modelMapper.map(updateUser, user);
         repository.saveAndFlush(user);
-        emailService.sendSimpleMail(user.getEmail(), "Update User Successfully",
-                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
-                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
+//        sendEmail(user);
 
         return ResponseEntity.status(200).body(user);
     }
@@ -216,5 +214,11 @@ public class UserService implements UserDetailsService {
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
+    }
+
+    public void sendEmail(User user) {
+        emailService.sendSimpleMail(user.getEmail(), "Update User Successfully",
+                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
+                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
     }
 }
