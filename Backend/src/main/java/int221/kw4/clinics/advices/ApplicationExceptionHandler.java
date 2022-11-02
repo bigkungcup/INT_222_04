@@ -2,6 +2,7 @@ package int221.kw4.clinics.advices;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -116,6 +118,17 @@ public class ApplicationExceptionHandler extends Exception {
         errorMap.put("Error:", notFoundException.getMessage());
         errors = new HandleValidationError(Instant.now(), HttpStatus.NOT_FOUND.value(),
                 "Not Found", "Validation", request.getRequest().getRequestURI(), errorMap);
+        return errors;
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public HandleValidationError handleMaxSizeException(MaxUploadSizeExceededException exc, ServletWebRequest request) {
+//        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
+//                .body(new FileStorageException("Unable to upload. File is too large!"));
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("Error:", "Unable to upload. File is too large!");
+        errors = new HandleValidationError(Instant.now(), HttpStatus.EXPECTATION_FAILED.value(),
+                "Expectation_Failed", "Validation", request.getRequest().getRequestURI(), errorMap);
         return errors;
     }
 

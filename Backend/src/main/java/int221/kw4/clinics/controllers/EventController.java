@@ -1,5 +1,8 @@
 package int221.kw4.clinics.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import int221.kw4.clinics.advices.HandleExceptionBadRequest;
 import int221.kw4.clinics.advices.HandleExceptionForbidden;
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
@@ -13,11 +16,14 @@ import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 
@@ -28,6 +34,7 @@ public class EventController {
 
     @Autowired
     private EventService service;
+    ObjectMapper objectMapper = new ObjectMapper();
 
     @GetMapping("")
 //    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
@@ -52,7 +59,7 @@ public class EventController {
     }
 
     @GetMapping("/{eventId}")
-    public EventDTO getEventById(@PathVariable Integer eventId) throws HandleExceptionNotFound, HandleExceptionForbidden {
+    public EventDTO getEventById(@PathVariable Integer eventId) throws HandleExceptionNotFound, HandleExceptionForbidden, IOException {
         return service.getEventById(eventId);
     }
 
@@ -81,16 +88,20 @@ public class EventController {
         return service.getUpcomingEvent(Instant.now(), page, pageSize);
     }
 
-    @PostMapping("")
+    @PostMapping(value = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity create(@Valid @RequestBody EventPostDTO newEvent) throws HandleExceptionOverlap, HandleExceptionBadRequest {
-        return service.addEvent(newEvent);
+    public ResponseEntity create(@Valid @RequestPart("event") String newEvent, @RequestPart(value = "file", required = false) MultipartFile file) throws HandleExceptionOverlap, HandleExceptionBadRequest, JsonProcessingException {
+        objectMapper.registerModule(new JavaTimeModule());
+        EventPostDTO eventPost = objectMapper.readValue(newEvent, EventPostDTO.class);
+        return service.addEvent(eventPost, file);
     }
 
-    @PostMapping("/guest")
+    @PostMapping(value = "/guest",  consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity guestCreate(@Valid @RequestBody EventPostDTO newEvent) throws HandleExceptionOverlap, HandleExceptionBadRequest {
-        return service.addEvent(newEvent);
+    public ResponseEntity guestCreate(@Valid @RequestPart("event") String newEvent, @RequestPart(value = "file", required = false) MultipartFile file) throws HandleExceptionOverlap, HandleExceptionBadRequest, JsonProcessingException {
+        objectMapper.registerModule(new JavaTimeModule());
+        EventPostDTO eventPost = objectMapper.readValue(newEvent, EventPostDTO.class);
+        return service.addEvent(eventPost,file);
     }
 
     @DeleteMapping("/{eventId}")
@@ -98,9 +109,11 @@ public class EventController {
         return service.deleteEvent(eventId);
     }
 
-    @PutMapping("/{eventId}")
-    public ResponseEntity update(@Valid @RequestBody EventEditDTO updateEvent, @PathVariable Integer eventId)
-            throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest {
-        return service.update(updateEvent, eventId);
+    @PutMapping(value = "/{eventId}",  consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity update(@Valid @RequestPart("event") String updateEvent, @PathVariable Integer eventId,  @RequestPart(value = "file", required = false) MultipartFile file)
+            throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest, IOException {
+        objectMapper.registerModule(new JavaTimeModule());
+        EventEditDTO eventEdit = objectMapper.readValue(updateEvent, EventEditDTO.class);
+        return service.update(eventEdit, eventId, file);
     }
 }

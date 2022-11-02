@@ -12,11 +12,11 @@ import int221.kw4.clinics.dtos.events.EventPostDTO;
 import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.entities.User;
+import int221.kw4.clinics.properties.FileStorageProperties;
 import int221.kw4.clinics.repositories.EventCategoryRepository;
 import int221.kw4.clinics.repositories.EventRepository;
 import int221.kw4.clinics.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -24,12 +24,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -41,15 +46,21 @@ public class EventService {
     private final ListMapper listMapper;
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final FileStorageService fileStorageService;
+
+    private final FileStorageProperties fileStorageProperties;
 
     public EventService(EventRepository repository, EventCategoryRepository eventCategoryRepository, ModelMapper modelMapper,
-                        ListMapper listMapper, UserRepository userRepository, EmailService emailService) {
+                        ListMapper listMapper, UserRepository userRepository, EmailService emailService, FileStorageService fileStorageService,
+                        FileStorageProperties fileStorageProperties) {
         this.repository = repository;
         this.eventCategoryRepository = eventCategoryRepository;
         this.modelMapper = modelMapper;
         this.listMapper = listMapper;
         this.userRepository = userRepository;
         this.emailService = emailService;
+        this.fileStorageService = fileStorageService;
+        this.fileStorageProperties = fileStorageProperties;
     }
 
     //    Get
@@ -62,6 +73,7 @@ public class EventService {
         if (user.getRole().toString().equals("admin")) {
             return modelMapper.map(repository.findAll(
                     PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, sortBy))), EventPageDTO.class);
+
         } else if (user.getRole().toString().equals("student")) {
             return modelMapper.map(repository.findAllByBookingEmail(user.getEmail(),
                     PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, sortBy))), EventPageDTO.class);
@@ -75,27 +87,15 @@ public class EventService {
         return listMapper.mapList(eventList, EventDTO.class, modelMapper);
     }
 
-    public EventPageDTO getEventByCategoryId(Integer userId, Integer page, Integer pageSize) throws HandleExceptionNotFound, HandleExceptionForbidden {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new HandleExceptionNotFound(
-                        "User ID: " + userId + " does not exist !!!")
-        );
-
-        if (user.getRole().toString().equals("student")) {
-            throw new HandleExceptionForbidden("Access denied for user:" + user.getEmail());
-        } else {
-            List<Integer> categoryIds = user.getEventCategories().stream().map(EventCategory::getId).collect(Collectors.toList());
-            System.out.println(categoryIds);
-            return modelMapper.map(repository.findByEventCategory_IdIn(categoryIds,
-                    PageRequest.of(page, pageSize)), EventPageDTO.class);
-        }
-
-    }
-
-    public EventDTO getEventById(Integer eventId) throws HandleExceptionNotFound, HandleExceptionForbidden {
+    public EventDTO getEventById(Integer eventId) throws HandleExceptionNotFound, HandleExceptionForbidden, IOException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByEmail(auth.getPrincipal().toString());
         Event event = repository.getById(eventId);
+
+        String userDir = event.getUser() != null ? "User/" + "User_" + event.getUser().getId() : "Guest";
+        Path path = Paths.get(fileStorageProperties.getUploadDir() + "/" + userDir + "/" + "Event_" + event.getId());
+        System.out.println("Path: " + path);
+
         System.out.println("User1: " + auth.getPrincipal());
         System.out.println("User2: " + user);
 
@@ -103,7 +103,10 @@ public class EventService {
             Event eventListById = repository.findById(eventId).orElseThrow(
                     () -> new HandleExceptionNotFound(
                             "Event ID: " + eventId + " does not exist !!!"));
-            return modelMapper.map(eventListById, EventDTO.class);
+            EventDTO eventDTO = modelMapper.map(eventListById, EventDTO.class);
+            eventDTO.setFileName(getFile(path).get("fileName"));
+            eventDTO.setFileUrl(getFile(path).get("pathFile"));
+            return eventDTO;
         } else if (user.getRole().toString().equals("student")) {
             if (user.getEmail().equals(event.getBookingEmail())) {
                 Event eventListById = repository.findByIdAndBookingEmail(eventId, user.getEmail());
@@ -124,6 +127,23 @@ public class EventService {
         } else {
             throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
         }
+    }
+
+    public EventPageDTO getEventByCategoryId(Integer userId, Integer page, Integer pageSize) throws HandleExceptionNotFound, HandleExceptionForbidden {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new HandleExceptionNotFound(
+                        "User ID: " + userId + " does not exist !!!")
+        );
+
+        if (user.getRole().toString().equals("student")) {
+            throw new HandleExceptionForbidden("Access denied for user:" + user.getEmail());
+        } else {
+            List<Integer> categoryIds = user.getEventCategories().stream().map(EventCategory::getId).collect(Collectors.toList());
+            System.out.println(categoryIds);
+            return modelMapper.map(repository.findByEventCategory_IdIn(categoryIds,
+                    PageRequest.of(page, pageSize)), EventPageDTO.class);
+        }
+
     }
 
     public EventPageDTO getEventByCategoryId(EventCategory eventCategoryId, Integer page, Integer pageSize) throws HandleExceptionNotFound, HandleExceptionForbidden {
@@ -201,62 +221,32 @@ public class EventService {
         return listMapper.mapList(eventList, EventDTO.class, modelMapper);
     }
 
-    public Event mapEvent(EventPostDTO newEvent) {
-        Event event = new Event();
-        event.setBookingName(newEvent.getBookingName());
-        event.setBookingEmail(newEvent.getBookingEmail());
-        event.setEventStartTime(newEvent.getEventStartTime());
-        event.setEventNotes(newEvent.getEventNotes());
-        event.setEventDuration(newEvent.getEventDuration());
-        event.setEventCategory(eventCategoryRepository.findById(newEvent.getEventCategoryId()).get());
-        return event;
-    }
-
     //    Post
-    public Date findEndDate(Date date, Integer duration) {
-        return new Date(date.getTime() + (duration * 60000));
-    }
-
-    public ResponseEntity addEvent(EventPostDTO newEvent) throws HandleExceptionOverlap, HandleExceptionBadRequest {
+    public ResponseEntity addEvent(EventPostDTO newEvent, MultipartFile file) throws HandleExceptionOverlap, HandleExceptionBadRequest {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         System.out.println("User1: " + auth.getPrincipal());
         System.out.println("New Event: " + newEvent);
 
-        Date newEventStartTime = Date.from(newEvent.getEventStartTime());
-        Date newEventEndTime = findEndDate(Date.from(newEvent.getEventStartTime()), newEvent.getEventDuration());
-        List<EventDTO> eventList = getEventByCurrentTime(newEvent.getEventStartTime(), newEvent.getEventCategoryId());
-
         if (!auth.getPrincipal().toString().equals("anonymousUser")) {
             User user = userRepository.findByEmail(auth.getPrincipal().toString());
-            System.out.println("User2: " + user.getEmail() + user.getRole());
 
             if (user.getRole().toString().equals("admin")) {
-                for (int i = 0; i < eventList.size(); i++) {
-                    Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
-                    Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
-                    if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
-                            newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
-                            newEventEndTime.equals(eventStartTime)) {
-                        throw new HandleExceptionOverlap("StartTime is Overlap");
-                    }
-                }
+                checkPostOverlap(newEvent);
+                newEvent.setUser(user);
                 Event event = mapEvent(newEvent);
                 repository.saveAndFlush(event);
+                fileStorageService.storeFile(file, event);
+//                sendEmail(event);
                 return ResponseEntity.status(201).body(event);
 
             } else if (user.getRole().toString().equals("student")) {
                 if (user.getEmail().equals(newEvent.getBookingEmail())) {
-                    for (int i = 0; i < eventList.size(); i++) {
-                        Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
-                        Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
-                        if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
-                                newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
-                                newEventEndTime.equals(eventStartTime)) {
-                            throw new HandleExceptionOverlap("StartTime is Overlap");
-                        }
-                    }
+                    checkPostOverlap(newEvent);
+                    newEvent.setUser(user);
                     Event event = mapEvent(newEvent);
                     repository.saveAndFlush(event);
+                    fileStorageService.storeFile(file, event);
+//                    sendEmail(event);
                     return ResponseEntity.status(201).body(event);
                 } else {
                     throw new HandleExceptionBadRequest("The booking email must be the same as the student's email");
@@ -265,25 +255,11 @@ public class EventService {
                 throw new HandleExceptionBadRequest("The booking email must be the same as the student's email");
             }
         } else {
-
-            for (int i = 0; i < eventList.size(); i++) {
-                Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
-                Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
-                if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
-                        newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
-                        newEventEndTime.equals(eventStartTime)) {
-                    throw new HandleExceptionOverlap("StartTime is Overlap");
-                }
-            }
-
+            checkPostOverlap(newEvent);
             Event event = mapEvent(newEvent);
             System.out.println("Event: " + event);
             repository.saveAndFlush(event);
-            emailService.sendSimpleMail(event.getBookingEmail(), "Booking Confirmation",
-                    "Your booking is confirmed" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
-                            "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
-                            "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
-                            "Category name: " + event.getEventCategory().getEventCategoryName());
+//            sendEmail(event);
             return ResponseEntity.status(201).body(event);
         }
     }
@@ -293,34 +269,31 @@ public class EventService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByEmail(auth.getPrincipal().toString());
         Event event = repository.getById(eventId);
-        System.out.println("User1: " + auth.getPrincipal());
-        System.out.println("User2: " + user.getEmail() + event.getBookingEmail());
+
+        String userDir = event.getUser() != null ? "User/" + "User_" + event.getUser().getId() : "Guest";
+        String path = Paths.get(fileStorageProperties.getUploadDir() + "/" + userDir + "/" + "Event_" + event.getId()).toString();
 
         if (user.getRole().toString().equals("admin")) {
             repository.findById(eventId).orElseThrow(
                     () -> new HandleExceptionNotFound(
                             "Event ID: " + eventId + " does not exist !!!")
             );
+            fileStorageService.deleteDir(path);
             repository.deleteById(eventId);
-            emailService.sendSimpleMail(event.getBookingEmail(), "Delete Confirmation",
-                    "Your booking is deleted" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
-                            "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
-                            "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
-                            "Category name: " + event.getEventCategory().getEventCategoryName());
+//            sendEmail(event);
             return ResponseEntity.status(200).body("Delete Event: " + eventId);
+
         } else if (user.getRole().toString().equals("student")) {
             if (user.getEmail().equals(event.getBookingEmail())) {
                 repository.findById(eventId).orElseThrow(
                         () -> new HandleExceptionNotFound(
                                 "Event ID: " + eventId + " does not exist !!!")
                 );
+                fileStorageService.deleteDir(path);
                 repository.deleteById(eventId);
-                emailService.sendSimpleMail(event.getBookingEmail(), "Delete Confirmation",
-                        "Your booking is deleted" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
-                                "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
-                                "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
-                                "Category name: " + event.getEventCategory().getEventCategoryName());
+//                sendEmail(event);
                 return ResponseEntity.status(200).body("Delete Event: " + eventId);
+
             } else {
                 throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
             }
@@ -330,65 +303,34 @@ public class EventService {
     }
 
     //    Update
-    public ResponseEntity update(EventEditDTO updateEvent, Integer eventId) throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest {
+    public ResponseEntity update(EventEditDTO updateEvent, Integer eventId, MultipartFile file) throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest, IOException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByEmail(auth.getPrincipal().toString());
         Event eventById = repository.getById(eventId);
-        System.out.println("User1: " + auth.getPrincipal());
-        System.out.println("User2: " + user.getEmail() + " " + eventById.getBookingEmail());
 
-        Date newEventStartTime = Date.from(updateEvent.getEventStartTime());
-        Date newEventEndTime = findEndDate(Date.from(updateEvent.getEventStartTime()), updateEvent.getEventDuration());
-        List<EventDTO> eventList = getAllEvent();
+        String userDir = eventById.getUser() != null ? "User/" + "User_" + eventById.getUser().getId() : "Guest";
+        Path path = Paths.get(fileStorageProperties.getUploadDir() + "/" + userDir + "/" + "Event_" + eventById.getId());
 
         if (user.getRole().toString().equals("admin")) {
-            for (int i = 0; i < eventList.size(); i++) {
-                List errors = new ArrayList();
-                if (updateEvent.getEventCategory().getId() == eventList.get(i).getEventCategory().getId() && eventList.get(i).getId() != eventId) {
-                    Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
-                    Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
-                    if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
-                            newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
-                            newEventEndTime.equals(eventStartTime)) {
-                        throw new HandleExceptionOverlap(errors.toString());
-                    }
-                }
-            }
+            checkUpdateOverlap(updateEvent, eventId);
+            updateFile(file, path, eventById);
             Event event = repository.findById(eventId).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.BAD_REQUEST)
             );
             modelMapper.map(updateEvent, event);
             repository.saveAndFlush(event);
-            emailService.sendSimpleMail(event.getBookingEmail(), "Update Confirmation",
-                    "Your booking is updated" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
-                            "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
-                            "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
-                            "Category name: " + event.getEventCategory().getEventCategoryName());
+//            sendEmail(event);
             return ResponseEntity.status(200).body(event);
         } else if (user.getRole().toString().equals("student")) {
             if (user.getEmail().equals(eventById.getBookingEmail())) {
-                for (int i = 0; i < eventList.size(); i++) {
-                    List errors = new ArrayList();
-                    if (updateEvent.getEventCategory().getId() == eventList.get(i).getEventCategory().getId() && eventList.get(i).getId() != eventId) {
-                        Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
-                        Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
-                        if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
-                                newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
-                                newEventEndTime.equals(eventStartTime)) {
-                            throw new HandleExceptionOverlap(errors.toString());
-                        }
-                    }
-                }
+                checkUpdateOverlap(updateEvent, eventId);
+                updateFile(file, path, eventById);
                 Event event = repository.findById(eventId).orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.BAD_REQUEST)
                 );
                 modelMapper.map(updateEvent, event);
                 repository.saveAndFlush(event);
-                emailService.sendSimpleMail(event.getBookingEmail(), "Update Confirmation",
-                        "Your booking is updated" + "\n" + "Booking name: " + event.getBookingName() + "\n" +
-                                "Booking email: " + event.getBookingEmail() + "\n" + "Event startTime: " + event.getEventStartTime() + "\n" +
-                                "Event duration: " + event.getEventDuration() + "\n" + "Event note: " + event.getEventNotes() + "\n" +
-                                "Category name: " + event.getEventCategory().getEventCategoryName());
+//                sendEmail(event);
                 return ResponseEntity.status(200).body(event);
             } else {
                 throw new HandleExceptionForbidden("The booking email must be the same as the student's email");
@@ -396,5 +338,106 @@ public class EventService {
         } else {
             throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
         }
+    }
+
+    public void updateFile(MultipartFile file, Path path, Event eventById) throws IOException {
+        if (file != null) {
+            if (Files.exists(path)) {
+                if (!Files.list(path).collect(Collectors.toList()).isEmpty()) {
+                    fileStorageService.deleteFile(path + "/" + Files.list(path).collect(Collectors.toList()).get(0).getFileName());
+                    fileStorageService.storeFile(file, eventById);
+                } else {
+                    fileStorageService.storeFile(file, eventById);
+                }
+            }
+        } else {
+            if (Files.exists(path)) {
+                if (!Files.list(path).collect(Collectors.toList()).isEmpty()) {
+                    fileStorageService.deleteFile(path + "/" + getFile(path).get("fileName"));
+                }
+            }
+        }
+    }
+
+    public Date findEndDate(Date date, Integer duration) {
+        return new Date(date.getTime() + (duration * 60000));
+    }
+
+    public void checkPostOverlap(EventPostDTO newEvent) throws HandleExceptionOverlap {
+        Date newEventStartTime = Date.from(newEvent.getEventStartTime());
+        Date newEventEndTime = findEndDate(Date.from(newEvent.getEventStartTime()), newEvent.getEventDuration());
+        List<EventDTO> eventList = getEventByCurrentTime(newEvent.getEventStartTime(), newEvent.getEventCategoryId());
+
+        for (int i = 0; i < eventList.size(); i++) {
+            Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
+            Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
+            if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
+                    newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
+                    newEventEndTime.equals(eventStartTime)) {
+                throw new HandleExceptionOverlap("StartTime is Overlap");
+            }
+        }
+    }
+
+    public void checkUpdateOverlap(EventEditDTO updateEvent, Integer eventId) throws HandleExceptionOverlap {
+        Date newEventStartTime = Date.from(updateEvent.getEventStartTime());
+        Date newEventEndTime = findEndDate(Date.from(updateEvent.getEventStartTime()), updateEvent.getEventDuration());
+        List<EventDTO> eventList = getAllEvent();
+
+        for (EventDTO eventDTO : eventList) {
+            if (updateEvent.getEventCategory().getId() == eventDTO.getEventCategory().getId() && eventDTO.getId() != eventId) {
+                Date eventStartTime = Date.from(eventDTO.getEventStartTime());
+                Date eventEndTime = findEndDate(Date.from(eventDTO.getEventStartTime()), eventDTO.getEventDuration());
+                if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
+                        newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
+                        newEventEndTime.equals(eventStartTime)) {
+                    throw new HandleExceptionOverlap("StartTime is Overlap");
+                }
+            }
+        }
+    }
+
+    public Event mapEvent(EventPostDTO newEvent) {
+        Event event = new Event();
+        event.setBookingName(newEvent.getBookingName());
+        event.setBookingEmail(newEvent.getBookingEmail());
+        event.setEventStartTime(newEvent.getEventStartTime());
+        event.setEventNotes(newEvent.getEventNotes());
+        event.setEventDuration(newEvent.getEventDuration());
+        event.setEventCategory(eventCategoryRepository.findById(newEvent.getEventCategoryId()).get());
+        event.setUser(newEvent.getUser());
+        return event;
+    }
+
+    public void sendEmail(Event event) {
+        ZoneId z = ZoneId.of("Asia/Bangkok");
+        String pattern = "E MMM dd, yyyy";
+        String patternTime = "HH:mm";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+        DateTimeFormatter formatterTime = DateTimeFormatter.ofPattern(patternTime);
+
+        emailService.sendSimpleMail(event.getBookingEmail(), "[OASIP] " + event.getEventCategory().getEventCategoryName() + " @ " +
+                        event.getEventStartTime().atZone(z).format(formatter) + " " + event.getEventStartTime().atZone(z).format(formatterTime) + "-" +
+                        event.getEventStartTime().atZone(z).plusMinutes(event.getEventDuration()).format(formatterTime) + " (ICT)",
+                "Subject: " + "[OASIP] " + event.getEventCategory().getEventCategoryName() + " @ " +
+                        event.getEventStartTime().atZone(z).format(formatter) + " " + event.getEventStartTime().atZone(z).format(formatterTime) + "-" +
+                        event.getEventStartTime().atZone(z).plusMinutes(event.getEventDuration()).format(formatterTime) + " (ICT)" + "\n" +
+                        "Reply-to: " + event.getBookingEmail() + "\n" +
+                        "Booking name: " + event.getBookingName() + "\n" +
+                        "Event Category: " + event.getEventCategory().getEventCategoryName() + "\n" +
+                        "When: " + event.getEventStartTime().atZone(z).format(formatter) + " " + event.getEventStartTime().atZone(z).format(formatterTime) + "-" +
+                        event.getEventStartTime().atZone(z).plusMinutes(event.getEventDuration()).format(formatterTime) + " (ICT)" + "\n" +
+                        "Event Note: " + event.getEventNotes(), new Date());
+    }
+
+    public Map<String, String> getFile(Path filePath) throws IOException {
+        Map<String, String> fileMap = new HashMap<>();
+        Path pathFile = Files.list(filePath).collect(Collectors.toList()).get(0);
+        System.out.println("PathFile: " + pathFile);
+        String fileName = fileStorageService.loadFileAsResource(pathFile.toString()).getFilename();
+        System.out.println("FileName: " + fileName);
+        fileMap.put("fileName", fileName);
+        fileMap.put("pathFile", pathFile.toString());
+        return fileMap;
     }
 }

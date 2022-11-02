@@ -5,8 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.core.io.Resource;
 
+import java.io.File;
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -20,4 +24,6 @@ public class EventDTO {
     private Instant eventStartTime;
     private String eventNotes;
     private Integer eventDuration;
+    private String fileName;
+    private String fileUrl;
 }

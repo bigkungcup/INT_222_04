@@ -1,7 +1,9 @@
-package int221.kw4.clinics;
+package int221.kw4.clinics.config;
 
+import int221.kw4.clinics.properties.FileStorageProperties;
 import int221.kw4.clinics.services.ListMapper;
 import org.modelmapper.ModelMapper;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -15,6 +17,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.util.Properties;
 
 @Configuration
+@EnableConfigurationProperties({
+        FileStorageProperties.class
+})
 public class ApplicationConfig {
     @Bean
     public ModelMapper modelMapper() {
@@ -36,19 +41,20 @@ public class ApplicationConfig {
         return new RestTemplate();
     }
 
+    @Bean
+    public WebMvcConfigurer getCorsConfiguration(){
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("*")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE")
+                        .allowedHeaders("*");
+            }
+        };
+    }
+
 }
 
 
 
-//    @Bean
-//    public WebMvcConfigurer getCorsConfiguration(){
-//        return new WebMvcConfigurer() {
-//            @Override
-//            public void addCorsMappings(CorsRegistry registry) {
-//                registry.addMapping("/**")
-//                        .allowedOrigins("*")
-//                        .allowedMethods("GET", "POST", "PUT", "DELETE")
-//                        .allowedHeaders("*");
-//            }
-//        };
-//    }

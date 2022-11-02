@@ -25,7 +25,7 @@ public class EmailService {
 
     // Method 1
     // To send a simple email
-    public String sendSimpleMail(String recipient, String subject, String msgBody)   {
+    public String sendSimpleMail(String recipient, String subject, String msgBody, Date date)   {
 
         // Try block to check for exceptions
         try {
@@ -36,6 +36,7 @@ public class EmailService {
             mailMessage.setTo(recipient);
             mailMessage.setSubject(subject);
             mailMessage.setText(msgBody);
+            mailMessage.setSentDate(date);
 
             // Sending the mail
             javaMailSender.send(mailMessage);
@@ -54,8 +55,7 @@ public class EmailService {
     // To send an email with attachment
     public String sendMailWithAttachment(String recipient, String subject, String msgBody, Date date, String attachment) {
         // Creating a mime message
-        MimeMessage mimeMessage
-                = javaMailSender.createMimeMessage();
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper;
 
         try {

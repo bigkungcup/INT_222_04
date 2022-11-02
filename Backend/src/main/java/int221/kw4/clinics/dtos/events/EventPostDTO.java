@@ -1,6 +1,8 @@
 package int221.kw4.clinics.dtos.events;
 
+import int221.kw4.clinics.entities.User;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.*;
 import java.time.Instant;
@@ -32,6 +34,7 @@ public class EventPostDTO {
     @NotNull(message = "Category shouldn't be null")
     private Integer eventCategoryId;
 
-//    private Integer userId;
+    private User user;
 
+    private MultipartFile file;
 }
