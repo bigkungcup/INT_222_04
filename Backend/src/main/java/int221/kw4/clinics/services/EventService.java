@@ -432,6 +432,11 @@ public class EventService {
 
     public Map<String, String> getFile(Path filePath) throws IOException {
         Map<String, String> fileMap = new HashMap<>();
+        if( Files.list(filePath).collect(Collectors.toList()).isEmpty()){
+            fileMap.put("fileName", "");
+            fileMap.put("pathFile", filePath.toString());
+            return fileMap;
+        }
         Path pathFile = Files.list(filePath).collect(Collectors.toList()).get(0);
         System.out.println("PathFile: " + pathFile);
         String fileName = fileStorageService.loadFileAsResource(pathFile.toString()).getFilename();

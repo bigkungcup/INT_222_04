@@ -40,18 +40,27 @@ public class FileStorageService {
     }
 
     public String storeFile(MultipartFile file, Event event) {
+
+//        String userDir;
+//        if(event.getUser() != null){
+//             userDir = "User/" + "User_" + event.getUser().getId().toString();
+//        }else {
+//             userDir = "Guest";
+//        }
+        String userDir = event.getUser() != null ? "User/" + "User_" + event.getUser().getId() : "Guest";
+        String eventDir = "Event_" + event.getId().toString();
+        if(file == null){
+            try {
+                Path fileDir = this.fileStorageLocation.resolve(userDir).resolve(eventDir);
+                Path targetLocation = Files.createDirectories(fileDir);
+            }catch (Exception ex){
+                throw new FileStorageException("Could not create the directory where the uploaded files will be stored.", ex);
+            }
+        }
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
         System.out.println("fileName: " + fileName);
-        String userDir;
-        if(event.getUser() != null){
-             userDir = "User/" + "User_" + event.getUser().getId().toString();
-        }else {
-             userDir = "Guest";
-        }
         System.out.println("userDir: " + userDir);
-        String eventDir = "Event_" + event.getId().toString();
         System.out.println("eventDir: " + eventDir);
-
 
         try {
             if(fileName.contains("..")) {

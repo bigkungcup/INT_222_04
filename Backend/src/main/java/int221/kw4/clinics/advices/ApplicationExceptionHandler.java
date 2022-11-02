@@ -128,7 +128,16 @@ public class ApplicationExceptionHandler extends Exception {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("Error:", "Unable to upload. File is too large!");
         errors = new HandleValidationError(Instant.now(), HttpStatus.EXPECTATION_FAILED.value(),
-                "Expectation_Failed", "Validation", request.getRequest().getRequestURI(), errorMap);
+                "Expectation Failed", "Validation", request.getRequest().getRequestURI(), errorMap);
+        return errors;
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public HandleValidationError handleNullPointerException(NullPointerException exc, ServletWebRequest request) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("Error:", "Null Pointer Exception");
+        errors = new HandleValidationError(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error", "Validation", request.getRequest().getRequestURI(), errorMap);
         return errors;
     }
 
