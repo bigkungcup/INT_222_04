@@ -6,21 +6,37 @@ module.exports = {
   theme: {
     extend: {
       backgroundImage: {
-        'home': "url('./assets/images/BgHome.png')",
-        'schedule': "url('./assets/images/BgListsAll.png')",
-        'detail':"url('./assets/images/BgDetail.png')",
-        'booking':"url('./assets/images/BgCreate.png')",
-        'aboutUs':"url('./assets/images/BgAboutUs.png')",
-        'user':"url('./assets/images/BgUser.png')"
+        'Bg': "url('./assets/images/Background.png')",
+        'Bg-Plain': "url('./assets/images/Background_Plain.png')",
+        'Bg-Login': "url('./assets/images/Background_Login.png')",
+        'Menu':"url('./assets/images/Menubar.png')"
       },
-      width:{
-        '110':'40rem',
-        '100':'30rem',
-        '99':'28em'
+      colors:{
+        'Web-pink':'#EB4C84',
+        'Web-violet':'#462A6C',
+        'bg-projectManagement':'#00A1FC',
+        'bg-devopInfra':'#B960FF',
+        'bg-database':'#FF1515',
+        'bg-clientSide':'#00DA30',
+        'bg-serverSide':'#FF6610'
+      },
+      height: {
+        '100': '32rem',
       },
       margin: {
-        '100': '35rem',
-        '99' : '25rem'
+        '88' : '22rem',
+        '104': '28rem'
+      },
+      textUnderlineOffset: {
+        10: '18px',
+      },
+      gridTemplateRows: {
+        '7': 'repeat(7, minmax(0, 1fr))',
+        '8': 'repeat(8, minmax(0, 1fr))',
+        'layout': '200px minmax(900px, 1fr) 100px',
+      },
+      gridRow: {
+        'span-7': 'span 7 / span 7',
       }
     },      
   },

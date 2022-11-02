@@ -1,31 +1,21 @@
 <script setup>
-import { onBeforeMount } from "vue";
-import EventCategoryList from "../components/EventCategoryList.vue";
-import NoAuthentication from "../components/NoAuthentication.vue"
-import { useEventCategory } from "../stores/event.js";
-import { useLogin } from "../stores/login.js";
-import Logout from "../components/Logout.vue";
-
-const category = useEventCategory();
-const login = useLogin()
-
-onBeforeMount(async () => {
-  await category.getEventCategory();
-});
 </script>
-
+ 
 <template>
-  <div
-    class="bg-home bg-no-repeat bg-auto bg-cover bg-center h-screen w-screen"
-  >
-    <EventCategoryList :currentCategory="category.categoryLists" />
-    <!-- <div class="grid" v-show="!login.noAuthentication">
-      <NoAuthentication/>
-  </div> -->
-  <div class="grid" v-show="login.logoutPopup">
-      <Logout/>
+    <div class="grid bg-Bg bg-cover h-screen grid-cols-5">
+    <div class="grid col-span-4">
+        <div class="grid content-center pl-24 gap-y-4"> 
+        <p class="font-bold text-white text-8xl">
+            <img src="/favicon.png" class="float-left animate-bounce" width="80" />ASIP-KW4
+        </p>
+        <hr class="-ml-10"/>
+        <p class="font-bold text-white text-6xl">Online Appointment System</p>
+        <p class="font-bold text-white text-6xl">Integrated Project</p>
     </div>
-  </div>
-</template>
+    </div>
 
-<style></style>
+    </div>
+</template>
+ 
+<style>
+</style>

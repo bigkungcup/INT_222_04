@@ -143,6 +143,7 @@ public class UserService implements UserDetailsService {
         emailService.sendSimpleMail(user.getEmail(), "Delete User Successfully",
                 "Time at: " + new Date() + "User: " + user.getName() + "\n" +
                         "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
+
         return ResponseEntity.status(200).body("Delete UserID:" + userId);
     }
 
@@ -198,6 +199,7 @@ public class UserService implements UserDetailsService {
         emailService.sendSimpleMail(user.getEmail(), "Update User Successfully",
                 "Time at: " + new Date() + "User: " + user.getName() + "\n" +
                         "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
+
         return ResponseEntity.status(200).body(user);
     }
 
