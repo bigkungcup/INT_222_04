@@ -33,7 +33,7 @@ defineProps({
                 ? `text-bg-database`
                 : list.eventCategory.id == 4
                   ? `text-bg-clientSide`
-                  : `text--bg-serverSide`]">{{ list.eventCategory.eventCategoryName }}</p>
+                  : `text-bg-serverSide`]">{{ list.eventCategory.eventCategoryName }}</p>
             <p class="grid place-content-center text-black text-xl">
               {{
                 formatTime(list.eventStartTime) +

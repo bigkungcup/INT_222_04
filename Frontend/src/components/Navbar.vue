@@ -45,8 +45,8 @@ defineProps({
                 Sign In
             </span>
             </router-link>
-            <button class="font-bold hover:underline underline-offset-8" v-show="logoutIcon" @click="$emit('toggle')">Log Out</button>
-            <!-- <button class="font-bold hover:underline underline-offset-8"  @click="$emit('toggle')">Log Out</button> -->
+            <!-- <button class="font-bold hover:underline underline-offset-8" v-show="logoutIcon" @click="$emit('toggle')">Log Out</button> -->
+            <button class="font-bold hover:underline underline-offset-8"  @click="$emit('toggle')">Log Out</button>
         </div>
     </div>
 </template>

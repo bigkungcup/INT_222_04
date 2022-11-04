@@ -9,8 +9,8 @@ import "@vuepic/vue-datepicker/dist/main.css";
 const clinic = useClinics();
 const event = useEvents();
 
-
 onBeforeMount(async () => {
+    event.resetNewEvent();
     await clinic.getClinics();
 });
 </script>
@@ -75,11 +75,31 @@ onBeforeMount(async () => {
           <Datepicker @closed="event.setMinTime(event.newEvent.eventStartTime)" :minDate="new Date()" 
            class="ml-6" v-model="event.newEvent.eventStartTime"></Datepicker></p>
   </div>
+  <div class="grid mt-6 text-white text-2xl">
+        <p class="flex font-bold my-3">Select file : 
+          <label v-show="true" for="file" >
+                <div v-show="!event.showFileName" class="border-2 border-white rounded-lg ml-6 text-white hover:bg-white hover:text-Web-violet text-center text-lg py-1 px-2">
+                <input id="file" type="file" @change="event.chooseFile"/>
+                Choose File
+                </div>
+                <div v-show="event.showFileName" class="bg-white text-Web-violet rounded-lg ml-6 text-white hover:bg-white/70 text-center text-lg py-1 px-2">
+                    <input id="file" type="file" @change="event.chooseFile"/>
+                    <p id="filename"></p>
+                </div>
+          </label>
+          <div v-show="event.showFileName">
+          <button class="ml-6 -mt-1" @click="event.resetNewEventFile"><svg width="40" height="40" viewBox="0 0 512 512" >
+                  <path fill="none" d="M296 64h-80a7.91 7.91 0 0 0-8 8v24h96V72a7.91 7.91 0 0 0-8-8Z"/>
+                  <path fill="#EB4C84" d="M432 96h-96V72a40 40 0 0 0-40-40h-80a40 40 0 0 0-40 40v24H80a16 16 0 0 0 0 32h17l19 304.92c1.42 26.85 22 47.08 48 47.08h184c26.13 0 46.3-19.78 48-47l19-305h17a16 16 0 0 0 0-32ZM192.57 416H192a16 16 0 0 1-16-15.43l-8-224a16 16 0 1 1 32-1.14l8 224A16 16 0 0 1 192.57 416ZM272 400a16 16 0 0 1-32 0V176a16 16 0 0 1 32 0Zm32-304h-96V72a7.91 7.91 0 0 1 8-8h80a7.91 7.91 0 0 1 8 8Zm32 304.57A16 16 0 0 1 320 416h-.58A16 16 0 0 1 304 399.43l8-224a16 16 0 1 1 32 1.14Z"/>
+          </svg></button></div>
+        </p>
+        <p v-show="event.showErrorFileText" class="text-Web-pink text-lg pl-40">*The file size cannot be larger than 10 MB.</p>
+  </div>
   <div class="flex my-12 text-2xl justify-center">
-    <button class="rounded-2xl bg-white py-2 w-1/5 text-Web-pink font-bold hover:bg-white hover:text-Web-pink mx-24" @click="event.resetNewEvent()">
+    <button class="rounded-2xl bg-white py-2 w-1/5 text-Web-pink font-bold mx-24" @click="event.resetNewEvent()">
                     Cancle
     </button>
-    <button class="rounded-2xl bg-Web-pink py-2 w-1/5 text-white font-bold hover:bg-Web-pink hover:text-white mx-24" @click="event.createEvent()">
+    <button class="rounded-2xl bg-Web-pink py-2 w-1/5 text-white font-bold mx-24" @click="event.createEvent()">
                     Book Now
     </button>
   </div>
@@ -98,5 +118,16 @@ onBeforeMount(async () => {
     padding-left: 1rem;
     padding-top: 0.5rem;
 }
+
+input[type="file"] {
+    display: none;
+}
+
+/* .custom-file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+} */
 
 </style>

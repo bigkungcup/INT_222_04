@@ -11,6 +11,9 @@ export const useEvents = defineStore("Events", () => {
   const editTime = ref(false);
   const validEmail =
     /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+  const eventFile = ref()
+  const showFileName = ref(false)
+  const showErrorFileText = ref(false)
   const eventList = ref([]);
   const eventListAll = ref([]);
 
@@ -86,14 +89,11 @@ export const useEvents = defineStore("Events", () => {
     } else console.log("error, cannot get event");
   };
 
+
+
   //Create Event
   const createEvent = async () => {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
+    const event = {
         bookingName: newEvent.value.bookingName,
         bookingEmail: newEvent.value.bookingEmail.match(validEmail)
           ? newEvent.value.bookingEmail
@@ -107,7 +107,16 @@ export const useEvents = defineStore("Events", () => {
           : newEvent.value.eventStartTime,
         eventNotes: newEvent.value.eventNotes,
         eventDuration: newEvent.value.eventCategory.eventDuration,
-      }),
+      }
+    
+    const formData = new FormData();
+    formData.append('event',JSON.stringify(event))
+    formData.append('file',eventFile.value == null ? "" : eventFile.value)
+    console.log(formData);
+
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events`, {
+      method: "POST",
+      body: formData
     });
     if (res.status === 201) {
       const addEvent = await res.json();
@@ -201,7 +210,15 @@ export const useEvents = defineStore("Events", () => {
       eventNotes: "",
       eventDuration: 0,
     };
+    resetNewEventFile();
   };
+
+  const resetNewEventFile = () => {
+    eventFile.value = null;
+    showFileName.value = false;
+    showErrorFileText.value = false;
+    document.getElementById("file").value = null;
+  }
 
   const resetEditField = () => {
     editEvent.value.eventNotes = "";
@@ -209,6 +226,27 @@ export const useEvents = defineStore("Events", () => {
 
   const resetEditTime = () => {
     editEvent.value.eventStartTime = "";
+  }
+
+  //Choose File
+  const chooseFile = () => {
+    let fileName = document.getElementById("filename")
+    let inputFile = document.querySelector("input[type=file]").files[0];
+    let fileSize = ((inputFile.size/1024)/1024).toFixed(4); //Mb
+
+    if(fileSize <= 10 && fileSize > 0){
+      eventFile.value = inputFile;
+      fileName.innerText = inputFile.name;
+      showErrorFileText.value = false;
+      showFileName.value = true;
+      console.log('a');
+    } else {
+      showErrorFileText.value = true;
+      console.log('b');
+      if(eventFile.value == null){
+        showFileName.value = false;
+      } else {showFileName.value = true;} 
+    }
   }
 
   const setMinTime = (eventStartTime) => {
@@ -259,7 +297,9 @@ export const useEvents = defineStore("Events", () => {
     getEventList,
     getEventDetail,
     createEvent,
+    chooseFile,
     resetNewEvent,
+    resetNewEventFile,
     resetEditField,
     resetEditTime,
     removeEvent,
@@ -275,7 +315,10 @@ export const useEvents = defineStore("Events", () => {
     bookingSeccessfully,
     deletePopup,
     editField,
-    editTime
+    editTime,
+    showFileName,
+    showErrorFileText,
+    eventFile
   };
 });
 
