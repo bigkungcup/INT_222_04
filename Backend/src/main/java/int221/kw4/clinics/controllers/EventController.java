@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
@@ -88,20 +89,22 @@ public class EventController {
         return service.getUpcomingEvent(Instant.now(), page, pageSize);
     }
 
-    @PostMapping(value = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity create(@Valid @RequestPart("event") String newEvent, @RequestPart(value = "file", required = false) MultipartFile file) throws HandleExceptionOverlap, HandleExceptionBadRequest, JsonProcessingException {
+    public ResponseEntity create(@Valid @RequestPart("event") String newEvent, @RequestPart(value = "file", required = false) MultipartFile file,
+                                 ServletWebRequest request) throws HandleExceptionOverlap, HandleExceptionBadRequest, JsonProcessingException {
         objectMapper.registerModule(new JavaTimeModule());
         EventPostDTO eventPost = objectMapper.readValue(newEvent, EventPostDTO.class);
-        return service.addEvent(eventPost, file);
+        return service.addEvent(eventPost, file, request);
     }
 
-    @PostMapping(value = "/guest",  consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/guest")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity guestCreate(@Valid @RequestPart("event") String newEvent, @RequestPart(value = "file", required = false) MultipartFile file) throws HandleExceptionOverlap, HandleExceptionBadRequest, JsonProcessingException {
+    public ResponseEntity guestCreate(@Valid @RequestPart("event") String newEvent, @RequestPart(value = "file", required = false) MultipartFile file,
+                                      ServletWebRequest request) throws HandleExceptionOverlap, HandleExceptionBadRequest, JsonProcessingException {
         objectMapper.registerModule(new JavaTimeModule());
         EventPostDTO eventPost = objectMapper.readValue(newEvent, EventPostDTO.class);
-        return service.addEvent(eventPost,file);
+        return service.addEvent(eventPost,file, request);
     }
 
     @DeleteMapping("/{eventId}")
@@ -110,10 +113,11 @@ public class EventController {
     }
 
     @PutMapping(value = "/{eventId}",  consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity update(@Valid @RequestPart("event") String updateEvent, @PathVariable Integer eventId,  @RequestPart(value = "file", required = false) MultipartFile file)
+    public ResponseEntity update(@Valid @RequestPart("event") String updateEvent, @PathVariable Integer eventId,
+                                 @RequestPart(value = "file", required = false) MultipartFile file, ServletWebRequest request)
             throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest, IOException {
         objectMapper.registerModule(new JavaTimeModule());
         EventEditDTO eventEdit = objectMapper.readValue(updateEvent, EventEditDTO.class);
-        return service.update(eventEdit, eventId, file);
+        return service.update(eventEdit, eventId, file, request);
     }
 }

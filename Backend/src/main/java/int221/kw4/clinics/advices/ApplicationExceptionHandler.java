@@ -121,6 +121,7 @@ public class ApplicationExceptionHandler extends Exception {
         return errors;
     }
 
+    @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public HandleValidationError handleMaxSizeException(MaxUploadSizeExceededException exc, ServletWebRequest request) {
 //        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
@@ -132,12 +133,13 @@ public class ApplicationExceptionHandler extends Exception {
         return errors;
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @ExceptionHandler(NullPointerException.class)
     public HandleValidationError handleNullPointerException(NullPointerException exc, ServletWebRequest request) {
         Map<String, String> errorMap = new HashMap<>();
-        errorMap.put("Error:", "Null Pointer Exception");
-        errors = new HandleValidationError(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error", "Validation", request.getRequest().getRequestURI(), errorMap);
+        errorMap.put("Error:", "File is empty");
+        errors = new HandleValidationError(Instant.now(), HttpStatus.CREATED.value(),
+                "Created", "Validation", request.getRequest().getRequestURI(), errorMap);
         return errors;
     }
 

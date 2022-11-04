@@ -1,9 +1,6 @@
 package int221.kw4.clinics.services;
 
-import int221.kw4.clinics.advices.HandleExceptionBadRequest;
-import int221.kw4.clinics.advices.HandleExceptionForbidden;
-import int221.kw4.clinics.advices.HandleExceptionNotFound;
-import int221.kw4.clinics.advices.HandleExceptionOverlap;
+import int221.kw4.clinics.advices.*;
 
 import int221.kw4.clinics.dtos.events.EventDTO;
 import int221.kw4.clinics.dtos.events.EventEditDTO;
@@ -24,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -35,6 +33,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
@@ -171,6 +171,18 @@ public class EventService {
         }
     }
 
+//    public EventPageDTO getEventByCategory(List<Integer> categoryIds,Integer page, Integer pageSize) throws HandleExceptionNotFound, HandleExceptionForbidden {
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        User user = userRepository.findByEmail(auth.getPrincipal().toString());
+//
+//
+//        if (user.getRole().toString().equals("admin")) {
+//            return modelMapper.map(repository.findByEventCategory_IdIn(categoryIds,
+//                    PageRequest.of(page, pageSize)), EventPageDTO.class);
+//        }
+//        return null;
+//    }
+
     public EventPageDTO getPastEvent(Instant instant, Integer page, Integer pageSize) throws HandleExceptionNotFound {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByEmail(auth.getPrincipal().toString());
@@ -222,7 +234,7 @@ public class EventService {
     }
 
     //    Post
-    public ResponseEntity addEvent(EventPostDTO newEvent, MultipartFile file) throws HandleExceptionOverlap, HandleExceptionBadRequest {
+    public ResponseEntity addEvent(EventPostDTO newEvent, MultipartFile file, ServletWebRequest request) throws HandleExceptionOverlap, HandleExceptionBadRequest {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         System.out.println("User1: " + auth.getPrincipal());
         System.out.println("New Event: " + newEvent);
@@ -230,18 +242,20 @@ public class EventService {
         if (!auth.getPrincipal().toString().equals("anonymousUser")) {
             User user = userRepository.findByEmail(auth.getPrincipal().toString());
 
+            HandleValidationError error = validationAdd(newEvent, request);
+            if (error != null) {
+                return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
+            }
+
             if (user.getRole().toString().equals("admin")) {
-                checkPostOverlap(newEvent);
                 newEvent.setUser(user);
                 Event event = mapEvent(newEvent);
                 repository.saveAndFlush(event);
                 fileStorageService.storeFile(file, event);
 //                sendEmail(event);
                 return ResponseEntity.status(201).body(event);
-
             } else if (user.getRole().toString().equals("student")) {
                 if (user.getEmail().equals(newEvent.getBookingEmail())) {
-                    checkPostOverlap(newEvent);
                     newEvent.setUser(user);
                     Event event = mapEvent(newEvent);
                     repository.saveAndFlush(event);
@@ -255,7 +269,10 @@ public class EventService {
                 throw new HandleExceptionBadRequest("The booking email must be the same as the student's email");
             }
         } else {
-            checkPostOverlap(newEvent);
+            HandleValidationError error = validationAdd(newEvent, request);
+            if (error != null) {
+                return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
+            }
             Event event = mapEvent(newEvent);
             System.out.println("Event: " + event);
             repository.saveAndFlush(event);
@@ -303,7 +320,7 @@ public class EventService {
     }
 
     //    Update
-    public ResponseEntity update(EventEditDTO updateEvent, Integer eventId, MultipartFile file) throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest, IOException {
+    public ResponseEntity update(EventEditDTO updateEvent, Integer eventId, MultipartFile file, ServletWebRequest request) throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest, IOException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByEmail(auth.getPrincipal().toString());
         Event eventById = repository.getById(eventId);
@@ -312,7 +329,10 @@ public class EventService {
         Path path = Paths.get(fileStorageProperties.getUploadDir() + "/" + userDir + "/" + "Event_" + eventById.getId());
 
         if (user.getRole().toString().equals("admin")) {
-            checkUpdateOverlap(updateEvent, eventId);
+            HandleValidationError error= validationUpdate(updateEvent, eventId, request);
+            if (error != null) {
+                return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
+            }
             updateFile(file, path, eventById);
             Event event = repository.findById(eventId).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.BAD_REQUEST)
@@ -322,8 +342,12 @@ public class EventService {
 //            sendEmail(event);
             return ResponseEntity.status(200).body(event);
         } else if (user.getRole().toString().equals("student")) {
+            HandleValidationError error= validationUpdate(updateEvent, eventId, request);
+            if (error != null) {
+                return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
+            }
             if (user.getEmail().equals(eventById.getBookingEmail())) {
-                checkUpdateOverlap(updateEvent, eventId);
+                validationUpdate(updateEvent, eventId, request);
                 updateFile(file, path, eventById);
                 Event event = repository.findById(eventId).orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.BAD_REQUEST)
@@ -363,40 +387,6 @@ public class EventService {
         return new Date(date.getTime() + (duration * 60000));
     }
 
-    public void checkPostOverlap(EventPostDTO newEvent) throws HandleExceptionOverlap {
-        Date newEventStartTime = Date.from(newEvent.getEventStartTime());
-        Date newEventEndTime = findEndDate(Date.from(newEvent.getEventStartTime()), newEvent.getEventDuration());
-        List<EventDTO> eventList = getEventByCurrentTime(newEvent.getEventStartTime(), newEvent.getEventCategoryId());
-
-        for (int i = 0; i < eventList.size(); i++) {
-            Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
-            Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
-            if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
-                    newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
-                    newEventEndTime.equals(eventStartTime)) {
-                throw new HandleExceptionOverlap("StartTime is Overlap");
-            }
-        }
-    }
-
-    public void checkUpdateOverlap(EventEditDTO updateEvent, Integer eventId) throws HandleExceptionOverlap {
-        Date newEventStartTime = Date.from(updateEvent.getEventStartTime());
-        Date newEventEndTime = findEndDate(Date.from(updateEvent.getEventStartTime()), updateEvent.getEventDuration());
-        List<EventDTO> eventList = getAllEvent();
-
-        for (EventDTO eventDTO : eventList) {
-            if (updateEvent.getEventCategory().getId() == eventDTO.getEventCategory().getId() && eventDTO.getId() != eventId) {
-                Date eventStartTime = Date.from(eventDTO.getEventStartTime());
-                Date eventEndTime = findEndDate(Date.from(eventDTO.getEventStartTime()), eventDTO.getEventDuration());
-                if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
-                        newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
-                        newEventEndTime.equals(eventStartTime)) {
-                    throw new HandleExceptionOverlap("StartTime is Overlap");
-                }
-            }
-        }
-    }
-
     public Event mapEvent(EventPostDTO newEvent) {
         Event event = new Event();
         event.setBookingName(newEvent.getBookingName());
@@ -432,7 +422,7 @@ public class EventService {
 
     public Map<String, String> getFile(Path filePath) throws IOException {
         Map<String, String> fileMap = new HashMap<>();
-        if( Files.list(filePath).collect(Collectors.toList()).isEmpty()){
+        if (Files.list(filePath).collect(Collectors.toList()).isEmpty()) {
             fileMap.put("fileName", "");
             fileMap.put("pathFile", filePath.toString());
             return fileMap;
@@ -445,4 +435,67 @@ public class EventService {
         fileMap.put("pathFile", pathFile.toString());
         return fileMap;
     }
+
+    public HandleValidationError validationAdd(EventPostDTO newEvent, ServletWebRequest request) {
+        Map<String, String> errorMap = new HashMap<>();
+        Date newEventStartTime = Date.from(newEvent.getEventStartTime());
+        Date newEventEndTime = findEndDate(Date.from(newEvent.getEventStartTime()), newEvent.getEventDuration());
+        List<EventDTO> eventList = getEventByCurrentTime(newEvent.getEventStartTime(), newEvent.getEventCategoryId());
+        Pattern pattern = Pattern.compile("[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$");
+        Matcher matcher = pattern.matcher(newEvent.getBookingEmail());
+
+        for (int i = 0; i < eventList.size(); i++) {
+            Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
+            Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
+            if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
+                    newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
+                    newEventEndTime.equals(eventStartTime)) {
+                errorMap.put("eventStartTime", "StartTime is Overlap");
+            }
+        }
+
+        if (newEvent.getBookingName() == null || newEvent.getBookingName().isEmpty()) errorMap.put("bookingName", "Name shouldn't be null");
+        if (newEvent.getBookingName().length() >= 100) errorMap.put("bookingName", "Booking name must be less than 100 characters");
+        if (newEvent.getBookingEmail() == null || newEvent.getBookingEmail().isEmpty()) errorMap.put("bookingEmail", "Email shouldn't be null");
+        if (newEvent.getBookingEmail().length() >= 45) errorMap.put("bookingEmail", "Booking email must be less than 100 characters");
+        if (!matcher.matches()) errorMap.put("bookingEmail", "Booking email is invalid syntax");
+        if (newEvent.getEventStartTime() == null || newEvent.getEventStartTime().toString().isEmpty()) errorMap.put("eventStartTime", "startTime shouldn't be null");
+        if (newEvent.getEventStartTime().isBefore(Instant.now())) errorMap.put("eventStartTime", "Event start time shouldn't be past");
+        if (newEvent.getEventCategoryId() == null) errorMap.put("eventCategoryId", "Category shouldn't be null");
+        if (newEvent.getEventNotes().length() >= 500) errorMap.put("eventNotes", "Event notes must be less than 500 characters");
+        if (errorMap.size() <= 0) return null;
+
+        HandleValidationError errors = new HandleValidationError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
+                "Bad Requestss", "Validation", request.getRequest().getRequestURI(), errorMap);
+        return errors;
+    }
+
+    public HandleValidationError validationUpdate(EventEditDTO updateEvent, Integer eventId, ServletWebRequest request) {
+        Map<String, String> errorMap = new HashMap<>();
+        Date newEventStartTime = Date.from(updateEvent.getEventStartTime());
+        Date newEventEndTime = findEndDate(Date.from(updateEvent.getEventStartTime()), updateEvent.getEventDuration());
+        List<EventDTO> eventList = getAllEvent();
+
+        for (EventDTO eventDTO : eventList) {
+            if (updateEvent.getEventCategory().getId() == eventDTO.getEventCategory().getId() && eventDTO.getId() != eventId) {
+                Date eventStartTime = Date.from(eventDTO.getEventStartTime());
+                Date eventEndTime = findEndDate(Date.from(eventDTO.getEventStartTime()), eventDTO.getEventDuration());
+                if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
+                        newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
+                        newEventEndTime.equals(eventStartTime)) {
+                    errorMap.put("eventStartTime", "StartTime is Overlap");
+                }
+            }
+        }
+
+        if (updateEvent.getEventStartTime() == null || updateEvent.getEventStartTime().toString().isEmpty()) errorMap.put("eventStartTime", "startTime shouldn't be null");
+        if (updateEvent.getEventStartTime().isBefore(Instant.now())) errorMap.put("eventStartTime", "Event start time shouldn't be past");
+        if (updateEvent.getEventNotes().length() >= 500) errorMap.put("eventNotes", "Event notes must be less than 500 characters");
+        if (errorMap.size() <= 0) return null;
+
+        HandleValidationError errors = new HandleValidationError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
+                "Bad Requestss", "Validation", request.getRequest().getRequestURI(), errorMap);
+        return errors;
+    }
+
 }

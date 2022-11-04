@@ -5,6 +5,7 @@ import int221.kw4.clinics.advices.HandleExceptionForbidden;
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.advices.HandleExceptionUnique;
 import int221.kw4.clinics.dtos.users.*;
+import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.entities.User;
 import int221.kw4.clinics.repositories.EventCategoryRepository;
@@ -24,6 +25,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -97,8 +100,8 @@ public class UserService implements UserDetailsService {
             } else if (newUser.getEmail().equals(userList.get(i).getEmail())) {
                 throw new HandleExceptionUnique("Email should be Unique");
             }
-
         }
+
         User user = modelMapper.map(newUser, User.class);
         repository.saveAndFlush(user);
         user.setPassword("**********");
@@ -196,7 +199,9 @@ public class UserService implements UserDetailsService {
 
         modelMapper.map(updateUser, user);
         repository.saveAndFlush(user);
-//        sendEmail(user);
+//        emailService.sendSimpleMail(user.getEmail(), "Update User Successfully",
+//                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
+//                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
 
         return ResponseEntity.status(200).body(user);
     }
@@ -216,9 +221,4 @@ public class UserService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
     }
 
-    public void sendEmail(User user) {
-        emailService.sendSimpleMail(user.getEmail(), "Update User Successfully",
-                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
-                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
-    }
 }
