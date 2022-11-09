@@ -137,7 +137,7 @@ public class ApplicationExceptionHandler extends Exception {
     @ExceptionHandler(NullPointerException.class)
     public HandleValidationError handleNullPointerException(NullPointerException exc, ServletWebRequest request) {
         Map<String, String> errorMap = new HashMap<>();
-        errorMap.put("Error:", "File is empty");
+        errorMap.put("Error:", "Field is empty");
         errors = new HandleValidationError(Instant.now(), HttpStatus.CREATED.value(),
                 "Created", "Validation", request.getRequest().getRequestURI(), errorMap);
         return errors;

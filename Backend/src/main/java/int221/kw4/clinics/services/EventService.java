@@ -110,7 +110,10 @@ public class EventService {
         } else if (user.getRole().toString().equals("student")) {
             if (user.getEmail().equals(event.getBookingEmail())) {
                 Event eventListById = repository.findByIdAndBookingEmail(eventId, user.getEmail());
-                return modelMapper.map(eventListById, EventDTO.class);
+                EventDTO eventDTO = modelMapper.map(eventListById, EventDTO.class);
+                eventDTO.setFileName(getFile(path).get("fileName"));
+                eventDTO.setFileUrl(getFile(path).get("pathFile"));
+                return eventDTO;
             } else {
                 throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
             }
@@ -120,7 +123,10 @@ public class EventService {
                 Event eventListById = repository.findById(eventId).orElseThrow(
                         () -> new HandleExceptionNotFound(
                                 "Event ID: " + eventId + " does not exist !!!"));
-                return modelMapper.map(eventListById, EventDTO.class);
+                EventDTO eventDTO = modelMapper.map(eventListById, EventDTO.class);
+                eventDTO.setFileName(getFile(path).get("fileName"));
+                eventDTO.setFileUrl(getFile(path).get("pathFile"));
+                return eventDTO;
             } else {
                 throw new HandleExceptionForbidden("The event category is not the same as lecturer's category");
             }

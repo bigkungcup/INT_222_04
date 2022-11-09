@@ -40,13 +40,6 @@ public class FileStorageService {
     }
 
     public String storeFile(MultipartFile file, Event event) {
-
-//        String userDir;
-//        if(event.getUser() != null){
-//             userDir = "User/" + "User_" + event.getUser().getId().toString();
-//        }else {
-//             userDir = "Guest";
-//        }
         String userDir = event.getUser() != null ? "User/" + "User_" + event.getUser().getId() : "Guest";
         String eventDir = "Event_" + event.getId().toString();
         if(file == null){
