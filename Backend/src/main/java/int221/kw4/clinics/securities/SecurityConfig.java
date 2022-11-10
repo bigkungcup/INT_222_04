@@ -66,7 +66,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/api/users/register/**").permitAll()
                 .antMatchers("/api/token/refresh", "/api/token/remove").permitAll()
                 .antMatchers("/api/login").permitAll()
-                .antMatchers("/api/events/guest").permitAll();
+                .antMatchers("/api/events/guest").permitAll()
+                .antMatchers("/Files/Uploads/**").permitAll();
 
         http.authorizeRequests().antMatchers("/api/users/register/{userId}/eventCategory").hasAnyAuthority("lecturer", "admin")
                 .antMatchers("/api/users/{userId}/eventCategory/{eventCategoryId}").hasAnyAuthority("lecturer", "admin")

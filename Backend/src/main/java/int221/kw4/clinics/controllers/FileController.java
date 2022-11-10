@@ -52,43 +52,43 @@ public class FileController {
 //                .collect(Collectors.toList());
 //    }
 
-    @GetMapping("/downloadFile/{id}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable  String fileName, HttpServletRequest request) {
-        // Load file as Resource
-        Resource resource = fileStorageService.loadFileAsResource(fileName);
-//        System.out.println(resource.getFile().getAbsolutePath());
-        // Try to determine file's content type
-        String contentType = null;
-        try {
-            String content = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-            contentType = request.getServletContext().getMimeType(content);
-            System.out.println(resource.getFile().getAbsolutePath());
-            System.out.println("contentType: " + contentType);
-        } catch (IOException ex) {
-            logger.info("Could not determine file type.");
-        }
+//    @GetMapping("/downloadFile/{id}")
+//    public ResponseEntity<Resource> downloadFile(@PathVariable  String fileName, HttpServletRequest request) {
+//        // Load file as Resource
+//        Resource resource = fileStorageService.loadFileAsResource(fileName);
+////        System.out.println(resource.getFile().getAbsolutePath());
+//        // Try to determine file's content type
+//        String contentType = null;
+//        try {
+//            String content = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+//            contentType = request.getServletContext().getMimeType(content);
+//            System.out.println(resource.getFile().getAbsolutePath());
+//            System.out.println("contentType: " + contentType);
+//        } catch (IOException ex) {
+//            logger.info("Could not determine file type.");
+//        }
+//
+//        // Fallback to the default content type if type could not be determined
+//        if(contentType == null) {
+//            contentType = "application/octet-stream";
+//        }
+//
+//        return ResponseEntity.ok()
+//                .contentType(MediaType.parseMediaType(contentType))
+//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"  " + resource.getFilename() + "\"")
+//                .body(resource);
+//    }
 
-        // Fallback to the default content type if type could not be determined
-        if(contentType == null) {
-            contentType = "application/octet-stream";
-        }
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
-    }
-
-    @DeleteMapping("/deleteFile/{fileName:.+}")
-    public ResponseEntity<String> deleteFile(@PathVariable String fileName) {
-        // Load file as Resource
-        Resource resource = fileStorageService.loadFileAsResource(fileName);
-        try {
-            Files.delete(resource.getFile().toPath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return ResponseEntity.ok().body("File deleted");
-    }
+//    @DeleteMapping("/deleteFile/{fileName:.+}")
+//    public ResponseEntity<String> deleteFile(@PathVariable String fileName) {
+//        // Load file as Resource
+//        Resource resource = fileStorageService.loadFileAsResource(fileName);
+//        try {
+//            Files.delete(resource.getFile().toPath());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return ResponseEntity.ok().body("File deleted");
+//    }
 
 }

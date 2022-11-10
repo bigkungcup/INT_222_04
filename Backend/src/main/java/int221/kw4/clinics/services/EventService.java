@@ -14,6 +14,7 @@ import int221.kw4.clinics.repositories.EventCategoryRepository;
 import int221.kw4.clinics.repositories.EventRepository;
 import int221.kw4.clinics.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -104,15 +106,15 @@ public class EventService {
                     () -> new HandleExceptionNotFound(
                             "Event ID: " + eventId + " does not exist !!!"));
             EventDTO eventDTO = modelMapper.map(eventListById, EventDTO.class);
-            eventDTO.setFileName(getFile(path).get("fileName"));
-            eventDTO.setFileUrl(getFile(path).get("pathFile"));
+            eventDTO.setFileName(getFile(path, eventListById).get("fileName"));
+            eventDTO.setFileUrl(getFile(path, eventListById).get("pathFile"));
             return eventDTO;
         } else if (user.getRole().toString().equals("student")) {
             if (user.getEmail().equals(event.getBookingEmail())) {
                 Event eventListById = repository.findByIdAndBookingEmail(eventId, user.getEmail());
                 EventDTO eventDTO = modelMapper.map(eventListById, EventDTO.class);
-                eventDTO.setFileName(getFile(path).get("fileName"));
-                eventDTO.setFileUrl(getFile(path).get("pathFile"));
+                eventDTO.setFileName(getFile(path, eventListById).get("fileName"));
+                eventDTO.setFileUrl(getFile(path, eventListById).get("pathFile"));
                 return eventDTO;
             } else {
                 throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
@@ -124,8 +126,8 @@ public class EventService {
                         () -> new HandleExceptionNotFound(
                                 "Event ID: " + eventId + " does not exist !!!"));
                 EventDTO eventDTO = modelMapper.map(eventListById, EventDTO.class);
-                eventDTO.setFileName(getFile(path).get("fileName"));
-                eventDTO.setFileUrl(getFile(path).get("pathFile"));
+                eventDTO.setFileName(getFile(path, eventListById).get("fileName"));
+                eventDTO.setFileUrl(getFile(path, eventListById).get("pathFile"));
                 return eventDTO;
             } else {
                 throw new HandleExceptionForbidden("The event category is not the same as lecturer's category");
@@ -383,7 +385,7 @@ public class EventService {
         } else {
             if (Files.exists(path)) {
                 if (!Files.list(path).collect(Collectors.toList()).isEmpty()) {
-                    fileStorageService.deleteFile(path + "/" + getFile(path).get("fileName"));
+                    fileStorageService.deleteFile(path + "/" + getFile(path, eventById).get("fileName"));
                 }
             }
         }
@@ -426,7 +428,7 @@ public class EventService {
                         "Event Note: " + event.getEventNotes(), new Date());
     }
 
-    public Map<String, String> getFile(Path filePath) throws IOException {
+    public Map<String, String> getFile(Path filePath, Event event) throws IOException {
         Map<String, String> fileMap = new HashMap<>();
         if (Files.list(filePath).collect(Collectors.toList()).isEmpty()) {
             fileMap.put("fileName", "");
@@ -435,10 +437,12 @@ public class EventService {
         }
         Path pathFile = Files.list(filePath).collect(Collectors.toList()).get(0);
         System.out.println("PathFile: " + pathFile);
-        String fileName = fileStorageService.loadFileAsResource(pathFile.toString()).getFilename();
+        String fileName = fileStorageService.loadFileAsResource(pathFile.toString(), event).getFilename();
+        URL resource = fileStorageService.loadFileAsResource(fileName, event).getURL();
+        System.out.println("Resource: " + resource);
         System.out.println("FileName: " + fileName);
         fileMap.put("fileName", fileName);
-        fileMap.put("pathFile", pathFile.toString());
+        fileMap.put("pathFile", resource.toString());
         return fileMap;
     }
 
