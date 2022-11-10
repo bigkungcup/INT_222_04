@@ -14,6 +14,7 @@ import int221.kw4.clinics.advices.MyFileNotFoundException;
 import int221.kw4.clinics.dtos.events.EventPostDTO;
 import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.properties.FileStorageProperties;
+import int221.kw4.clinics.repositories.EventRepository;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -27,8 +28,10 @@ public class FileStorageService {
 
     private final Path fileStorageLocation;
 
+    private final EventRepository eventRepository;
+
     @Autowired
-    public FileStorageService(FileStorageProperties fileStorageProperties) {
+    public FileStorageService(FileStorageProperties fileStorageProperties, EventRepository eventRepository) {
         this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
                 .toAbsolutePath().normalize();
 
@@ -37,6 +40,7 @@ public class FileStorageService {
         } catch (Exception ex) {
             throw new FileStorageException("Could not create the directory where the uploaded files will be stored.", ex);
         }
+        this.eventRepository = eventRepository;
     }
 
     public String storeFile(MultipartFile file, Event event) {
@@ -71,6 +75,25 @@ public class FileStorageService {
     }
 
     public Resource loadFileAsResource(String fileName, Event event) {
+        String userDir = event.getUser() != null ? "User/" + "User_" + event.getUser().getId() : "Guest";
+        String eventDir = "Event_" + event.getId().toString();
+        try {
+            Path filePath = this.fileStorageLocation.resolve(userDir).resolve(eventDir).resolve(fileName).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+            System.out.println(filePath.toUri());
+            System.out.println(resource);
+            if(resource.exists()) {
+                return resource;
+            } else {
+                throw new MyFileNotFoundException("File not found " + "eventNo" + fileName);
+            }
+        } catch (MalformedURLException ex) {
+            throw new MyFileNotFoundException("File not found " + "eventNo" + fileName, ex);
+        }
+    }
+
+    public Resource loadFileAsResource(String fileName, Integer id) {
+        Event event = eventRepository.findById(id).orElseThrow(() -> new MyFileNotFoundException("Event not found with id " + id));
         String userDir = event.getUser() != null ? "User/" + "User_" + event.getUser().getId() : "Guest";
         String eventDir = "Event_" + event.getId().toString();
         try {

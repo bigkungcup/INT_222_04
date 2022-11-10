@@ -31,64 +31,15 @@ public class FileController {
     @Autowired
     private FileStorageService fileStorageService;
 
-//    @PostMapping("/uploadFile")
-//    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file, Integer id) {
-//        String fileName = fileStorageService.storeFile(file, id);
-//
-//        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-//                .path("/downloadFile/")
-//                .path(fileName)
-//                .toUriString();
-//
-//        return new UploadFileResponse(fileName, fileDownloadUri,
-//                file.getContentType(), file.getSize());
-//    }
+    @GetMapping("/{eventId}/{fileName:.+}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable  String fileName,@PathVariable  Integer eventId, HttpServletRequest request) throws IOException {
 
-//    @PostMapping("/uploadMultipleFiles")
-//    public List<UploadFileResponse> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) {
-//        return Arrays.asList(files)
-//                .stream()
-//                .map(file -> uploadFile(file))
-//                .collect(Collectors.toList());
-//    }
+        // Load file as Resource
+        Resource resource = fileStorageService.loadFileAsResource(fileName, eventId);
+        System.out.println(resource.getFile().getAbsolutePath());
 
-//    @GetMapping("/downloadFile/{id}")
-//    public ResponseEntity<Resource> downloadFile(@PathVariable  String fileName, HttpServletRequest request) {
-//        // Load file as Resource
-//        Resource resource = fileStorageService.loadFileAsResource(fileName);
-////        System.out.println(resource.getFile().getAbsolutePath());
-//        // Try to determine file's content type
-//        String contentType = null;
-//        try {
-//            String content = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-//            contentType = request.getServletContext().getMimeType(content);
-//            System.out.println(resource.getFile().getAbsolutePath());
-//            System.out.println("contentType: " + contentType);
-//        } catch (IOException ex) {
-//            logger.info("Could not determine file type.");
-//        }
-//
-//        // Fallback to the default content type if type could not be determined
-//        if(contentType == null) {
-//            contentType = "application/octet-stream";
-//        }
-//
-//        return ResponseEntity.ok()
-//                .contentType(MediaType.parseMediaType(contentType))
-//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"  " + resource.getFilename() + "\"")
-//                .body(resource);
-//    }
-
-//    @DeleteMapping("/deleteFile/{fileName:.+}")
-//    public ResponseEntity<String> deleteFile(@PathVariable String fileName) {
-//        // Load file as Resource
-//        Resource resource = fileStorageService.loadFileAsResource(fileName);
-//        try {
-//            Files.delete(resource.getFile().toPath());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return ResponseEntity.ok().body("File deleted");
-//    }
-
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"  " + resource.getFilename() + "\"")
+                .body(resource);
+    }
 }
