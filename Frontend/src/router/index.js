@@ -7,8 +7,8 @@ import Booking from "../view/Booking.vue";
 import EventDetail from "../view/EventDetail.vue";
 // import CategoryDetail from "../view/CategoryDetail.vue"
 // import AboutUs from "../view/AboutUs.vue"
-// import User from "../view/User.vue"
-// import UserDetail from "../view/UserDetail.vue"
+import Users from "../view/Users.vue"
+import UserDetail from "../view/UserDetail.vue"
 import Login from "../view/Login.vue"
 import SignUp from "../view/SignUp.vue"
 // import Profile from "../view/Profile.vue"
@@ -55,16 +55,16 @@ const routes = [
   //   name: "AboutUs",
   //   component: AboutUs,
   // },
-  // {
-  //   path: "/user",
-  //   name: "User",
-  //   component: User,
-  // },
-  // {
-  //   path: "/user/:id",
-  //   name: "UserDetail",
-  //   component: UserDetail,
-  // },
+  {
+    path: "/users",
+    name: "Users",
+    component: Users,
+  },
+  {
+    path: "/user/:id",
+    name: "UserDetail",
+    component: UserDetail,
+  },
   {
     path: "/signUp",
     name: "SignUp",

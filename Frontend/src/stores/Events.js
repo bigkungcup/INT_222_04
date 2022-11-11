@@ -9,6 +9,7 @@ export const useEvents = defineStore("Events", () => {
   const deletePopup = ref(false);
   const editField = ref(false);
   const editTime = ref(false);
+  const editFile = ref(false)
   const validEmail =
     /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
   const eventFile = ref()
@@ -19,8 +20,7 @@ export const useEvents = defineStore("Events", () => {
 
   const newEvent = ref({
     bookingName: "",
-    // bookingEmail: login.getRoleToken() == null || login.getRoleToken() == '[admin]' ? "" :userEmail.value,
-    bookingEmail: "",
+    bookingEmail: login.getRoleToken() == null || login.getRoleToken() == 'admin' ? "" : login.getEmailToken(),
     eventCategory: {},
     eventStartTime: "",
     eventNotes: "",
@@ -51,6 +51,9 @@ export const useEvents = defineStore("Events", () => {
     );
     if (res.status === 200) {
       eventList.value = await res.json();
+      if(eventList.value.numberOfElements == 0){
+        getEventList(eventList.value.pageNumber - 1);
+      }
       console.log("get event list successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getEventList((page = 0)));
@@ -83,13 +86,28 @@ export const useEvents = defineStore("Events", () => {
     });
     if (res.status === 200) {
       displayEvent.value = await res.json();
+      console.log(displayEvent.value);
       console.log("get successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else console.log("error, cannot get event");
   };
 
-
+  //Get Event File
+  // const getEventFile = async (eventId,filname) => {
+  //   const res = await fetch(
+  //     `${import.meta.env.VITE_BASE_URL}/files/${eventId}/${filname}`,
+  //     {
+  //       method: "GET",
+  //     }
+  //   );
+  //   if (res.status === 200) {
+  //     console.log("get file successfully");
+  //   } else if (res.status === 401 && login.logoutIcon == true) {
+  //   } else if (res.status === 401 && login.logoutIcon == false) {
+  //   }
+  //   console.log("error, cannot get event list");
+  // };
 
   //Create Event
   const createEvent = async () => {
@@ -111,7 +129,7 @@ export const useEvents = defineStore("Events", () => {
     
     const formData = new FormData();
     formData.append('event',JSON.stringify(event))
-    formData.append('file',eventFile.value == null ? "" : eventFile.value)
+    formData.append('file',eventFile.value == null ? "No file" : eventFile.value)
     console.log(formData);
 
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events`, {
@@ -120,6 +138,7 @@ export const useEvents = defineStore("Events", () => {
     });
     if (res.status === 201) {
       const addEvent = await res.json();
+      console.log(login.getEmailToken());
       eventListAll.value.push(addEvent);
       getAllEventList();
       bookingSeccessfully.value = true;
@@ -127,6 +146,8 @@ export const useEvents = defineStore("Events", () => {
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(createEvent(newEvent));
     } else if (res.status === 401 && login.logoutIcon == false) {
+    } else if (res.status === 417) {
+
     } else {
       console.log("error, cannot create");
     }
@@ -190,6 +211,7 @@ export const useEvents = defineStore("Events", () => {
       getEventDetail(id);
       editField.value = false;
       editTime.value = false;
+      editFile.value = false;
       resetEditField();
       resetEditTime();
       console.log("edit successfully");
@@ -204,7 +226,7 @@ export const useEvents = defineStore("Events", () => {
   const resetNewEvent = () => {
     newEvent.value = {
       bookingName: "",
-      bookingEmail: "",
+      bookingEmail: login.getRoleToken() == null || login.getRoleToken() == 'admin' ? "" : login.getEmailToken(),
       eventCategory: {},
       eventStartTime: "",
       eventNotes: "",
@@ -232,17 +254,15 @@ export const useEvents = defineStore("Events", () => {
   const chooseFile = () => {
     let fileName = document.getElementById("filename")
     let inputFile = document.querySelector("input[type=file]").files[0];
-    let fileSize = ((inputFile.size/1024)/1024).toFixed(4); //Mb
+    let fileSize = ((inputFile.size/1024)/1024); //Mb
 
-    if(fileSize <= 10 && fileSize > 0){
+    if(fileSize <= 10.00 && fileSize > 0){
       eventFile.value = inputFile;
       fileName.innerText = inputFile.name;
       showErrorFileText.value = false;
       showFileName.value = true;
-      console.log('a');
     } else {
       showErrorFileText.value = true;
-      console.log('b');
       if(eventFile.value == null){
         showFileName.value = false;
       } else {showFileName.value = true;} 
@@ -296,6 +316,7 @@ export const useEvents = defineStore("Events", () => {
     getAllEventList,
     getEventList,
     getEventDetail,
+    // getEventFile,
     createEvent,
     chooseFile,
     resetNewEvent,
@@ -316,6 +337,7 @@ export const useEvents = defineStore("Events", () => {
     deletePopup,
     editField,
     editTime,
+    editFile,
     showFileName,
     showErrorFileText,
     eventFile

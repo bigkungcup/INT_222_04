@@ -19,7 +19,16 @@ export const useClinics = defineStore("Clinics", () => {
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else console.log("error, cannot get event clinics list");
   };
-  return { getClinics,clinicList };
+
+  const filterClinics = (allClinicList,userClinicList) => {
+    allClinicList = clinicList.value;
+    for(let i = 0; i < userClinicList.eventCategories.length; i++ ) {
+      allClinicList = allClinicList.filter(x => x.id != userClinicList.eventCategories[i].id);
+      }
+      return allClinicList
+  }
+
+  return { getClinics,filterClinics,clinicList };
 });
 
 //-----------------------------------------------------------------------------------

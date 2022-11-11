@@ -5,7 +5,8 @@ import router from "../router";
 export const useLogin = defineStore("Login", () => {
   const loginSuccessfully = ref(false);
   const token = ref();
-  const logoutIcon = ref(false)
+  const logoutIcon = ref(localStorage.getItem("id") != null ? true : false);
+  const userPageIcon = ref(localStorage.getItem("role") == 'admin' ? true : false);
   const logoutPopup = ref(false)
 
   const loginAccount = ref({
@@ -92,6 +93,9 @@ export const useLogin = defineStore("Login", () => {
       token.value = await res.json();
       resetToken();
       setToken(token.value)
+      if(localStorage.getItem("role") == 'admin'){
+        userPageIcon.value = true;
+      }
       getAll;
       console.log("Refresh token success");
     } else if (res.status === 401) {
@@ -112,11 +116,12 @@ export const useLogin = defineStore("Login", () => {
           resetToken();
           logoutPopup.value = false;
           logoutIcon.value = false;
+          userPageIcon.value = false;
           router.push({ name: "Login" });
         } else console.log();
       };
 
-  return { handleLogin,getRefresh,logout,resetLoginAccount,getIdToken,loginAccount,loginSuccessfully,logoutPopup,logoutIcon,token };
+  return { getRoleToken,getEmailToken,handleLogin,getRefresh,logout,resetLoginAccount,getIdToken,loginAccount,loginSuccessfully,logoutPopup,logoutIcon,userPageIcon,token };
 });
 
 //-----------------------------------------------------------------------------------

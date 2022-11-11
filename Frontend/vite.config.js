@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
         "/api": {
-            // target: "https://intproj21.sit.kmutt.ac.th/us1",
+            // target: "https://intproj21.sit.kmutt.ac.th/kw4",
             target: `http://localhost:8080`,
             changeOrigin: true,
             secure: false,

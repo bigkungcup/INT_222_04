@@ -22,6 +22,7 @@ module.exports = {
       },
       height: {
         '100': '32rem',
+        '144': '36rem'
       },
       margin: {
         '88' : '22rem',

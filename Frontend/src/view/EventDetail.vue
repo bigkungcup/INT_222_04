@@ -7,9 +7,11 @@ import { useEvents } from "../stores/Events.js";
 
 const { params } = useRoute();
 const event = useEvents();
+const fileUrl = ref()
 
 onBeforeMount(async () => {
   await event.getEventDetail(params.id);
+  fileUrl.value = "https://" + window.location.host +"/api/files/" + params.id  + "/" + event.displayEvent.fileName
 });
 </script>
 
@@ -115,6 +117,46 @@ onBeforeMount(async () => {
           </button>
         </div>
           </div>
+  </div>
+
+  <div class="grid grid-cols-2 h-24 mt-6 text-white text-2xl bg-white rounded-2xl">
+        <p class="flex text-Web-violet font-bold my-8 mx-14">File :
+        <a :href="fileUrl" v-show="!event.editFile && event.displayEvent.fileName != ''" download>
+          <div v-show="true" class="border-2 border-Web-violet rounded-lg ml-6 text-Web-violet hover:bg-Web-violet hover:text-white text-center text-lg py-1 px-2 -mt-1">
+            {{ event.displayEvent.fileName }}
+          </div>
+        </a>
+        <label for="file" v-show="event.editFile">
+                <div v-show="event.displayEvent.fileName == ''" class="border-2 border-Web-violet rounded-lg ml-6 text-Web-violet hover:bg-Web-violet hover:text-white text-center text-lg py-1 px-2">
+                <input id="file" type="file" @change="event.chooseFile"/>
+                Choose File
+                </div>
+                <div v-show="event.displayEvent.fileName != ''" class="bg-white text-Web-violet rounded-lg ml-6 text-white hover:bg-white/70 text-center text-lg py-1 px-2">
+                    <input id="file" type="file" @change="event.chooseFile"/>
+                    <p id="filename"></p>
+                </div>
+          </label>
+          <div v-show="event.showFileName">
+          <button class="ml-6 -mt-1" @click="event.resetNewEventFile"><svg width="40" height="40" viewBox="0 0 512 512" >
+                  <path fill="none" d="M296 64h-80a7.91 7.91 0 0 0-8 8v24h96V72a7.91 7.91 0 0 0-8-8Z"/>
+                  <path fill="#EB4C84" d="M432 96h-96V72a40 40 0 0 0-40-40h-80a40 40 0 0 0-40 40v24H80a16 16 0 0 0 0 32h17l19 304.92c1.42 26.85 22 47.08 48 47.08h184c26.13 0 46.3-19.78 48-47l19-305h17a16 16 0 0 0 0-32ZM192.57 416H192a16 16 0 0 1-16-15.43l-8-224a16 16 0 1 1 32-1.14l8 224A16 16 0 0 1 192.57 416ZM272 400a16 16 0 0 1-32 0V176a16 16 0 0 1 32 0Zm32-304h-96V72a7.91 7.91 0 0 1 8-8h80a7.91 7.91 0 0 1 8 8Zm32 304.57A16 16 0 0 1 320 416h-.58A16 16 0 0 1 304 399.43l8-224a16 16 0 1 1 32 1.14Z"/>
+          </svg></button></div>
+      </p>
+      <div v-show="!event.editFile" class="grid place-items-end">
+        <button
+            class="rounded-2xl bg-Web-pink py-2 w-1/6 text-white text-lg font-bold mx-14 my-7"
+            @click="event.editFile = true"
+          >
+            Edit
+          </button>
+        </div>
+
+        
+        
+        <p v-show="event.showErrorFileText" class="text-Web-pink text-lg pl-40">*The file size cannot be larger than 10 MB.</p>
+        <!-- <button class="border-2 border-Web-violet rounded-lg ml-6 text-Web-violet hover:bg-Web-violet hover:text-white text-center text-lg py-1 px-2 -mt-1" @click="event.getEventFile(params.id,event.displayEvent.fileName)">
+          {{ event.displayEvent.fileName }}
+        </button> -->
   </div>
   </div>
 </template>

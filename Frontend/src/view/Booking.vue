@@ -1,17 +1,19 @@
 <script setup>
 import { ref,onBeforeMount } from "vue";
 import { useClinics } from "../stores/Clinics.js";
-import { useEvents } from "../stores/Events";
+import { useEvents } from "../stores/Events.js";
+import { useLogin } from "../stores/Login.js";
 import BookingSeccessfully from "../components/BookingSuccessfully.vue";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 
 const clinic = useClinics();
 const event = useEvents();
+const login = useLogin();
 
 onBeforeMount(async () => {
-    event.resetNewEvent();
     await clinic.getClinics();
+    event.resetNewEvent();
 });
 </script>
 
@@ -34,9 +36,11 @@ onBeforeMount(async () => {
             <input
               type="text"
               class="padding-input-detail bg-Bg-Plain rounded-lg h-16 w-9/12 text-1xl text-white placeholder:italic placeholder:text-1xl place-self-center"
+              v-show="login.getRoleToken() == null || login.getRoleToken() == 'admin'"
               v-model="event.newEvent.bookingEmail"
               placeholder="Enter Your Email"
             />
+            <p class="text-Web-violet text-xl font-bold my-10" v-show="!(login.getRoleToken() == 'admin')">{{ login.getEmailToken() }}</p>
           </div>
         </div>
         <div class="p-6">
@@ -77,7 +81,7 @@ onBeforeMount(async () => {
   </div>
   <div class="grid mt-6 text-white text-2xl">
         <p class="flex font-bold my-3">Select file : 
-          <label v-show="true" for="file" >
+          <label for="file" >
                 <div v-show="!event.showFileName" class="border-2 border-white rounded-lg ml-6 text-white hover:bg-white hover:text-Web-violet text-center text-lg py-1 px-2">
                 <input id="file" type="file" @change="event.chooseFile"/>
                 Choose File
