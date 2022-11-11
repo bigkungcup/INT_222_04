@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue";
-import { useLogin } from "../stores/login.js";
+import { useLogin } from "../stores/Login.js";
 import LoginSuccessfully from "../components/LoginSuccessfully.vue";
 
 const login = useLogin();

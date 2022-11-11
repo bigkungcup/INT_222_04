@@ -1,7 +1,7 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
 import { ref } from "vue";
 import moment from "moment";
-import { useLogin } from "../stores/Login.js";
+import { useLogin } from "./Login.js";
 
 export const useEvents = defineStore("Events", () => {
   const login = useLogin()
@@ -13,6 +13,7 @@ export const useEvents = defineStore("Events", () => {
   const validEmail =
     /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
   const eventFile = ref()
+  const editEventFile = ref()
   const showFileName = ref(false)
   const showErrorFileText = ref(false)
   const eventList = ref([]);
@@ -250,6 +251,10 @@ export const useEvents = defineStore("Events", () => {
     editEvent.value.eventStartTime = "";
   }
 
+  const resetEditFile = () => {
+    editEventFile.value = "";
+  }
+
   //Choose File
   const chooseFile = () => {
     let fileName = document.getElementById("filename")
@@ -268,6 +273,25 @@ export const useEvents = defineStore("Events", () => {
       } else {showFileName.value = true;} 
     }
   }
+
+    //Choose File
+    const chooseEditFile = () => {
+      let fileName = document.getElementById("filename")
+      let inputFile = document.querySelector("input[type=file]").files[0];
+      let fileSize = ((inputFile.size/1024)/1024); //Mb
+  
+      if(fileSize <= 10.00 && fileSize > 0){
+        editEventFile.value = inputFile;
+        fileName.innerText = inputFile.name;
+        showErrorFileText.value = false;
+        showFileName.value = true;
+      } else {
+        showErrorFileText.value = true;
+        if(editEventFile.value == null){
+          showFileName.value = false;
+        } else {showFileName.value = true;} 
+      }
+    }
 
   const setMinTime = (eventStartTime) => {
     newEvent.value.eventStartTime = moment(eventStartTime).isAfter(
@@ -319,10 +343,12 @@ export const useEvents = defineStore("Events", () => {
     // getEventFile,
     createEvent,
     chooseFile,
+    chooseEditFile,
     resetNewEvent,
     resetNewEventFile,
     resetEditField,
     resetEditTime,
+    resetEditFile,
     removeEvent,
     saveEvent,
     setMinTime,
@@ -340,7 +366,8 @@ export const useEvents = defineStore("Events", () => {
     editFile,
     showFileName,
     showErrorFileText,
-    eventFile
+    eventFile,
+    editEventFile
   };
 });
 

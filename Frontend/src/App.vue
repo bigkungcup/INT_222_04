@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted } from "vue";
 import Navbar from "./components/Navbar.vue";
-import { useLogin } from "../src/stores/Login.js";
+import { useLogin } from "./stores/Login.js";
 import Logout from "./components/Logout.vue";
 
 const login = useLogin();
