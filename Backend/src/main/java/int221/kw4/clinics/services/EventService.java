@@ -373,19 +373,21 @@ public class EventService {
     }
 
     public void updateFile(MultipartFile file, Path path, Event eventById) throws IOException {
-        if (file != null) {
+        System.out.println("File: " + file.isEmpty());
+        if (!file.isEmpty()) {
             if (Files.exists(path)) {
                 if (!Files.list(path).collect(Collectors.toList()).isEmpty()) {
                     fileStorageService.deleteFile(path + "/" + Files.list(path).collect(Collectors.toList()).get(0).getFileName());
                     fileStorageService.storeFile(file, eventById);
-                } else {
+                } else if(Files.list(path).collect(Collectors.toList()).isEmpty()) {
                     fileStorageService.storeFile(file, eventById);
                 }
             }
-        } else {
+        } else if(file.isEmpty()) {
             if (Files.exists(path)) {
                 if (!Files.list(path).collect(Collectors.toList()).isEmpty()) {
-                    fileStorageService.deleteFile(path + "/" + getFile(path, eventById).get("fileName"));
+                    System.out.println("File: " + path + "/" + Files.list(path).collect(Collectors.toList()).get(0).getFileName());
+                    fileStorageService.deleteFile(path + "/" + Files.list(path).collect(Collectors.toList()).get(0).getFileName());
                 }
             }
         }
