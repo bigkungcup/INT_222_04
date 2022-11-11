@@ -142,7 +142,7 @@ onBeforeMount(async () => {
                   <path fill="#EB4C84" d="M432 96h-96V72a40 40 0 0 0-40-40h-80a40 40 0 0 0-40 40v24H80a16 16 0 0 0 0 32h17l19 304.92c1.42 26.85 22 47.08 48 47.08h184c26.13 0 46.3-19.78 48-47l19-305h17a16 16 0 0 0 0-32ZM192.57 416H192a16 16 0 0 1-16-15.43l-8-224a16 16 0 1 1 32-1.14l8 224A16 16 0 0 1 192.57 416ZM272 400a16 16 0 0 1-32 0V176a16 16 0 0 1 32 0Zm32-304h-96V72a7.91 7.91 0 0 1 8-8h80a7.91 7.91 0 0 1 8 8Zm32 304.57A16 16 0 0 1 320 416h-.58A16 16 0 0 1 304 399.43l8-224a16 16 0 1 1 32 1.14Z"/>
           </svg></button></div>
       </p>
-      <div v-show="!event.editFile" class="grid place-items-end">
+      <div class="grid place-items-end" v-show="!event.editFile" >
         <button
             class="rounded-2xl bg-Web-pink py-2 w-1/6 text-white text-lg font-bold mx-14 my-7"
             @click="event.editFile = true"
@@ -150,6 +150,22 @@ onBeforeMount(async () => {
             Edit
           </button>
         </div>
+        <div class="grid place-items-end" v-show="event.editFile" >
+          <div class="flex w-4/6">
+            <button
+            class="rounded-2xl bg-white py-2 w-1/4 text-Web-pink border-2 border-Web-pink text-lg font-bold ml-32 my-6"
+            @click="event.editFile = false, event.resetEditFile()"
+          >
+            Cancle
+          </button>
+          <button
+            class="rounded-2xl bg-Web-pink py-2 w-1/4 text-white text-lg font-bold ml-6 my-6"
+            @click="event.saveEvent(params.id)"
+          >
+            Submit
+          </button>
+        </div>
+          </div>
 
         
         

@@ -176,6 +176,31 @@ export const useEvents = defineStore("Events", () => {
 
   //Edit Event
   const saveEvent = async (id) => {
+    const event = {
+      bookingName: displayEvent.value.bookingName,
+      bookingEmail: displayEvent.value.bookingEmail,
+      eventCategory: displayEvent.value.eventCategory,
+      eventStartTime:
+        editEvent.value.eventStartTime === ""
+          ? displayEvent.value.eventStartTime
+          : getOverlapTime(
+              editEvent.value.eventStartTime,
+              displayEvent.value.eventCategory.id
+            )
+          ? (editEvent.value.eventStartTime = "overlap")
+          : editEvent.value.eventStartTime,
+      eventNotes:
+        editEvent.value.eventNotes === ""
+          ? displayEvent.value.eventNotes
+          : editEvent.value.eventNotes,
+      eventDuration: displayEvent.value.eventDuration,
+    }
+
+    const formData = new FormData();
+    formData.append('event',JSON.stringify(event))
+    formData.append('file',editEventFile.value == null ? "No file" : editEventFile.value)
+    console.log(formData);
+
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/events/${id}`,
       {
@@ -183,25 +208,7 @@ export const useEvents = defineStore("Events", () => {
         headers: {
           "content-type": "application/json",
         },
-        body: JSON.stringify({
-          bookingName: displayEvent.value.bookingName,
-          bookingEmail: displayEvent.value.bookingEmail,
-          eventCategory: displayEvent.value.eventCategory,
-          eventStartTime:
-            editEvent.value.eventStartTime === ""
-              ? displayEvent.value.eventStartTime
-              : getOverlapTime(
-                  editEvent.value.eventStartTime,
-                  displayEvent.value.eventCategory.id
-                )
-              ? (editEvent.value.eventStartTime = "overlap")
-              : editEvent.value.eventStartTime,
-          eventNotes:
-            editEvent.value.eventNotes === ""
-              ? displayEvent.value.eventNotes
-              : editEvent.value.eventNotes,
-          eventDuration: displayEvent.value.eventDuration,
-        }),
+        body: formData
       }
     );
     if (res.status === 200) {
@@ -215,6 +222,7 @@ export const useEvents = defineStore("Events", () => {
       editFile.value = false;
       resetEditField();
       resetEditTime();
+      resetEditFile();
       console.log("edit successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
     } else if (res.status === 401 && login.logoutIcon == false) {
@@ -252,7 +260,10 @@ export const useEvents = defineStore("Events", () => {
   }
 
   const resetEditFile = () => {
-    editEventFile.value = "";
+    editEventFile.value = null;
+    showFileName.value = false;
+    showErrorFileText.value = false;
+    document.getElementById("file").value = null;
   }
 
   //Choose File
