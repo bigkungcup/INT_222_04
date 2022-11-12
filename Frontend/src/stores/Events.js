@@ -14,6 +14,7 @@ export const useEvents = defineStore("Events", () => {
     /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
   const eventFile = ref()
   const editEventFile = ref()
+  const fileUrl = ref()
   const showFileName = ref(false)
   const showErrorFileText = ref(false)
   const eventList = ref([]);
@@ -52,7 +53,7 @@ export const useEvents = defineStore("Events", () => {
     );
     if (res.status === 200) {
       eventList.value = await res.json();
-      if(eventList.value.numberOfElements == 0){
+      if(eventList.value.numberOfElements == 0 && eventList.value.pageNumber > 0){
         getEventList(eventList.value.pageNumber - 1);
       }
       console.log("get event list successfully");
@@ -130,7 +131,7 @@ export const useEvents = defineStore("Events", () => {
     
     const formData = new FormData();
     formData.append('event',JSON.stringify(event))
-    formData.append('file',eventFile.value == null ? "No file" : eventFile.value)
+    formData.append('file',eventFile.value == null ? document.querySelector("input[type=file]").files[0] : eventFile.value)
     console.log(formData);
 
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events`, {
@@ -177,8 +178,8 @@ export const useEvents = defineStore("Events", () => {
   //Edit Event
   const saveEvent = async (id) => {
     const event = {
-      bookingName: displayEvent.value.bookingName,
-      bookingEmail: displayEvent.value.bookingEmail,
+      // bookingName: displayEvent.value.bookingName,
+      // bookingEmail: displayEvent.value.bookingEmail,
       eventCategory: displayEvent.value.eventCategory,
       eventStartTime:
         editEvent.value.eventStartTime === ""
@@ -205,9 +206,6 @@ export const useEvents = defineStore("Events", () => {
       `${import.meta.env.VITE_BASE_URL}/events/${id}`,
       {
         method: "PUT",
-        headers: {
-          "content-type": "application/json",
-        },
         body: formData
       }
     );
@@ -216,7 +214,8 @@ export const useEvents = defineStore("Events", () => {
       // if (editEvent.eventStartTime !== "" || editEvent.eventNotes !== "") {
       //   showEditPopUp();
       // }
-      getEventDetail(id);
+      await getEventDetail(id);
+      createFileUrl(id,displayEvent.value.fileName)
       editField.value = false;
       editTime.value = false;
       editFile.value = false;
@@ -304,6 +303,13 @@ export const useEvents = defineStore("Events", () => {
       }
     }
 
+    //Create File Url
+    const createFileUrl = (id,fileName) => {
+      if(window.location.host == 'localhost:3000'){
+        fileUrl.value = window.location.protocol + "//" + window.location.host +"/api/files/" + id  + "/" + fileName
+      } else { fileUrl.value = 'https://10.4.56.93/api/files/' + id  + "/" + fileName }
+    }
+
   const setMinTime = (eventStartTime) => {
     newEvent.value.eventStartTime = moment(eventStartTime).isAfter(
       moment(new Date())
@@ -355,6 +361,7 @@ export const useEvents = defineStore("Events", () => {
     createEvent,
     chooseFile,
     chooseEditFile,
+    createFileUrl,
     resetNewEvent,
     resetNewEventFile,
     resetEditField,
@@ -378,7 +385,8 @@ export const useEvents = defineStore("Events", () => {
     showFileName,
     showErrorFileText,
     eventFile,
-    editEventFile
+    editEventFile,
+    fileUrl
   };
 });
 

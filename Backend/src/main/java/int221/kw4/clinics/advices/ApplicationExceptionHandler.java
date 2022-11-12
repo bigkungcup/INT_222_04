@@ -133,7 +133,7 @@ public class ApplicationExceptionHandler extends Exception {
         return errors;
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(NullPointerException.class)
     public HandleValidationError handleNullPointerException(NullPointerException exc, ServletWebRequest request) {
         Map<String, String> errorMap = new HashMap<>();
