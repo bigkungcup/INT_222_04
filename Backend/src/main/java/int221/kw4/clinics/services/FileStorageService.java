@@ -46,7 +46,17 @@ public class FileStorageService {
     public String storeFile(MultipartFile file, Event event) {
         String userDir = event.getUser() != null ? "User/" + "User_" + event.getUser().getId() : "Guest";
         String eventDir = "Event_" + event.getId().toString();
-        if(!file.isEmpty()){
+        if (file == null || file.isEmpty()) {
+            try {
+                Path fileDir = this.fileStorageLocation.resolve(userDir).resolve(eventDir);
+                Files.createDirectories(fileDir);
+                return null;
+            }catch (Exception ex){
+                throw new FileStorageException("Could not create the directory where the uploaded files will be stored.", ex);
+            }
+        }
+
+        if(file != null && !file.isEmpty()){
             String fileName = StringUtils.cleanPath((file.getOriginalFilename()));
             System.out.println("Testtttttttttttttttttttttttt");
             System.out.println("fileName: " + fileName);
@@ -66,15 +76,8 @@ public class FileStorageService {
             } catch (IOException ex) {
                 throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
             }
-        } else {
-            try {
-                Path fileDir = this.fileStorageLocation.resolve(userDir).resolve(eventDir);
-                Files.createDirectories(fileDir);
-                return null;
-            }catch (Exception ex){
-                throw new FileStorageException("Could not create the directory where the uploaded files will be stored.", ex);
-            }
         }
+        return null;
     }
 
     public Resource loadFileAsResource(String fileName, Event event) {
