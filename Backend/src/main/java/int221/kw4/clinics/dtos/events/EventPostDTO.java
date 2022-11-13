@@ -36,5 +36,5 @@ public class EventPostDTO {
 
     private User user;
 
-    private MultipartFile file;
+//    private MultipartFile file;
 }

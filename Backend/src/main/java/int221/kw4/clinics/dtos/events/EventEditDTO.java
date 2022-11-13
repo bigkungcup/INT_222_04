@@ -27,5 +27,4 @@ public class EventEditDTO {
 
     private Integer eventDuration;
 
-    private MultipartFile file;
 }

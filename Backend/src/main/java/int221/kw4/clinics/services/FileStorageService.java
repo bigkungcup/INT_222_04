@@ -27,11 +27,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileStorageService {
 
     private final Path fileStorageLocation;
-
-    private final EventRepository eventRepository;
+    @Autowired
+    private EventRepository eventRepository;
 
     @Autowired
-    public FileStorageService(FileStorageProperties fileStorageProperties, EventRepository eventRepository) {
+    public FileStorageService(FileStorageProperties fileStorageProperties) {
         this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
                 .toAbsolutePath().normalize();
 
@@ -40,38 +40,40 @@ public class FileStorageService {
         } catch (Exception ex) {
             throw new FileStorageException("Could not create the directory where the uploaded files will be stored.", ex);
         }
-        this.eventRepository = eventRepository;
     }
 
     public String storeFile(MultipartFile file, Event event) {
         String userDir = event.getUser() != null ? "User/" + "User_" + event.getUser().getId() : "Guest";
         String eventDir = "Event_" + event.getId().toString();
-        if(file == null){
+        if(file.isEmpty()){
             try {
                 Path fileDir = this.fileStorageLocation.resolve(userDir).resolve(eventDir);
-                Path targetLocation = Files.createDirectories(fileDir);
+                Files.createDirectories(fileDir);
+
             }catch (Exception ex){
                 throw new FileStorageException("Could not create the directory where the uploaded files will be stored.", ex);
             }
-        }
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        System.out.println("fileName: " + fileName);
-        System.out.println("userDir: " + userDir);
-        System.out.println("eventDir: " + eventDir);
+        } else if (!file.isEmpty()) {
+            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+            System.out.println("fileName: " + fileName);
+            System.out.println("userDir: " + userDir);
+            System.out.println("eventDir: " + eventDir);
 
-        try {
-            if(fileName.contains("..")) {
-                throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
+            try {
+                if(fileName.contains("..")) {
+                    throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
+                }
+                Path fileDir = this.fileStorageLocation.resolve(userDir).resolve(eventDir);
+                System.out.println("fileDir: " + fileDir.toString());
+                Path targetLocation = Files.createDirectories(fileDir).resolve(fileName);
+                System.out.println("targetLocation: " + targetLocation.toString());
+                Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+                return fileName;
+            } catch (IOException ex) {
+                throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
             }
-            Path fileDir = this.fileStorageLocation.resolve(userDir).resolve(eventDir);
-            System.out.println("fileDir: " + fileDir.toString());
-            Path targetLocation = Files.createDirectories(fileDir).resolve(fileName);
-            System.out.println("targetLocation: " + targetLocation.toString());
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-            return fileName;
-        } catch (IOException ex) {
-            throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
         }
+        return null;
     }
 
     public Resource loadFileAsResource(String fileName, Event event) {

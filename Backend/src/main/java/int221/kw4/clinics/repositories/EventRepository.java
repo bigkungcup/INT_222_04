@@ -25,11 +25,17 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
 
     Page<Event> findAllByEventCategory(EventCategory eventCategory, Pageable pageable);
 
+    Page<Event> findAllByEventCategory_Id(Integer eventCategoryId, Pageable pageable);
+
+    Page<Event> findAllByBookingEmailAndEventCategory_Id(String email, Integer eventCategoryId, Pageable pageable);
+
     Page<Event> findAllByBookingEmail(String email, Pageable pageable);
 
     Event findByIdAndBookingEmail(Integer eventId, String email);
 
     Page<Event> findByEventCategory_IdIn(Collection<Integer> ids, Pageable pageable);
+
+    Page<Event> findAllByEventCategory_IdIn(Collection<Integer> ids, Pageable pageable);
 
     Page<Event> findAllByEventCategory_IdInAndEventStartTimeBeforeOrderByEventStartTimeDesc(Collection<Integer> ids, Instant instantTime, Pageable pageable);
 

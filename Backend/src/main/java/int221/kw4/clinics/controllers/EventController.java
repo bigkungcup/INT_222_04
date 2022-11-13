@@ -18,12 +18,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
@@ -35,14 +39,16 @@ public class EventController {
 
     @Autowired
     private EventService service;
+
+    @Autowired
+    protected Validator validator;
     ObjectMapper objectMapper = new ObjectMapper();
 
     @GetMapping("")
 //    @PreAuthorize("hasRole('admin')  or hasRole('student') or hasRole('lecturer')")
-    public EventPageDTO getAllEvent(
-            @RequestParam(defaultValue = "eventStartTime") String sortBy,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "6") int pageSize
+    public EventPageDTO getAllEvent(@RequestParam(defaultValue = "eventStartTime") String sortBy,
+                                    @RequestParam(defaultValue = "0") int page,
+                                    @RequestParam(defaultValue = "6") int pageSize
     ) throws HandleExceptionNotFound {
         return service.getAllEventPage(sortBy, page, pageSize);
     }
@@ -64,47 +70,56 @@ public class EventController {
         return service.getEventById(eventId);
     }
 
-    @GetMapping("/eventByCategory/{eventCategoryId}")
-    public EventPageDTO getAllEventByCategories(
-            @PathVariable EventCategory eventCategoryId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "6") int pageSize
+//    @GetMapping("/eventByCategory/{eventCategoryId}")
+//    public EventPageDTO getAllEventByCategories(
+//            @PathVariable EventCategory eventCategoryId,
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "6") int pageSize
+//    ) throws HandleExceptionNotFound, HandleExceptionForbidden {
+//        return service.getEventByCategoryId(eventCategoryId, page, pageSize);
+//    }
+
+//    @GetMapping("/pastEvents")
+//    public EventPageDTO getAllEventByPast(
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "6") int pageSize
+//    ) throws HandleExceptionNotFound {
+//        return service.getPastEvent(Instant.now(), page, pageSize);
+//    }
+
+//    @GetMapping("/upComingEvents")
+//    public EventPageDTO getAllEventByUpComing(
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "6") int pageSize
+//    ) throws HandleExceptionNotFound {
+//        return service.getUpcomingEvent(Instant.now(), page, pageSize);
+//    }
+
+    @GetMapping("/filter")
+    public EventPageDTO getAllEventByCategories(@RequestParam @Nullable Integer eventCategoryId,
+                                                @RequestParam String time,
+                                                @RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "6") int pageSize
     ) throws HandleExceptionNotFound, HandleExceptionForbidden {
-        return service.getEventByCategoryId(eventCategoryId, page, pageSize);
-    }
-
-    @GetMapping("/pastEvents")
-    public EventPageDTO getAllEventByPast(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "6") int pageSize
-    ) throws HandleExceptionNotFound {
-        return service.getPastEvent(Instant.now(), page, pageSize);
-    }
-
-    @GetMapping("/upComingEvents")
-    public EventPageDTO getAllEventByUpComing(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "6") int pageSize
-    ) throws HandleExceptionNotFound {
-        return service.getUpcomingEvent(Instant.now(), page, pageSize);
+        return service.getEventByEventCategoryAndTime(eventCategoryId, time, page, pageSize);
     }
 
     @PostMapping(value = "")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity create(@Valid @RequestPart("event") String newEvent, @RequestPart(value = "file", required = false) MultipartFile file,
-                                 ServletWebRequest request) throws HandleExceptionOverlap, HandleExceptionBadRequest, JsonProcessingException {
-        objectMapper.registerModule(new JavaTimeModule());
-        EventPostDTO eventPost = objectMapper.readValue(newEvent, EventPostDTO.class);
-        return service.addEvent(eventPost, file, request);
+    public ResponseEntity create(@RequestPart("event") @Valid EventPostDTO newEvent,
+                                 @RequestPart("file") @Nullable MultipartFile file,
+                                 ServletWebRequest request
+    ) throws HandleExceptionOverlap, HandleExceptionBadRequest {
+        return service.addEvent(newEvent, file, request);
     }
 
     @PostMapping(value = "/guest")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity guestCreate(@Valid @RequestPart("event") String newEvent, @RequestPart(value = "file", required = false) MultipartFile file,
-                                      ServletWebRequest request) throws HandleExceptionOverlap, HandleExceptionBadRequest, JsonProcessingException {
-        objectMapper.registerModule(new JavaTimeModule());
-        EventPostDTO eventPost = objectMapper.readValue(newEvent, EventPostDTO.class);
-        return service.addEvent(eventPost,file, request);
+    public ResponseEntity guestCreate(@RequestPart("event") @Valid EventPostDTO newEvent,
+                                      @RequestPart(value = "file", required = false) MultipartFile file,
+                                      ServletWebRequest request
+    ) throws HandleExceptionOverlap, HandleExceptionBadRequest {
+        return service.addEvent(newEvent, file, request);
     }
 
     @DeleteMapping("/{eventId}")
@@ -112,12 +127,12 @@ public class EventController {
         return service.deleteEvent(eventId);
     }
 
-    @PutMapping(value = "/{eventId}",  consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity update(@Valid @RequestPart("event") String updateEvent, @PathVariable Integer eventId,
-                                 @RequestPart(value = "file", required = false) MultipartFile file, ServletWebRequest request)
-            throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest, IOException {
-        objectMapper.registerModule(new JavaTimeModule());
-        EventEditDTO eventEdit = objectMapper.readValue(updateEvent, EventEditDTO.class);
-        return service.update(eventEdit, eventId, file, request);
+    @PutMapping(value = "/{eventId}")
+    public ResponseEntity update(@RequestPart("event") @Valid EventEditDTO updateEvent,
+                                 @PathVariable Integer eventId,
+                                 @RequestPart(value = "file", required = false) MultipartFile file,
+                                 ServletWebRequest request
+    ) throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest, IOException {
+        return service.update(updateEvent, eventId, file, request);
     }
 }
