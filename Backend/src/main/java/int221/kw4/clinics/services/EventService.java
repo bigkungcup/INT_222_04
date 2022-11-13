@@ -107,14 +107,14 @@ public class EventService {
                             "Event ID: " + eventId + " does not exist !!!"));
             EventDTO eventDTO = modelMapper.map(eventListById, EventDTO.class);
             eventDTO.setFileName(getFile(path, eventListById).get("fileName"));
-            eventDTO.setFileUrl(getFile(path, eventListById).get("pathFile"));
+//            eventDTO.setFileUrl(getFile(path, eventListById).get("pathFile"));
             return eventDTO;
         } else if (user.getRole().toString().equals("student")) {
             if (user.getEmail().equals(event.getBookingEmail())) {
                 Event eventListById = repository.findByIdAndBookingEmail(eventId, user.getEmail());
                 EventDTO eventDTO = modelMapper.map(eventListById, EventDTO.class);
                 eventDTO.setFileName(getFile(path, eventListById).get("fileName"));
-                eventDTO.setFileUrl(getFile(path, eventListById).get("pathFile"));
+//                eventDTO.setFileUrl(getFile(path, eventListById).get("pathFile"));
                 return eventDTO;
             } else {
                 throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
@@ -127,7 +127,7 @@ public class EventService {
                                 "Event ID: " + eventId + " does not exist !!!"));
                 EventDTO eventDTO = modelMapper.map(eventListById, EventDTO.class);
                 eventDTO.setFileName(getFile(path, eventListById).get("fileName"));
-                eventDTO.setFileUrl(getFile(path, eventListById).get("pathFile"));
+//                eventDTO.setFileUrl(getFile(path, eventListById).get("pathFile"));
                 return eventDTO;
             } else {
                 throw new HandleExceptionForbidden("The event category is not the same as lecturer's category");
@@ -416,6 +416,7 @@ public class EventService {
                 Event event = repository.findById(eventId).orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.BAD_REQUEST)
                 );
+                event.setEventCategory(updateEvent.getEventCategory());
                 modelMapper.map(updateEvent, event);
                 repository.saveAndFlush(event);
 //                sendEmail(event);
@@ -429,8 +430,7 @@ public class EventService {
     }
 
     public void updateFile(MultipartFile file, Path path, Event eventById) throws IOException {
-        System.out.println("File: " + file.isEmpty());
-        if (!file.isEmpty()) {
+        if (file != null) {
             if (Files.exists(path)) {
                 if (!Files.list(path).collect(Collectors.toList()).isEmpty()) {
                     fileStorageService.deleteFile(path + "/" + Files.list(path).collect(Collectors.toList()).get(0).getFileName());
@@ -439,7 +439,7 @@ public class EventService {
                     fileStorageService.storeFile(file, eventById);
                 }
             }
-        } else if (file.isEmpty()) {
+        } else {
             if (Files.exists(path)) {
                 if (!Files.list(path).collect(Collectors.toList()).isEmpty()) {
                     System.out.println("File: " + path + "/" + Files.list(path).collect(Collectors.toList()).get(0).getFileName());
@@ -496,11 +496,11 @@ public class EventService {
         Path pathFile = Files.list(filePath).collect(Collectors.toList()).get(0);
         System.out.println("PathFile: " + pathFile);
         String fileName = fileStorageService.loadFileAsResource(pathFile.toString(), event).getFilename();
-        URL resource = fileStorageService.loadFileAsResource(fileName, event).getURL();
+        Resource resource = fileStorageService.loadFileAsResource(fileName, event);
         System.out.println("Resource: " + resource);
         System.out.println("FileName: " + fileName);
         fileMap.put("fileName", fileName);
-        fileMap.put("pathFile", resource.toString());
+//        fileMap.put("pathFile", resource.getURI().toString());
         return fileMap;
     }
 

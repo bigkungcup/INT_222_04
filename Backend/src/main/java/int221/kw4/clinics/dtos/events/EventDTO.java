@@ -25,5 +25,5 @@ public class EventDTO {
     private String eventNotes;
     private Integer eventDuration;
     private String fileName;
-    private String fileUrl;
+//    private String fileUrl;
 }

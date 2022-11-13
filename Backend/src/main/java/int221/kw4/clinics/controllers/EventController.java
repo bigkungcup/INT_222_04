@@ -107,7 +107,7 @@ public class EventController {
     @PostMapping(value = "")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity create(@RequestPart("event") @Valid EventPostDTO newEvent,
-                                 @RequestPart("file") @Nullable MultipartFile file,
+                                 @RequestPart(value = "file") @Nullable  MultipartFile file,
                                  ServletWebRequest request
     ) throws HandleExceptionOverlap, HandleExceptionBadRequest {
         return service.addEvent(newEvent, file, request);
@@ -116,7 +116,7 @@ public class EventController {
     @PostMapping(value = "/guest")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity guestCreate(@RequestPart("event") @Valid EventPostDTO newEvent,
-                                      @RequestPart(value = "file", required = false) MultipartFile file,
+                                      @RequestPart(value = "file") @Nullable MultipartFile file,
                                       ServletWebRequest request
     ) throws HandleExceptionOverlap, HandleExceptionBadRequest {
         return service.addEvent(newEvent, file, request);
@@ -130,7 +130,7 @@ public class EventController {
     @PutMapping(value = "/{eventId}")
     public ResponseEntity update(@RequestPart("event") @Valid EventEditDTO updateEvent,
                                  @PathVariable Integer eventId,
-                                 @RequestPart(value = "file", required = false) MultipartFile file,
+                                 @RequestPart(value = "file") @Nullable MultipartFile file,
                                  ServletWebRequest request
     ) throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest, IOException {
         return service.update(updateEvent, eventId, file, request);

@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 
 import int221.kw4.clinics.advices.FileStorageException;
 import int221.kw4.clinics.advices.MyFileNotFoundException;
@@ -45,35 +46,35 @@ public class FileStorageService {
     public String storeFile(MultipartFile file, Event event) {
         String userDir = event.getUser() != null ? "User/" + "User_" + event.getUser().getId() : "Guest";
         String eventDir = "Event_" + event.getId().toString();
-        if(file.isEmpty()){
-            try {
-                Path fileDir = this.fileStorageLocation.resolve(userDir).resolve(eventDir);
-                Files.createDirectories(fileDir);
-
-            }catch (Exception ex){
-                throw new FileStorageException("Could not create the directory where the uploaded files will be stored.", ex);
-            }
-        } else if (!file.isEmpty()) {
-            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        if(!file.isEmpty()){
+            String fileName = StringUtils.cleanPath((file.getOriginalFilename()));
+            System.out.println("Testtttttttttttttttttttttttt");
             System.out.println("fileName: " + fileName);
             System.out.println("userDir: " + userDir);
             System.out.println("eventDir: " + eventDir);
 
             try {
-                if(fileName.contains("..")) {
+                if (fileName.contains("..")) {
                     throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
                 }
                 Path fileDir = this.fileStorageLocation.resolve(userDir).resolve(eventDir);
-                System.out.println("fileDir: " + fileDir.toString());
+                System.out.println("fileDir: " + fileDir);
                 Path targetLocation = Files.createDirectories(fileDir).resolve(fileName);
-                System.out.println("targetLocation: " + targetLocation.toString());
+                System.out.println("targetLocation: " + targetLocation);
                 Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
                 return fileName;
             } catch (IOException ex) {
                 throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
             }
+        } else {
+            try {
+                Path fileDir = this.fileStorageLocation.resolve(userDir).resolve(eventDir);
+                Files.createDirectories(fileDir);
+                return null;
+            }catch (Exception ex){
+                throw new FileStorageException("Could not create the directory where the uploaded files will be stored.", ex);
+            }
         }
-        return null;
     }
 
     public Resource loadFileAsResource(String fileName, Event event) {
