@@ -3,11 +3,16 @@ import { onMounted } from "vue";
 import Navbar from "./components/Navbar.vue";
 import { useLogin } from "./stores/Login.js";
 import Logout from "./components/Logout.vue";
+import NoAuthorization from "./components/NoAuthorization.vue";
 
 const login = useLogin();
 
 const togglePopup = () => {
   login.logoutPopup = !login.logoutPopup
+}
+
+const togglenoAuthorizationPopup = () => {
+  login.noAuthorization = !login.noAuthorization
 }
 
 // onMounted(async () => {
@@ -22,6 +27,9 @@ const togglePopup = () => {
     <router-view></router-view>
     <div v-show="login.logoutPopup">
         <Logout @toggle="togglePopup()" @logout="login.logout()"/>
+    </div>
+    <div v-show="login.noAuthorization">
+        <NoAuthorization @toggle="togglenoAuthorizationPopup()"/>
     </div>
   </div>
 </template>

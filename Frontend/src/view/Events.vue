@@ -10,6 +10,7 @@ const event = useEvents();
 const eventId = ref();
 
 onBeforeMount(async () => {
+  event.eventList = '';
   await clinic.getClinics();
   await event.getEventList();
 });
@@ -47,7 +48,7 @@ onBeforeMount(async () => {
         :eventId="eventId"
         @delete="event.removeEvent"
       />
-      <div class="grid grid-cols-3 py-6 place-items-center" v-show="event.eventList.numberOfElements != 0">
+      <div class="grid grid-cols-3 py-6 place-items-center" v-show="event.eventList.numberOfElements != 0 && event.eventList.numberOfElements != null">
         <div>
           <button
             class="text-xl text-white rounded-3xl w-28 h-12 mx-2 bg-Web-pink hover:bg-white hover:text-Web-pink"

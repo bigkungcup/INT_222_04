@@ -1,17 +1,20 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
 import { ref } from "vue";
+import { useLogin } from "./Login.js";
 
 export const useUsers = defineStore("Users", () => {
+  const login = useLogin()
   const deletePopup = ref(false);
   const editUserField = ref(false);
   const userList = ref([]);
   const userListAll = ref([]);
   const newUserClinic = ref('');
   const clinicList = ref([]);
-  const confirmPassword = ref();
-  const lecturerClinic = ref();
+  const confirmPassword = ref('');
+  const lecturerClinic = ref(1);
   const validEmail =
     /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+  const signUpValidate = ref(true)
   const signUpSuccessfully = ref(false);
   const editUserSuccessfully = ref(false);
 
@@ -45,7 +48,8 @@ export const useUsers = defineStore("Users", () => {
       password: "",
     };
     confirmPassword.value = "";
-    lecturerClinic.value = "";
+    lecturerClinic.value = 1;
+    signUpValidate.value = true;
   };
 
   const resetEditUser = () =>{
@@ -57,6 +61,7 @@ export const useUsers = defineStore("Users", () => {
     },
     newUserClinic.value = ""
     editUserField.value = false;
+    signUpValidate.value = true;
   };
 
   //Get User Page
@@ -71,6 +76,7 @@ export const useUsers = defineStore("Users", () => {
       userList.value = await res.json();
       console.log("get user lists successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(getUserList());
     } else if (res.status === 401 && login.logoutIcon == false) {
     }
     // else if (res.status === 403) {}
@@ -103,7 +109,7 @@ export const useUsers = defineStore("Users", () => {
       displayUser.value = await res.json();
       console.log("get successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
-      login.getRefresh(getUser());
+      login.getRefresh(getUserDetail(userId));
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else console.log("error, cannot get user");
   };
@@ -121,7 +127,7 @@ export const useUsers = defineStore("Users", () => {
           ? newUser.value.email
           : null,
         role: newUser.value.role,
-        password: newUser.value.password,
+        password: newUser.value.password == confirmPassword.value ? newUser.value.password : null,
       }),
     });
     if (res.status === 201) {
@@ -135,8 +141,9 @@ export const useUsers = defineStore("Users", () => {
       getUserAll();
       console.log("created successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
-      login.getRefresh(signUp(newUser));
-    } else if (res.status === 401) {
+      login.getRefresh(signUp());
+    } else if (res.status === 400) {
+      signUpValidate.value = false;
     } else {
       console.log("error, cannot create");
     }
@@ -166,6 +173,7 @@ export const useUsers = defineStore("Users", () => {
         // resetEditUser();
         console.log("edit successfully");
       } else if (res.status === 401 && login.logoutIcon == true) {
+        login.getRefresh(saveUser(userId));
       } else if(res.status === 401 && login.logoutIcon == false){
       } else {
         console.log("error, cannot edit");
@@ -188,6 +196,7 @@ export const useUsers = defineStore("Users", () => {
     if (res.status === 200) {
       console.log("created successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(addLecturerClinic(userId,lecturerClinicId));
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else {
       console.log("error, cannot create");
@@ -210,6 +219,7 @@ export const useUsers = defineStore("Users", () => {
       );
       console.log("Delete category success");
     } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(deleteLecturerClinic(userId, userClinicId));
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else console.log("Delete category not success");
   };
@@ -229,6 +239,7 @@ export const useUsers = defineStore("Users", () => {
       );
       console.log("deleteted succesfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(removeUser(userId));
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else console.log("error, cannot delete");
     getUserList();
@@ -263,8 +274,10 @@ export const useUsers = defineStore("Users", () => {
     editUser,
     newUserClinic,
     clinicList,
+    validEmail,
     confirmPassword,
     lecturerClinic,
+    signUpValidate,
     signUpSuccessfully,
     editUserSuccessfully,
     deletePopup,

@@ -7,10 +7,15 @@ import { useEvents } from "../stores/Events.js";
 
 const { params } = useRoute();
 const event = useEvents();
+const setEditFileName = () => {
+  event.editFileName = event.displayEvent.fileName
+}
+
 
 onBeforeMount(async () => {
   await event.getEventDetail(params.id)
   event.createFileUrl(params.id,event.displayEvent.fileName)
+  setEditFileName()
   // if(window.location.host == 'localhost:3000'){
   // fileUrl.value = window.location.protocol + "//" + window.location.host +"/api/files/" + params.id  + "/" + event.displayEvent.fileName
   // } else { fileUrl.value = 'https://10.4.56.93/api/files/' + params.id  + "/" + event.displayEvent.fileName }
@@ -89,7 +94,7 @@ onBeforeMount(async () => {
       
       </div>
 
-    <div class="grid grid-cols-2 h-24 mt-6 text-white text-2xl bg-white rounded-2xl">
+    <div class="grid grid-cols-2 h-26 mt-6 text-white text-2xl bg-white rounded-2xl">
         <p class="flex text-Web-violet font-bold my-8 mx-14">Booking time : 
           <p class="ml-2" v-show="!event.editTime">{{ formatDate(event.displayEvent.eventStartTime) }} || {{ formatTime(event.displayEvent.eventStartTime) }}</p>
           <Datepicker @closed="event.setMinTime(event.newEvent.eventStartTime)" :minDate="new Date()" 
@@ -121,30 +126,31 @@ onBeforeMount(async () => {
           </div>
   </div>
 
-  <div class="grid grid-cols-2 h-24 mt-6 text-white text-2xl bg-white rounded-2xl">
+  <div class="grid grid-cols-2 h-26 mt-6 text-white text-2xl bg-white rounded-2xl">
         <p class="flex text-Web-violet font-bold my-8 mx-14">File :
         <a :href="event.fileUrl" v-show="!event.editFile && event.displayEvent.fileName != ''" download>
           <div class="border-2 border-Web-violet rounded-lg ml-6 text-Web-violet hover:bg-Web-violet hover:text-white text-center text-lg py-1 px-2 -mt-1">
             {{ event.displayEvent.fileName }}
           </div>
         </a>
-        <p v-show="event.displayEvent.fileName == ''">No File</p>
+        <p class="ml-2" v-show="event.displayEvent.fileName == '' && !event.editFile">No File</p>
         <label for="file" v-show="event.editFile">
                 <div v-show="!event.showFileName" class="border-2 border-Web-violet rounded-lg ml-6 text-Web-violet hover:bg-Web-violet hover:text-white text-center text-lg py-1 px-2">
                 <input id="file" type="file" @change="event.chooseEditFile"/>
-                Choose File
+                <p v-show="!(event.editFileName == '')">{{ event.editFileName }}</p><p v-show="event.editFileName == ''">Choose File</p>
                 </div>
                 <div v-show="event.showFileName" class="bg-Web-violet text-white rounded-lg ml-6 hover:bg-Web-violet/70 text-center text-lg py-1 px-2">
                     <input id="file" type="file" @change="event.chooseEditFile"/>
                     <p id="filename"></p>
                 </div>
           </label>
-          <div v-show="event.showFileName">
-          <button class="ml-6 -mt-1" @click="event.resetEditFile"><svg width="40" height="40" viewBox="0 0 512 512" >
+          <div v-show="event.editFile && (event.showFileName || !(event.editFileName == ''))">
+          <button class="ml-6 -mt-1" @click="event.resetEditFile()"><svg width="40" height="40" viewBox="0 0 512 512" >
                   <path fill="none" d="M296 64h-80a7.91 7.91 0 0 0-8 8v24h96V72a7.91 7.91 0 0 0-8-8Z"/>
                   <path fill="#EB4C84" d="M432 96h-96V72a40 40 0 0 0-40-40h-80a40 40 0 0 0-40 40v24H80a16 16 0 0 0 0 32h17l19 304.92c1.42 26.85 22 47.08 48 47.08h184c26.13 0 46.3-19.78 48-47l19-305h17a16 16 0 0 0 0-32ZM192.57 416H192a16 16 0 0 1-16-15.43l-8-224a16 16 0 1 1 32-1.14l8 224A16 16 0 0 1 192.57 416ZM272 400a16 16 0 0 1-32 0V176a16 16 0 0 1 32 0Zm32-304h-96V72a7.91 7.91 0 0 1 8-8h80a7.91 7.91 0 0 1 8 8Zm32 304.57A16 16 0 0 1 320 416h-.58A16 16 0 0 1 304 399.43l8-224a16 16 0 1 1 32 1.14Z"/>
           </svg></button></div>
       </p>
+      
       <div class="grid place-items-end" v-show="!event.editFile" >
         <button
             class="rounded-2xl bg-Web-pink py-2 w-1/6 text-white text-lg font-bold mx-14 my-7"
@@ -157,25 +163,19 @@ onBeforeMount(async () => {
           <div class="flex w-4/6">
             <button
             class="rounded-2xl bg-white py-2 w-1/4 text-Web-pink border-2 border-Web-pink text-lg font-bold ml-32 my-6"
-            @click="event.editFile = false, event.resetEditFile()"
+            @click="event.editFile = false,event.resetEditFile(),setEditFileName()"
           >
             Cancle
           </button>
           <button
             class="rounded-2xl bg-Web-pink py-2 w-1/4 text-white text-lg font-bold ml-6 my-6"
-            @click="event.saveEvent(params.id)"
+            @click="event.editFileName == '' ? event.saveEvent(params.id) : event.editFile = false"
           >
             Submit
           </button>
         </div>
-          </div>
-
-        
-        
-        <p v-show="event.showErrorFileText" class="text-Web-pink text-lg pl-40">*The file size cannot be larger than 10 MB.</p>
-        <!-- <button class="border-2 border-Web-violet rounded-lg ml-6 text-Web-violet hover:bg-Web-violet hover:text-white text-center text-lg py-1 px-2 -mt-1" @click="event.getEventFile(params.id,event.displayEvent.fileName)">
-          {{ event.displayEvent.fileName }}
-        </button> -->
+          </div>     
+          <p v-show="event.showErrorFileText" class="text-Web-pink text-lg pl-14 -mt-8">*The file size cannot be larger than 10 MB.</p>
   </div>
   </div>
 </template>

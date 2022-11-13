@@ -2,14 +2,17 @@ import { defineStore, acceptHMRUpdate } from "pinia";
 import { ref } from "vue";
 import moment from "moment";
 import { useLogin } from "./Login.js";
+import { useClinics } from "./Clinics.js";
 
 export const useEvents = defineStore("Events", () => {
   const login = useLogin()
+  const clinic = useClinics()
   const bookingSeccessfully = ref(false);
   const deletePopup = ref(false);
   const editField = ref(false);
   const editTime = ref(false);
   const editFile = ref(false)
+  const editFileName = ref()
   const validEmail =
     /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
   const eventFile = ref()
@@ -23,7 +26,7 @@ export const useEvents = defineStore("Events", () => {
   const newEvent = ref({
     bookingName: "",
     bookingEmail: login.getRoleToken() == null || login.getRoleToken() == 'admin' ? "" : login.getEmailToken(),
-    eventCategory: {},
+    eventCategory: clinic.clinicList[0],
     eventStartTime: "",
     eventNotes: "",
     eventDuration: 0,
@@ -60,6 +63,7 @@ export const useEvents = defineStore("Events", () => {
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getEventList((page = 0)));
     } else if (res.status === 401 && login.logoutIcon == false) {
+      login.noAuthorization = true;
     }
     console.log("error, cannot get event list");
   };
@@ -91,6 +95,7 @@ export const useEvents = defineStore("Events", () => {
       console.log(displayEvent.value);
       console.log("get successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(getEventDetail(id));
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else console.log("error, cannot get event");
   };
@@ -130,8 +135,8 @@ export const useEvents = defineStore("Events", () => {
       }
     
     const formData = new FormData();
-    formData.append('event',JSON.stringify(event))
-    formData.append('file',eventFile.value == null ? document.querySelector("input[type=file]").files[0] : eventFile.value)
+    formData.append('event',new Blob([JSON.stringify(event)],{ type: 'application/json' }))
+    formData.append('file',eventFile.value == null ? document.getElementById("file").setCustomValidity('') : eventFile.value)
     console.log(formData);
 
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events`, {
@@ -140,13 +145,12 @@ export const useEvents = defineStore("Events", () => {
     });
     if (res.status === 201) {
       const addEvent = await res.json();
-      console.log(login.getEmailToken());
-      eventListAll.value.push(addEvent);
-      getAllEventList();
+      // eventListAll.value.push(addEvent);
+      // getAllEventList();
       bookingSeccessfully.value = true;
       console.log("created successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
-      login.getRefresh(createEvent(newEvent));
+      login.getRefresh(createEvent());
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else if (res.status === 417) {
 
@@ -154,6 +158,46 @@ export const useEvents = defineStore("Events", () => {
       console.log("error, cannot create");
     }
   };
+
+      //Create Event With Guest
+      const createEventWithGuest = async () => {
+        const event = {
+          bookingName: newEvent.value.bookingName,
+          bookingEmail: newEvent.value.bookingEmail.match(validEmail)
+            ? newEvent.value.bookingEmail
+            : null,
+          eventCategoryId: newEvent.value.eventCategory.id,
+          eventStartTime: getOverlapTime(
+            newEvent.value.eventStartTime,
+            newEvent.value.eventCategory.id
+          )
+            ? (newEvent.value.eventStartTime = "overlap")
+            : newEvent.value.eventStartTime,
+          eventNotes: newEvent.value.eventNotes,
+          eventDuration: newEvent.value.eventCategory.eventDuration,
+        }
+      
+      const formData = new FormData();
+      formData.append('event',JSON.stringify(event))
+      formData.append('file',eventFile.value == null ? undefined : eventFile.value)
+      console.log(formData);
+
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events/guest`, {
+          method: "POST",
+          body: formData,
+        });
+        if (res.status === 201) {
+          const addEvent = await res.json();
+          bookingSeccessfully.value = true;
+          // listsNewEvent.value.push(addEvent);
+          console.log("created successfully");
+        }else if (res.status === 401 && login.logoutIcon == true) {
+          login.getRefresh(createEventWithGuest());
+        } else if(res.status === 401 && login.logoutIcon == false){
+        } else {
+          console.log("error, cannot create");
+        }
+      };
 
   //Delete Event
   const removeEvent = async (eventId) => {
@@ -171,6 +215,7 @@ export const useEvents = defineStore("Events", () => {
       getEventList(eventList.value.pageNumber);
       console.log("deleteted succesfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(removeEvent(eventId));
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else console.log("error, cannot delete");
   };
@@ -198,8 +243,8 @@ export const useEvents = defineStore("Events", () => {
     }
 
     const formData = new FormData();
-    formData.append('event',JSON.stringify(event))
-    formData.append('file',editEventFile.value == null ? "No file" : editEventFile.value)
+    formData.append('event',new Blob([JSON.stringify(event)],{ type: 'application/json' }))
+    formData.append('file',editEventFile.value == null ? undefined : editEventFile.value)
     console.log(formData);
 
     const res = await fetch(
@@ -222,8 +267,10 @@ export const useEvents = defineStore("Events", () => {
       resetEditField();
       resetEditTime();
       resetEditFile();
+      editFileName.value = displayEvent.value.fileName;
       console.log("edit successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(saveEvent(id));
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else {
       console.log("error, cannot edit");
@@ -235,7 +282,7 @@ export const useEvents = defineStore("Events", () => {
     newEvent.value = {
       bookingName: "",
       bookingEmail: login.getRoleToken() == null || login.getRoleToken() == 'admin' ? "" : login.getEmailToken(),
-      eventCategory: {},
+      eventCategory: clinic.clinicList[0],
       eventStartTime: "",
       eventNotes: "",
       eventDuration: 0,
@@ -259,11 +306,24 @@ export const useEvents = defineStore("Events", () => {
   }
 
   const resetEditFile = () => {
+        if(editFileName.value != ''){
+      editFileName.value = '';
+    }
     editEventFile.value = null;
     showFileName.value = false;
     showErrorFileText.value = false;
     document.getElementById("file").value = null;
   }
+
+  // const deleteEditFile = () => {
+  //   if(editFileName.value != ''){
+  //     editFileName.value = '';
+  //   }
+  //   editEventFile.value = null;
+  //   showFileName.value = false;
+  //   showErrorFileText.value = false;
+  //   document.getElementById("file").value = null;
+  // }
 
   //Choose File
   const chooseFile = () => {
@@ -295,6 +355,7 @@ export const useEvents = defineStore("Events", () => {
         fileName.innerText = inputFile.name;
         showErrorFileText.value = false;
         showFileName.value = true;
+        editFileName.value = '';
       } else {
         showErrorFileText.value = true;
         if(editEventFile.value == null){
@@ -359,6 +420,7 @@ export const useEvents = defineStore("Events", () => {
     getEventDetail,
     // getEventFile,
     createEvent,
+    createEventWithGuest,
     chooseFile,
     chooseEditFile,
     createFileUrl,
@@ -382,6 +444,7 @@ export const useEvents = defineStore("Events", () => {
     editField,
     editTime,
     editFile,
+    editFileName,
     showFileName,
     showErrorFileText,
     eventFile,

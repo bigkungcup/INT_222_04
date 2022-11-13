@@ -8,6 +8,8 @@ export const useLogin = defineStore("Login", () => {
   const logoutIcon = ref(localStorage.getItem("id") != null ? true : false);
   const userPageIcon = ref(localStorage.getItem("role") == 'admin' ? true : false);
   const logoutPopup = ref(false)
+  const loginValidate = ref(true)
+  const noAuthorization = ref(false);
 
   const loginAccount = ref({
     email: "",
@@ -19,6 +21,7 @@ export const useLogin = defineStore("Login", () => {
       email: "",
       password: "",
     };
+    loginValidate.value = true;
   };
 
   const getRoleToken = () => {
@@ -73,10 +76,10 @@ export const useLogin = defineStore("Login", () => {
       logoutIcon.value = true;
       console.log("Password Matched");
     } else if (res.status === 401) {
-    //
+      loginValidate.value = false;
       console.log("Password NOT Matched");
     } else if (res.status === 404) {
-      //
+      loginValidate.value = false;
       console.log("A user with the specified email DOES NOT exist");
     }
   };
@@ -121,7 +124,7 @@ export const useLogin = defineStore("Login", () => {
         } else console.log();
       };
 
-  return { getRoleToken,getEmailToken,handleLogin,getRefresh,logout,resetLoginAccount,getIdToken,loginAccount,loginSuccessfully,logoutPopup,logoutIcon,userPageIcon,token };
+  return { getRoleToken,getEmailToken,handleLogin,getRefresh,logout,resetLoginAccount,getIdToken,loginAccount,loginSuccessfully,logoutPopup,loginValidate,logoutIcon,userPageIcon,token,noAuthorization };
 });
 
 //-----------------------------------------------------------------------------------

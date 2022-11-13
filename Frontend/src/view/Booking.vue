@@ -4,16 +4,20 @@ import { useClinics } from "../stores/Clinics.js";
 import { useEvents } from "../stores/Events.js";
 import { useLogin } from "../stores/Login.js";
 import BookingSeccessfully from "../components/BookingSuccessfully.vue";
+import ContinueAsGuest from "../components/ContinueAsGuest.vue";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 
 const clinic = useClinics();
 const event = useEvents();
 const login = useLogin();
+const checkGuest = ref(false);
+const asGuest = ref(false);
 
 onBeforeMount(async () => {
     await clinic.getClinics();
     event.resetNewEvent();
+    checkGuest.value = login.getRoleToken() == null ? true : false;
 });
 </script>
 
@@ -31,6 +35,7 @@ onBeforeMount(async () => {
               placeholder="Enter Your Name"
             />
           </div>
+
           <div class="flex">
             <p class="text-Web-violet text-xl font-bold my-10 ml-11 mr-4">Email :</p>
             <input
@@ -43,6 +48,7 @@ onBeforeMount(async () => {
             <p class="text-Web-violet text-xl font-bold my-10" v-show="!(login.getRoleToken() == 'admin')">{{ login.getEmailToken() }}</p>
           </div>
         </div>
+
         <div class="p-6">
         <textarea
           class="padding-input-note bg-Bg-Plain rounded-lg h-full w-full text-1xl text-white resize-none placeholder:italic placeholder:text-1xl"
@@ -50,6 +56,7 @@ onBeforeMount(async () => {
           placeholder="Add your note (optional)"></textarea>
         </div>
       </div>
+
     <div class="grid mt-6 text-white text-2xl">
         <p class="font-bold my-3">Select clinic :</p>
         <div class="grid grid-cols-2">
@@ -74,11 +81,13 @@ onBeforeMount(async () => {
         </div>
     </div>
   </div>
+
   <div class="grid mt-6 text-white text-2xl">
         <p class="flex font-bold my-3">Select time : 
           <Datepicker @closed="event.setMinTime(event.newEvent.eventStartTime)" :minDate="new Date()" 
            class="ml-6" v-model="event.newEvent.eventStartTime"></Datepicker></p>
   </div>
+
   <div class="grid mt-6 text-white text-2xl">
         <p class="flex font-bold my-3">Select file : 
           <label for="file" >
@@ -91,6 +100,7 @@ onBeforeMount(async () => {
                     <p id="filename"></p>
                 </div>
           </label>
+          
           <div v-show="event.showFileName">
           <button class="ml-6 -mt-1" @click="event.resetNewEventFile"><svg width="40" height="40" viewBox="0 0 512 512" >
                   <path fill="none" d="M296 64h-80a7.91 7.91 0 0 0-8 8v24h96V72a7.91 7.91 0 0 0-8-8Z"/>
@@ -99,16 +109,22 @@ onBeforeMount(async () => {
         </p>
         <p v-show="event.showErrorFileText" class="text-Web-pink text-lg pl-40">*The file size cannot be larger than 10 MB.</p>
   </div>
+
   <div class="flex my-12 text-2xl justify-center">
     <button class="rounded-2xl bg-white py-2 w-1/5 text-Web-pink font-bold mx-24" @click="event.resetNewEvent()">
                     Cancle
     </button>
-    <button class="rounded-2xl bg-Web-pink py-2 w-1/5 text-white font-bold mx-24" @click="event.createEvent()">
+    <button class="rounded-2xl bg-Web-pink py-2 w-1/5 text-white font-bold mx-24" @click="asGuest ? event.createEventWithGuest() : event.createEvent()">
                     Book Now
     </button>
   </div>
+
   <div v-show="event.bookingSeccessfully">
     <BookingSeccessfully @reset="event.resetNewEvent()" @toggle="event.bookingSeccessfully = false"/>
+  </div>
+  
+  <div v-show="checkGuest">
+    <ContinueAsGuest @toggle="checkGuest = false,asGuest = true"/>
   </div>
 </div>
 </template>
