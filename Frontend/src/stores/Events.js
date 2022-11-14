@@ -8,6 +8,7 @@ export const useEvents = defineStore("Events", () => {
   const login = useLogin()
   const clinic = useClinics()
   const bookingSeccessfully = ref(false);
+  const bookingValidate = ref(true)
   const deletePopup = ref(false);
   const editField = ref(false);
   const editTime = ref(false);
@@ -153,8 +154,9 @@ export const useEvents = defineStore("Events", () => {
       login.getRefresh(createEvent());
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else if (res.status === 417) {
-
-    } else {
+    }else if (res.status === 400) {
+      bookingValidate.value = false;
+    }else {
       console.log("error, cannot create");
     }
   };
@@ -376,7 +378,7 @@ export const useEvents = defineStore("Events", () => {
       moment(new Date())
     )
       ? eventStartTime
-      : "a";
+      : "previous time";
     console.log(newEvent.value.eventStartTime);
   };
 
@@ -440,6 +442,7 @@ export const useEvents = defineStore("Events", () => {
     displayEvent,
     editEvent,
     bookingSeccessfully,
+    bookingValidate,
     deletePopup,
     editField,
     editTime,
@@ -449,7 +452,8 @@ export const useEvents = defineStore("Events", () => {
     showErrorFileText,
     eventFile,
     editEventFile,
-    fileUrl
+    fileUrl,
+    validEmail
   };
 });
 

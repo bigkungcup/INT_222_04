@@ -26,6 +26,7 @@ onBeforeMount(async () => {
       <p class="font-bold text-white text-2xl my-3">Add your details :</p>
       <div class="grid grid-cols-2 bg-white rounded-2xl h-56">
         <div class="grid grid-rows-2">
+          <div>
           <div class="flex">
             <p class="text-Web-violet text-xl font-bold my-10 ml-11 mr-3">Name :</p>
             <input
@@ -35,7 +36,11 @@ onBeforeMount(async () => {
               placeholder="Enter Your Name"
             />
           </div>
+          <p class="text-Web-pink -mt-5 ml-32" v-show="event.newEvent.bookingName == '' && !event.bookingValidate">*Please enter your name.</p>
+          <p class="text-Web-pink -mt-5 ml-32" v-show="event.newEvent.bookingName.length > 100 && !event.bookingValidate">*Name can't be longer than 100 characters.</p>
+        </div>
 
+        <div>
           <div class="flex">
             <p class="text-Web-violet text-xl font-bold my-10 ml-11 mr-4">Email :</p>
             <input
@@ -48,12 +53,17 @@ onBeforeMount(async () => {
             <p class="text-Web-violet text-xl font-bold my-10" v-show="!(login.getRoleToken() == 'admin')">{{ login.getEmailToken() }}</p>
           </div>
         </div>
+        <p class="text-Web-pink -mt-6 ml-32" v-show="event.newEvent.bookingEmail == '' && !event.bookingValidate">*Please enter your email.</p>
+        <p class="text-Web-pink -mt-6 ml-32" v-show="!(event.newEvent.bookingEmail.match(event.validEmail)) && event.newEvent.bookingEmail != '' && !event.bookingValidate">*Invalid email.</p>
+        <p class="text-Web-pink -mt-6 ml-32" v-show="event.newEvent.bookingEmail.length > 255 && !event.bookingValidate">*Email can't be longer than 255 characters.</p>
+      </div>
 
         <div class="p-6">
         <textarea
           class="padding-input-note bg-Bg-Plain rounded-lg h-full w-full text-1xl text-white resize-none placeholder:italic placeholder:text-1xl"
           v-model="event.newEvent.eventNotes"
           placeholder="Add your note (optional)"></textarea>
+          <p class="text-Web-pink -mt-1.5" v-show="event.newEvent.eventNotes > 500 && !event.bookingValidate">*Note can't be longer than 500 characters.</p>
         </div>
       </div>
 
@@ -86,6 +96,9 @@ onBeforeMount(async () => {
         <p class="flex font-bold my-3">Select time : 
           <Datepicker @closed="event.setMinTime(event.newEvent.eventStartTime)" :minDate="new Date()" 
            class="ml-6" v-model="event.newEvent.eventStartTime"></Datepicker></p>
+           <p class="text-Web-pink text-lg -mt-2 ml-40" v-show="event.newEvent.eventStartTime == '' && !event.bookingValidate">*Please enter your select time.</p>
+           <p class="text-Web-pink text-lg -mt-2 ml-40" v-show="event.newEvent.eventStartTime == 'previous time' && !event.bookingValidate">*Not be able to select the previous date and time.</p>
+           <p class="text-Web-pink text-lg -mt-2 ml-40" v-show="event.newEvent.eventStartTime == 'overlap' && !event.bookingValidate">*This select time has already been used.</p>
   </div>
 
   <div class="grid mt-6 text-white text-2xl">

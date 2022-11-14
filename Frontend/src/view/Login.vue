@@ -47,7 +47,7 @@ onBeforeMount(async () => {
             </form>
             <div class="grid col-span-2" v-show="!login.loginValidate">
                 <div class="rounded-lg h-16 w-5/6 font-bold text-white text-xl bg-black/30 border-4 border-Web-pink">
-                   <p class="text-Web-pink text-center py-3">Incorrect email or password</p> 
+                   <p class="text-Web-pink text-center py-3">*Incorrect email or password</p> 
                 </div>
             </div>
             <div class="grid content-center font-bold text-Web-pink text-xl">

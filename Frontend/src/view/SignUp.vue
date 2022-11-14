@@ -38,8 +38,8 @@ const togglePopup = () => {
                 <input type="text"
                     class="padding-input bg-white border border-slate-300 rounded-lg h-16 w-5/6 text-3xl placeholder:italic placeholder:text-2xl mt-4"
                     placeholder="Enter Your Name" v-model.trim="user.newUser.name"/>
-                <p class="text-Web-pink pt-3" v-show="user.newUser.name == '' && !user.signUpValidate">Please enter your user name.</p>
-                <p class="text-Web-pink pt-3" v-show="user.newUser.name.length > 100 && !user.signUpValidate">Name can't be longer than 100 characters.</p>
+                <p class="text-Web-pink pt-3" v-show="user.newUser.name == '' && !user.signUpValidate">*Please enter your user name.</p>
+                <p class="text-Web-pink pt-3" v-show="user.newUser.name.length > 100 && !user.signUpValidate">*Name can't be longer than 100 characters.</p>
             </div>
 
             <div class="grid col-span-2">
@@ -50,9 +50,9 @@ const togglePopup = () => {
                 <input type="text"
                     class="padding-input bg-white border border-slate-300 rounded-lg h-16 w-5/6 text-3xl placeholder:italic placeholder:text-2xl"
                     placeholder="Enter Your Email" v-model.trim="user.newUser.email"/>
-                    <p class="text-Web-pink pt-3" v-show="user.newUser.email == '' && !user.signUpValidate">Please enter your user email.</p>
-                    <p class="text-Web-pink pt-3" v-show="user.newUser.email.match(user.validEmail) && user.newUser.email.length > 50 && !user.signUpValidate">Email can't be longer than 50 characters.</p>
-                    <p class="text-Web-pink pt-3" v-show="!(user.newUser.email.match(user.validEmail)) && user.newUser.email != '' && !user.signUpValidate">Please enter a valid email address.</p>
+                    <p class="text-Web-pink pt-3" v-show="user.newUser.email == '' && !user.signUpValidate">*Please enter your user email.</p>
+                    <p class="text-Web-pink pt-3" v-show="user.newUser.email.match(user.validEmail) && user.newUser.email.length > 50 && !user.signUpValidate">*Email can't be longer than 50 characters.</p>
+                    <p class="text-Web-pink pt-3" v-show="!(user.newUser.email.match(user.validEmail)) && user.newUser.email != '' && !user.signUpValidate">*Please enter a valid email address.</p>
             </div>
 
             <form class="grid col-span-2">
@@ -64,7 +64,7 @@ const togglePopup = () => {
                     class="bg-white border padding-input border-slate-300 rounded-lg h-16 w-5/6 text-3xl placeholder:italic placeholder:text-2xl"
                     placeholder="Enter Your Password" v-model="user.newUser.password"/>
                     <p class="text-Web-pink pt-3" v-show="user.newUser.password == '' && !user.signUpValidate">Please enter your user password.</p>
-                    <p class="text-Web-pink pt-3" v-show="(user.newUser.password.length > 14 || user.newUser.password.length < 8) && user.newUser.password != '' && !user.signUpValidate">Use 8-14 characters for password.</p>
+                    <p class="text-Web-pink pt-3" v-show="(user.newUser.password.length > 14 || user.newUser.password.length < 8) && user.newUser.password != '' && !user.signUpValidate">*Use 8-14 characters for password.</p>
             </form>
 
             <form class="grid col-span-2">
@@ -75,8 +75,8 @@ const togglePopup = () => {
                 <input type="password" autocomplete="off"
                     class="bg-white border padding-input border-slate-300 rounded-lg h-16 w-5/6 text-3xl placeholder:italic placeholder:text-2xl"
                     placeholder="Confirm Your Password" v-model="user.confirmPassword"/>
-                    <p class="text-Web-pink pt-3" v-show="user.confirmPassword == '' && !user.signUpValidate">Please enter your confirm password.</p>
-                    <p class="text-Web-pink pt-3" v-show="user.confirmPassword != user.newUser.password && !user.signUpValidate && user.confirmPassword != ''">The password confirmation does not match.</p>
+                    <p class="text-Web-pink pt-3" v-show="user.confirmPassword == '' && !user.signUpValidate">*Please enter your confirm password.</p>
+                    <p class="text-Web-pink pt-3" v-show="user.confirmPassword != user.newUser.password && !user.signUpValidate && user.confirmPassword != ''">*The password confirmation does not match.</p>
             </form>
 
             <div class="grid col-span-2 font-bold text-white text-xl">
