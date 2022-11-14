@@ -15,6 +15,7 @@ export const useUsers = defineStore("Users", () => {
   const validEmail =
     /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
   const signUpValidate = ref(true)
+  const userUnique = ref(false)
   const signUpSuccessfully = ref(false);
   const editUserSuccessfully = ref(false);
 
@@ -50,6 +51,7 @@ export const useUsers = defineStore("Users", () => {
     confirmPassword.value = "";
     lecturerClinic.value = 1;
     signUpValidate.value = true;
+    userUnique.value = false;
   };
 
   const resetEditUser = () =>{
@@ -144,7 +146,10 @@ export const useUsers = defineStore("Users", () => {
       login.getRefresh(signUp());
     } else if (res.status === 400) {
       signUpValidate.value = false;
-    } else {
+    } else if (res.status === 500) {
+      userUnique.value = true;
+    } 
+    else {
       console.log("error, cannot create");
     }
   };
@@ -278,6 +283,7 @@ export const useUsers = defineStore("Users", () => {
     confirmPassword,
     lecturerClinic,
     signUpValidate,
+    userUnique,
     signUpSuccessfully,
     editUserSuccessfully,
     deletePopup,

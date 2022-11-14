@@ -13,6 +13,9 @@ const setEditFileName = () => {
 
 
 onBeforeMount(async () => {
+  event.editField = false;
+  event.editTime = false;
+  event.editFile = false;
   await event.getEventDetail(params.id)
   event.createFileUrl(params.id,event.displayEvent.fileName)
   setEditFileName()
@@ -169,7 +172,7 @@ onBeforeMount(async () => {
           </button>
           <button
             class="rounded-2xl bg-Web-pink py-2 w-1/4 text-white text-lg font-bold ml-6 my-6"
-            @click="event.editFileName == '' ? event.saveEvent(params.id) : event.editFile = false"
+            @click="event.editFileName == '' ? event.saveEvent(params.id) : (event.editFile = false,event.showErrorFileText = false)"
           >
             Submit
           </button>

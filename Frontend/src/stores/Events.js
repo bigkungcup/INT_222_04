@@ -119,6 +119,10 @@ export const useEvents = defineStore("Events", () => {
 
   //Create Event
   const createEvent = async () => {
+    console.log(getOverlapTime(
+      newEvent.value.eventStartTime,
+      newEvent.value.eventCategory.id
+    ));
     const event = {
         bookingName: newEvent.value.bookingName,
         bookingEmail: newEvent.value.bookingEmail.match(validEmail)
@@ -180,7 +184,7 @@ export const useEvents = defineStore("Events", () => {
         }
       
       const formData = new FormData();
-      formData.append('event',JSON.stringify(event))
+      formData.append('event',new Blob([JSON.stringify(event)],{ type: 'application/json' }))
       formData.append('file',eventFile.value == null ? undefined : eventFile.value)
       console.log(formData);
 
@@ -196,7 +200,10 @@ export const useEvents = defineStore("Events", () => {
         }else if (res.status === 401 && login.logoutIcon == true) {
           login.getRefresh(createEventWithGuest());
         } else if(res.status === 401 && login.logoutIcon == false){
-        } else {
+        }else if (res.status === 400) {
+          bookingValidate.value = false;
+        }
+         else {
           console.log("error, cannot create");
         }
       };
@@ -290,6 +297,7 @@ export const useEvents = defineStore("Events", () => {
       eventDuration: 0,
     };
     resetNewEventFile();
+    bookingValidate.value = true;
   };
 
   const resetNewEventFile = () => {
@@ -385,6 +393,7 @@ export const useEvents = defineStore("Events", () => {
   // Get Overlap Time
   const getOverlapTime = (eventStartTime, category) => {
     let listAll;
+    getAllEventList();
     listAll = eventListAll.value.filter((a) => a.eventCategory.id == category);
     return listAll.some((event) => {
       if (

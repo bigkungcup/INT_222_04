@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref,onBeforeMount } from "vue";
 import { useClinics } from "../stores/Clinics.js";
 import { useUsers } from "../stores/Users";
 import SignUpSuccessfully from "../components/SignUpSuccessfully.vue";
@@ -15,6 +15,9 @@ const togglePopup = () => {
     user.signUpSuccessfully = !user.signUpSuccessfully;
 }
 
+onBeforeMount(async () => {
+    user.resetNewUser();
+});
 
 </script>
 
@@ -53,6 +56,7 @@ const togglePopup = () => {
                     <p class="text-Web-pink pt-3" v-show="user.newUser.email == '' && !user.signUpValidate">*Please enter your user email.</p>
                     <p class="text-Web-pink pt-3" v-show="user.newUser.email.match(user.validEmail) && user.newUser.email.length > 50 && !user.signUpValidate">*Email can't be longer than 50 characters.</p>
                     <p class="text-Web-pink pt-3" v-show="!(user.newUser.email.match(user.validEmail)) && user.newUser.email != '' && !user.signUpValidate">*Please enter a valid email address.</p>
+                    <p class="text-Web-pink pt-3" v-show="user.userUnique">*Username or email already exists.</p>
             </div>
 
             <form class="grid col-span-2">
