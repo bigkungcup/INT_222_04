@@ -58,7 +58,6 @@ public class FileStorageService {
 
         if(file != null && !file.isEmpty()){
             String fileName = StringUtils.cleanPath((file.getOriginalFilename()));
-            System.out.println("Testtttttttttttttttttttttttt");
             System.out.println("fileName: " + fileName);
             System.out.println("userDir: " + userDir);
             System.out.println("eventDir: " + eventDir);
