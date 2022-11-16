@@ -254,7 +254,7 @@ public class EventService {
                             PageRequest.of(page, pageSize)), EventPageDTO.class);
                 }
             }
-        } else if (time.equals("upcoming")) {
+        } else if (time.equals("upComing")) {
             if (user.getRole().toString().equals("admin")) {
                 if(eventCategoryId != 0){
                     return modelMapper.map(repository.findAllByEventCategory_IdAndEventStartTimeAfterOrderByEventStartTimeAsc(eventCategoryId, Instant.now(),
