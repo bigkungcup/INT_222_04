@@ -64,7 +64,7 @@ onBeforeMount(async () => {
           class="padding-input-note bg-Bg-Plain rounded-lg h-full w-full text-1xl text-white resize-none placeholder:italic placeholder:text-1xl"
           v-model="event.newEvent.eventNotes"
           placeholder="Add your note (optional)"></textarea>
-          <p class="text-Web-pink -mt-1.5" v-show="event.newEvent.eventNotes > 500 && !event.bookingValidate">*Note can't be longer than 500 characters.</p>
+          <p class="text-Web-pink -mt-1.5" v-show="event.newEvent.eventNotes.length > 500 && !event.bookingValidate">*Note can't be longer than 500 characters.</p>
         </div>
       </div>
 

@@ -4,19 +4,22 @@ import { useRoute, useRouter } from "vue-router";
 import { formatDate, formatTime } from "../main.js";
 import Datepicker from "@vuepic/vue-datepicker";
 import { useEvents } from "../stores/Events.js";
+import { useClinics } from "../stores/Clinics.js";
 
 const { params } = useRoute();
 const event = useEvents();
+const clinic = useClinics();
 const setEditFileName = () => {
   event.editFileName = event.displayEvent.fileName
 }
 
 
 onBeforeMount(async () => {
-  event.editField = false;
-  event.editTime = false;
-  event.editFile = false;
   await event.getEventDetail(params.id)
+  clinic.getClinics();
+  event.resetEditField();
+  event.resetEditTime();
+  event.editFile = false;
   event.createFileUrl(params.id,event.displayEvent.fileName)
   setEditFileName()
   // if(window.location.host == 'localhost:3000'){
@@ -38,7 +41,7 @@ onBeforeMount(async () => {
           By {{ event.displayEvent.bookingEmail }}
         </div>
       </div>
-      <div class="grid grid-rows-2 pt-2">
+      <div class="grid grid-rows-2 pt-2" v-show="!event.editField">
         <div
           :class="['text-center text-white font-bold w-3/5 rounded-2xl place-self-center ml-32',
             event.displayEvent.eventCategory.id == 1 
@@ -60,6 +63,18 @@ onBeforeMount(async () => {
           {{ event.displayEvent.eventCategory.eventDuration }} min.
         </div>
       </div>
+      
+      <div class="grid grid-rows-2 pt-2" v-show="event.editField">
+      <select class="bg-Web-violet text-center text-white font-bold w-3/5 rounded-2xl place-self-center py-3 ml-32" v-model="event.editEvent.eventCategory">
+        <option v-for="list in clinic.clinicList" :value="list">
+            {{ list.eventCategoryName }}            
+        </option>
+        </select>
+        <div class="grid text-center text-stone-500 mb-6 ml-104">
+          {{ event.editEvent.eventCategory.eventDuration }} min.
+        </div>
+    </div>
+
       <hr class="col-span-2 h-3 -mt-6"/>
       <div class="col-span-2 text-1xl text-black px-14 pb-2 -mt-12 h-20 resize-none break-words">
         <p v-show="!event.editField">{{ event.displayEvent.eventNotes }}</p>
@@ -68,6 +83,7 @@ onBeforeMount(async () => {
           v-model="event.editEvent.eventNotes"
           v-show="event.editField"
           placeholder="Add your note (optional)"></textarea>
+          <p class="text-Web-pink " v-show="event.editEvent.eventNotes.length > 500 && !event.editValidate && event.editField">*Note can't be longer than 500 characters.</p>
       </div>
       <div class="col-span-2 h-6">
         <div class="grid place-items-end">
@@ -81,7 +97,7 @@ onBeforeMount(async () => {
         <div class="flex w-3/6 -mt-5" v-show="event.editField">
             <button
             class="rounded-2xl bg-white py-2 w-2/12 text-Web-pink border-2 border-Web-pink text-lg font-bold ml-88 my-6"
-            @click="event.editField = false, event.resetEditField()"
+            @click="event.resetEditField()"
           >
             Cancle
           </button>
@@ -94,13 +110,12 @@ onBeforeMount(async () => {
         </div>
       </div>
       </div>
-      
       </div>
 
     <div class="grid grid-cols-2 h-26 mt-6 text-white text-2xl bg-white rounded-2xl">
         <p class="flex text-Web-violet font-bold my-8 mx-14">Booking time : 
           <p class="ml-2" v-show="!event.editTime">{{ formatDate(event.displayEvent.eventStartTime) }} || {{ formatTime(event.displayEvent.eventStartTime) }}</p>
-          <Datepicker @closed="event.setMinTime(event.newEvent.eventStartTime)" :minDate="new Date()" 
+          <Datepicker @closed="event.setMinTime(event.editEvent.eventStartTime)" :minDate="new Date()" 
            class="ml-6" v-show="event.editTime" v-model="event.editEvent.eventStartTime"></Datepicker>
         </p>
         <div v-show="!event.editTime" class="grid place-items-end">
@@ -115,7 +130,7 @@ onBeforeMount(async () => {
           <div class="flex w-4/6">
             <button
             class="rounded-2xl bg-white py-2 w-1/4 text-Web-pink border-2 border-Web-pink text-lg font-bold ml-32 my-6"
-            @click="event.editTime = false, event.resetEditTime()"
+            @click="event.resetEditTime()"
           >
             Cancle
           </button>
@@ -127,6 +142,8 @@ onBeforeMount(async () => {
           </button>
         </div>
           </div>
+          <p class="col-span-2 text-Web-pink text-lg -mt-7 ml-60" v-show="event.editEvent.eventStartTime == 'previous time' && !event.editValidate">*Not be able to select the previous date and time.</p>
+          <p class="col-span-2 text-Web-pink text-lg -mt-7 ml-60" v-show="event.editEvent.eventStartTime == 'overlap' && !event.editValidate">*This select time has already been used.</p>
   </div>
 
   <div class="grid grid-cols-2 h-26 mt-6 text-white text-2xl bg-white rounded-2xl">

@@ -9,6 +9,7 @@ export const useEvents = defineStore("Events", () => {
   const clinic = useClinics()
   const bookingSeccessfully = ref(false);
   const bookingValidate = ref(true)
+  const editValidate = ref(true)
   const deletePopup = ref(false);
   const editField = ref(false);
   const editTime = ref(false);
@@ -43,6 +44,7 @@ export const useEvents = defineStore("Events", () => {
   });
 
   const editEvent = ref({
+    eventCategory: {},
     eventStartTime: "",
     eventNotes: "",
   });
@@ -86,6 +88,24 @@ export const useEvents = defineStore("Events", () => {
     } else console.log("error, cannot get all event list");
   };
 
+  //Get Filter Event
+  const getFilterEventList = async (clinicId = 0,time = 'all',page = 0) => {
+    const res = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/events/filter/?eventCategoryId=${clinicId}&time=${time}&page=${page}`,
+      {
+        method: "GET",
+      }
+    );
+    if (res.status === 200) {
+      eventList.value = await res.json();
+      console.log("get event lists successfully");
+    } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(getFilterEventList((page = 0)));
+    } else if (res.status === 401 && login.logoutIcon == false) {
+    }
+    console.log("error, cannot get event lists");
+  };
+
   //get event detail
   const getEventDetail = async (id) => {
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events/${id}`, {
@@ -101,21 +121,6 @@ export const useEvents = defineStore("Events", () => {
     } else console.log("error, cannot get event");
   };
 
-  //Get Event File
-  // const getEventFile = async (eventId,filname) => {
-  //   const res = await fetch(
-  //     `${import.meta.env.VITE_BASE_URL}/files/${eventId}/${filname}`,
-  //     {
-  //       method: "GET",
-  //     }
-  //   );
-  //   if (res.status === 200) {
-  //     console.log("get file successfully");
-  //   } else if (res.status === 401 && login.logoutIcon == true) {
-  //   } else if (res.status === 401 && login.logoutIcon == false) {
-  //   }
-  //   console.log("error, cannot get event list");
-  // };
 
   //Create Event
   const createEvent = async () => {
@@ -234,7 +239,7 @@ export const useEvents = defineStore("Events", () => {
     const event = {
       // bookingName: displayEvent.value.bookingName,
       // bookingEmail: displayEvent.value.bookingEmail,
-      eventCategory: displayEvent.value.eventCategory,
+      eventCategory: editEvent.value.eventCategory,
       eventStartTime:
         editEvent.value.eventStartTime === ""
           ? displayEvent.value.eventStartTime
@@ -270,20 +275,20 @@ export const useEvents = defineStore("Events", () => {
       // }
       await getEventDetail(id);
       createFileUrl(id,displayEvent.value.fileName)
-      editField.value = false;
-      editTime.value = false;
       editFile.value = false;
       resetEditField();
       resetEditTime();
       resetEditFile();
+      editValidate.value = true;
       editFileName.value = displayEvent.value.fileName;
       console.log("edit successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(saveEvent(id));
     } else if (res.status === 401 && login.logoutIcon == false) {
-    } else {
+    } else if (res.status === 400) {
+      editValidate.value = false;
+    }else {
       console.log("error, cannot edit");
-      alert("error, cannot edit");
     }
   };
 
@@ -308,11 +313,14 @@ export const useEvents = defineStore("Events", () => {
   }
 
   const resetEditField = () => {
+    editEvent.value.eventCategory = displayEvent.value.eventCategory;
     editEvent.value.eventNotes = "";
+    editField.value = false;
   }
 
   const resetEditTime = () => {
     editEvent.value.eventStartTime = "";
+    editTime.value = false;
   }
 
   const resetEditFile = () => {
@@ -324,16 +332,6 @@ export const useEvents = defineStore("Events", () => {
     showErrorFileText.value = false;
     document.getElementById("file").value = null;
   }
-
-  // const deleteEditFile = () => {
-  //   if(editFileName.value != ''){
-  //     editFileName.value = '';
-  //   }
-  //   editEventFile.value = null;
-  //   showFileName.value = false;
-  //   showErrorFileText.value = false;
-  //   document.getElementById("file").value = null;
-  // }
 
   //Choose File
   const chooseFile = () => {
@@ -428,8 +426,8 @@ export const useEvents = defineStore("Events", () => {
   return {
     getAllEventList,
     getEventList,
+    getFilterEventList,
     getEventDetail,
-    // getEventFile,
     createEvent,
     createEventWithGuest,
     chooseFile,
@@ -452,6 +450,7 @@ export const useEvents = defineStore("Events", () => {
     editEvent,
     bookingSeccessfully,
     bookingValidate,
+    editValidate,
     deletePopup,
     editField,
     editTime,

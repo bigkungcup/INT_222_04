@@ -2,17 +2,32 @@
 import { ref, onBeforeMount } from "vue";
 import { useClinics } from "../stores/Clinics.js";
 import { useEvents } from "../stores/Events.js";
+import { useUsers } from "../stores/Users.js";
+import { useLogin } from "../stores/Login.js";
 import EventList from "../components/EventList.vue";
 import EventEmptyListVue from "../components/EventEmptyList.vue";
 
 const clinic = useClinics();
 const event = useEvents();
+const user = useUsers();
+const login = useLogin();
 const eventId = ref();
+const clinicFilter = ref()
+const selectClinic = ref(0)
+const selectTime = ref('all')
+
+const checkRole = async () => {
+  await event.getFilterEventList();
+    if(localStorage.getItem('role') == 'lecturer'){
+      await user.getUserDetail(localStorage.getItem('id'));
+      clinicFilter.value = user.displayUser.eventCategories;
+    }else clinicFilter.value = clinic.clinicList;
+  }
 
 onBeforeMount(async () => {
-  event.eventList = '';
+  event.eventList = {};
   await clinic.getClinics();
-  await event.getEventList();
+  await checkRole();
 });
 </script>
 
@@ -25,16 +40,16 @@ onBeforeMount(async () => {
         <span>Clinic:</span>
         <select
           class="rounded-lg h-12 w-80 font-bold text-white text-xl bg-black/30 border-4 border-Web-pink padding-select"
-        >
+         v-model="selectClinic" @change="event.getFilterEventList(selectClinic,selectTime)">
           <option default value="0">All</option>
-          <option v-for="list in clinic.clinicList" :value="list.id">
+          <option v-for="list in clinicFilter" :value="list.id">
             {{ list.eventCategoryName }}
           </option>
         </select>
         <span>Time:</span>
         <select
           class="rounded-lg h-12 w-60 font-bold text-white text-xl bg-black/30 border-4 border-Web-pink padding-select"
-        >
+        v-model="selectTime" @change="event.getFilterEventList(selectClinic,selectTime)">
           <option default value="all">All</option>
           <option value="past">Past Events</option>
           <option value="upComing">Up-coming Events</option>

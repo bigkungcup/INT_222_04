@@ -15,7 +15,8 @@ export const useUsers = defineStore("Users", () => {
   const validEmail =
     /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
   const signUpValidate = ref(true)
-  const userUnique = ref(false)
+  const editValidate = ref(true)
+  const userUnique = ref(true)
   const signUpSuccessfully = ref(false);
   const editUserSuccessfully = ref(false);
 
@@ -51,7 +52,7 @@ export const useUsers = defineStore("Users", () => {
     confirmPassword.value = "";
     lecturerClinic.value = 1;
     signUpValidate.value = true;
-    userUnique.value = false;
+    userUnique.value = true;
   };
 
   const resetEditUser = () =>{
@@ -64,6 +65,8 @@ export const useUsers = defineStore("Users", () => {
     newUserClinic.value = ""
     editUserField.value = false;
     signUpValidate.value = true;
+    editValidate.value = true;
+    userUnique.value = true;
   };
 
   //Get User Page
@@ -147,7 +150,7 @@ export const useUsers = defineStore("Users", () => {
     } else if (res.status === 400) {
       signUpValidate.value = false;
     } else if (res.status === 500) {
-      userUnique.value = true;
+      userUnique.value = false;
     } 
     else {
       console.log("error, cannot create");
@@ -163,7 +166,8 @@ export const useUsers = defineStore("Users", () => {
         },
         body: JSON.stringify({
           name: editUser.value.name === "" ? displayUser.value.name : editUser.value.name,
-          email: editUser.value.email === "" ? displayUser.value.email : editUser.value.email,
+          email: editUser.value.email === "" ? displayUser.value.email : 
+                  editUser.value.email.match(validEmail) ? editUser.value.email : null,
           role: editUser.value.role === "" ? displayUser.value.role : editUser.value.role
         }),
       });
@@ -174,12 +178,14 @@ export const useUsers = defineStore("Users", () => {
           addLecturerClinic(userId,newUserClinic.value);
         }
         editUserSuccessfully.value = true;
-        // editUserField.value = false;
-        // resetEditUser();
         console.log("edit successfully");
       } else if (res.status === 401 && login.logoutIcon == true) {
         login.getRefresh(saveUser(userId));
       } else if(res.status === 401 && login.logoutIcon == false){
+      } else if (res.status === 400) {
+        editValidate.value = false;
+      } else if (res.status === 500) {
+        userUnique.value = false;
       } else {
         console.log("error, cannot edit");
       }
@@ -283,6 +289,7 @@ export const useUsers = defineStore("Users", () => {
     confirmPassword,
     lecturerClinic,
     signUpValidate,
+    editValidate,
     userUnique,
     signUpSuccessfully,
     editUserSuccessfully,
