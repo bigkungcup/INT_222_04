@@ -102,6 +102,7 @@ export const useEvents = defineStore("Events", () => {
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getFilterEventList((page = 0)));
     } else if (res.status === 401 && login.logoutIcon == false) {
+      login.noAuthorization = true;
     }
     console.log("error, cannot get event lists");
   };

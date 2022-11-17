@@ -7,10 +7,6 @@ import NoAuthorization from "./components/NoAuthorization.vue";
 
 const login = useLogin();
 
-const togglePopup = () => {
-  login.logoutPopup = !login.logoutPopup
-}
-
 const togglenoAuthorizationPopup = () => {
   login.noAuthorization = !login.noAuthorization
 }
@@ -23,11 +19,8 @@ const togglenoAuthorizationPopup = () => {
 
 <template>
   <div class="inter">
-    <Navbar :logoutIcon="login.logoutIcon" :userPageIcon="login.userPageIcon" @toggle="togglePopup()" @logout="login.logoutPopup"/>
+    <Navbar :userName="login.getNameToken()" :logoutIcon="login.logoutIcon" :userPageIcon="login.userPageIcon" @toggle="togglePopup()" @logout="login.logoutPopup"/>
     <router-view></router-view>
-    <div v-show="login.logoutPopup">
-        <Logout @toggle="togglePopup()" @logout="login.logout()"/>
-    </div>
     <div v-show="login.noAuthorization">
         <NoAuthorization @toggle="togglenoAuthorizationPopup()"/>
     </div>

@@ -124,7 +124,7 @@ export const useLogin = defineStore("Login", () => {
         } else console.log();
       };
 
-  return { getRoleToken,getEmailToken,handleLogin,getRefresh,logout,resetLoginAccount,getIdToken,loginAccount,loginSuccessfully,logoutPopup,loginValidate,logoutIcon,userPageIcon,token,noAuthorization };
+  return { getRoleToken,getNameToken,getEmailToken,handleLogin,getRefresh,logout,resetLoginAccount,getIdToken,loginAccount,loginSuccessfully,logoutPopup,loginValidate,logoutIcon,userPageIcon,token,noAuthorization };
 });
 
 //-----------------------------------------------------------------------------------
