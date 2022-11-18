@@ -1,5 +1,7 @@
 package int221.kw4.clinics.services;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import int221.kw4.clinics.advices.HandleExceptionBadRequest;
 import int221.kw4.clinics.advices.HandleExceptionForbidden;
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,11 +26,17 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -37,6 +46,12 @@ public class UserService implements UserDetailsService {
     private final ModelMapper modelMapper;
     private final ListMapper listMapper;
     private final PasswordEncoder passwordEncoder;
+
+    private final String secret = "secret";
+
+    private final Integer jwtExpirationInMs = 30 * 60 * 1000;
+
+    private final Integer refreshExpirationDateInMs = 24 * 60 * 60 * 1000;
 
     public UserService(UserRepository repository, EventCategoryRepository eventCategoryRepository, EmailService emailService, ModelMapper modelMapper, ListMapper listMapper, PasswordEncoder passwordEncoder) {
         this.repository = repository;
@@ -202,8 +217,24 @@ public class UserService implements UserDetailsService {
 //        emailService.sendSimpleMail(user.getEmail(), "Update User Successfully",
 //                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
 //                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
-
         return ResponseEntity.status(200).body(user);
+    }
+
+    public void loginWithMicrosoft(UserPostMSDTO user, HttpServletRequest request, HttpServletResponse response) {
+        List<UserDTO> userList = getAll();
+
+        user.setName(user.getName().trim());
+        user.setEmail(user.getEmail().trim());
+
+        for (UserDTO userDTO : userList) {
+           if(userDTO.equals(user.getEmail())){
+              login(user, request, response);
+           }else {
+               User newUser = modelMapper.map(user, User.class);
+               repository.saveAndFlush(newUser);
+               login(user, request, response);
+           }
+        }
     }
 
     //AUTHENTICATION
@@ -219,6 +250,33 @@ public class UserService implements UserDetailsService {
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
+    }
+
+    public Cookie createCookie(String name, String value, Integer maxAge) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(maxAge);
+        cookie.setPath("/");
+        return cookie;
+    }
+
+    public void login(UserPostMSDTO user, HttpServletRequest request, HttpServletResponse response){
+        Algorithm algorithm = Algorithm.HMAC256(secret.getBytes(StandardCharsets.UTF_8));
+        String access_token = JWT.create()
+                .withSubject(user.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis() + jwtExpirationInMs))
+                .withIssuer(request.getRequestURI())
+                .withClaim("roles", Collections.singletonList(user.getRole()))
+                .sign(algorithm);
+
+        String refresh_token = JWT.create()
+                .withSubject(user.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis() + refreshExpirationDateInMs))
+                .withIssuer(request.getRequestURI().toString())
+                .sign(algorithm);
+
+        response.addCookie(createCookie("access_token", access_token, jwtExpirationInMs));
+        response.addCookie(createCookie("refresh_token", refresh_token, refreshExpirationDateInMs));
     }
 
 }
