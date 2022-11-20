@@ -136,14 +136,15 @@ export const useLogin = defineStore("Login", () => {
     resetToken();
     localStorage.setItem("name", response.account.name);
     localStorage.setItem("email", response.account.userName);
-    localStorage.setItem("role", response.account.idTokenClaims.roles[0]); 
+    localStorage.setItem("role", response.account.idTokenClaims.roles == undefined ? "guest" : response.account.idTokenClaims.roles[0] ); 
+    console.log(localStorage.getItem("email"));
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/loginWithMS`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         role: localStorage.getItem("role"),
         name: localStorage.getItem("name"),
-        email: localStorage.getItem("email")
+        email: localStorage.getItem("email") 
       }),
     });
     if (res.status === 200) {
