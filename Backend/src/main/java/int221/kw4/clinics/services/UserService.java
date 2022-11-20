@@ -217,7 +217,8 @@ public class UserService implements UserDetailsService {
             if (userList.get(i).getEmail().equals(user.getEmail())) {
                 System.out.println("Login with Microsoft");
                 login(user, request, response);
-                return ResponseEntity.status(200).body(user);
+                User userDetail = repository.findByEmail(user.getEmail());
+                return ResponseEntity.status(200).body(userDetail);
             }
         }
 
@@ -225,10 +226,10 @@ public class UserService implements UserDetailsService {
         if(user.getRole() == null){
             user.setRole(Role.guest);
         }
-        User newUser = modelMapper.map(user, User.class);
-        repository.saveAndFlush(newUser);
+        User userDetail = modelMapper.map(user, User.class);
+        repository.saveAndFlush(userDetail);
         login(user, request, response);
-        return ResponseEntity.status(201).body(user);
+        return ResponseEntity.status(201).body(userDetail);
     }
 
     //AUTHENTICATION
