@@ -62,7 +62,7 @@ onBeforeMount(async () => {
             </div>
         </div>
         <div v-show="login.logoutPopup">
-            <Logout @toggle="login.logoutPopup = !login.logoutPopup" @logout="login.logout()" />
+            <Logout @toggle="login.logoutPopup = !login.logoutPopup" @logout="login.msLogoutIcon ? login.msSignOut() : login.logout()" />
         </div>
     </div>
 </template>

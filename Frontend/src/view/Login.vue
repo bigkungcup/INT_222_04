@@ -50,8 +50,10 @@ onBeforeMount(async () => {
                    <p class="text-Web-pink text-center py-3">*Incorrect email or password</p> 
                 </div>
             </div>
-            <div class="grid content-center font-bold text-Web-pink text-xl">
-                Forgot Password?
+            <div class="font-bold text-Web-pink text-xl">
+                <button class="hover:underline underline-offset-8" @click="login.msSignIn()">
+                Login with MS
+                </button>
             </div>
             <div class="grid content-center font-bold text-white text-xl text-center">
                 <button class="rounded-full bg-Web-pink py-2 w-2/5 hover:bg-white hover:text-Web-pink mx-24" @click="login.handleLogin()">
