@@ -231,7 +231,6 @@ public class EventService {
                     return modelMapper.map(repository.findAllByEventStartTimeBeforeOrderByEventStartTimeDesc(Instant.now(),
                             PageRequest.of(page, pageSize)), EventPageDTO.class);
                 }
-
             } else if (user.getRole().toString().equals("student")) {
                 if(eventCategoryId != 0){
                     return modelMapper.map(repository.findAllByBookingEmailAndEventCategory_IdAndEventStartTimeBeforeOrderByEventStartTimeDesc(user.getEmail(), eventCategoryId, Instant.now(),
@@ -315,6 +314,14 @@ public class EventService {
                     return modelMapper.map(repository.findAllByEventCategory_IdIn(categoryIds,
                             PageRequest.of(page, pageSize)), EventPageDTO.class);
                 }
+            } else if (user.getRole().toString().equals("guest")) {
+                if (eventCategoryId != 0) {
+                    return modelMapper.map(repository.findAllByBookingEmailAndEventCategory_Id(user.getEmail(), eventCategoryId,
+                            PageRequest.of(page, pageSize)), EventPageDTO.class);
+                } else if (eventCategoryId == 0) {
+                    return modelMapper.map(repository.findAllByBookingEmail(user.getEmail(),
+                            PageRequest.of(page, pageSize)), EventPageDTO.class);
+                }
             }
         }
         return null;
@@ -346,6 +353,17 @@ public class EventService {
                 return ResponseEntity.status(201).body(event);
 
             } else if (user.getRole().toString().equals("student")) {
+                if (user.getEmail().equals(newEvent.getBookingEmail())) {
+                    newEvent.setUser(user);
+                    Event event = mapEvent(newEvent);
+                    repository.saveAndFlush(event);
+                    fileStorageService.storeFile(file, event);
+//                    sendEmail(event);
+                    return ResponseEntity.status(201).body(event);
+                } else {
+                    throw new HandleExceptionBadRequest("The booking email must be the same as the student's email");
+                }
+            } else if (user.getRole().toString().equals("guest")) {
                 if (user.getEmail().equals(newEvent.getBookingEmail())) {
                     newEvent.setUser(user);
                     Event event = mapEvent(newEvent);
