@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `clinic`.`user` (
   `userId` INT NOT NULL auto_increment,
   `name` VARCHAR(100) NOT NULL,
   `email` VARCHAR(50) NOT NULL,
-  `role` ENUM('student', 'lecturer', 'admin') NOT NULL,
+  `role` ENUM('student', 'lecturer', 'admin','guest') NOT NULL,
   `createdOn` DATETIME NOT NULL default current_timestamp,
   `updatedOn` DATETIME NOT NULL default current_timestamp on update current_timestamp,
   `password` VARCHAR(90) NULL,
