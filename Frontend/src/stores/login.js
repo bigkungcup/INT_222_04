@@ -146,13 +146,17 @@ export const useLogin = defineStore("Login", () => {
         email: localStorage.getItem("email")
       }),
     });
+    if (res.status === 200) {
+      token.value = await res.json();
+      resetToken();
+      setToken(token.value);
     if (localStorage.getItem("role") == "admin") {
       userPageIcon.value = true;
     }
     loginSuccessfully.value = true;
     logoutIcon.value = true; 
     msLogoutIcon.value = true;
-  };
+  }};
 
   const msSignOut = () => {
     // const logoutRequest = {
