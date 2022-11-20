@@ -11,6 +11,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
 import int221.kw4.clinics.advices.FileStorageException;
+import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.advices.MyFileNotFoundException;
 import int221.kw4.clinics.dtos.events.EventPostDTO;
 import int221.kw4.clinics.entities.Event;
@@ -63,7 +64,9 @@ public class FileStorageService {
             System.out.println("eventDir: " + eventDir);
 
             try {
-                if (fileName.contains("..")) {
+                if (fileName.contains("..") || fileName.contains(" ")) {
+                    Path fileDir = this.fileStorageLocation.resolve(userDir).resolve(eventDir);
+                    Files.createDirectories(fileDir);
                     throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
                 }
                 Path fileDir = this.fileStorageLocation.resolve(userDir).resolve(eventDir);
@@ -79,7 +82,7 @@ public class FileStorageService {
         return null;
     }
 
-    public Resource loadFileAsResource(String fileName, Event event) {
+    public Resource loadFileAsResource(String fileName, Event event) throws HandleExceptionNotFound {
         String userDir = event.getUser() != null ? "User/" + "User_" + event.getUser().getId() : "Guest";
         String eventDir = "Event_" + event.getId().toString();
         try {
@@ -90,14 +93,14 @@ public class FileStorageService {
             if(resource.exists()) {
                 return resource;
             } else {
-                throw new MyFileNotFoundException("File not found " + "eventNo" + fileName);
+                throw new HandleExceptionNotFound("File not found " + "eventNo" + fileName);
             }
         } catch (MalformedURLException ex) {
-            throw new MyFileNotFoundException("File not found " + "eventNo" + fileName, ex);
+            throw new FileStorageException("File not found " + "eventNo" + fileName, ex);
         }
     }
 
-    public Resource loadFileAsResource(String fileName, Integer id) {
+    public Resource loadFileAsResource(String fileName, Integer id) throws HandleExceptionNotFound {
         Event event = eventRepository.findById(id).orElseThrow(() -> new MyFileNotFoundException("Event not found with id " + id));
         String userDir = event.getUser() != null ? "User/" + "User_" + event.getUser().getId() : "Guest";
         String eventDir = "Event_" + event.getId().toString();
@@ -109,10 +112,10 @@ public class FileStorageService {
             if(resource.exists()) {
                 return resource;
             } else {
-                throw new MyFileNotFoundException("File not found " + "eventNo" + fileName);
+                throw new HandleExceptionNotFound("File not found " + "eventNo" + fileName);
             }
         } catch (MalformedURLException ex) {
-            throw new MyFileNotFoundException("File not found " + "eventNo" + fileName, ex);
+            throw new FileStorageException("File not found " + "eventNo" + fileName, ex);
         }
     }
 
@@ -121,7 +124,7 @@ public class FileStorageService {
             Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
             Files.delete(filePath);
         } catch (IOException ex) {
-            throw new MyFileNotFoundException("File not found " + fileName, ex);
+            throw new FileStorageException("File not found " + fileName, ex);
         }
     }
 
@@ -129,7 +132,7 @@ public class FileStorageService {
         try {
             FileUtils.deleteDirectory(new File(dir));
         } catch (IOException ex) {
-            throw new MyFileNotFoundException("Dir not found " + dir, ex);
+            throw new FileStorageException("Dir not found " + dir, ex);
         }
     }
 }

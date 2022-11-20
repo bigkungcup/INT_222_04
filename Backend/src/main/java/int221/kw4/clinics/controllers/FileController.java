@@ -1,6 +1,7 @@
 package int221.kw4.clinics.controllers;
 
 
+import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.dtos.files.UploadFileResponse;
 import int221.kw4.clinics.services.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class FileController {
     private FileStorageService fileStorageService;
 
     @GetMapping("/{eventId}/{fileName:.+}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable  String fileName,@PathVariable  Integer eventId, HttpServletRequest request) throws IOException {
+    public ResponseEntity<Resource> downloadFile(@PathVariable  String fileName,@PathVariable  Integer eventId, HttpServletRequest request) throws IOException, HandleExceptionNotFound {
 
         // Load file as Resource
         Resource resource = fileStorageService.loadFileAsResource(fileName, eventId);

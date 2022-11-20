@@ -7,8 +7,8 @@ import int221.kw4.clinics.advices.HandleExceptionForbidden;
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.advices.HandleExceptionUnique;
 import int221.kw4.clinics.dtos.users.*;
-import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.entities.EventCategory;
+import int221.kw4.clinics.entities.Role;
 import int221.kw4.clinics.entities.User;
 import int221.kw4.clinics.repositories.EventCategoryRepository;
 import int221.kw4.clinics.repositories.UserRepository;
@@ -18,7 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,17 +25,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -46,12 +41,6 @@ public class UserService implements UserDetailsService {
     private final ModelMapper modelMapper;
     private final ListMapper listMapper;
     private final PasswordEncoder passwordEncoder;
-
-    private final String secret = "secret";
-
-    private final Integer jwtExpirationInMs = 30 * 60 * 1000;
-
-    private final Integer refreshExpirationDateInMs = 24 * 60 * 60 * 1000;
 
     public UserService(UserRepository repository, EventCategoryRepository eventCategoryRepository, EmailService emailService, ModelMapper modelMapper, ListMapper listMapper, PasswordEncoder passwordEncoder) {
         this.repository = repository;
@@ -107,12 +96,12 @@ public class UserService implements UserDetailsService {
         newUser.setEmail(newUser.getEmail().trim());
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
 
-        for (int i = 0; i < userList.size(); i++) {
-            if (newUser.getName().equals(userList.get(i).getName()) && newUser.getEmail().equals(userList.get(i).getEmail())) {
+        for (User value : userList) {
+            if (newUser.getName().equals(value.getName()) && newUser.getEmail().equals(value.getEmail())) {
                 throw new HandleExceptionUnique("Name should be unique and email should be unique");
-            } else if (newUser.getName().equals(userList.get(i).getName())) {
+            } else if (newUser.getName().equals(value.getName())) {
                 throw new HandleExceptionUnique("Name should be Unique");
-            } else if (newUser.getEmail().equals(userList.get(i).getEmail())) {
+            } else if (newUser.getEmail().equals(value.getEmail())) {
                 throw new HandleExceptionUnique("Email should be Unique");
             }
         }
@@ -220,21 +209,26 @@ public class UserService implements UserDetailsService {
         return ResponseEntity.status(200).body(user);
     }
 
-    public void loginWithMicrosoft(UserPostMSDTO user, HttpServletRequest request, HttpServletResponse response) {
-        List<UserDTO> userList = getAll();
+    public ResponseEntity loginWithMicrosoft(UserPostMSDTO user, HttpServletRequest request, HttpServletResponse response) {
+        List<User> userList = repository.findAll();
 
-        user.setName(user.getName().trim());
-        user.setEmail(user.getEmail().trim());
-
-        for (UserDTO userDTO : userList) {
-           if(userDTO.equals(user.getEmail())){
-              login(user, request, response);
-           }else {
-               User newUser = modelMapper.map(user, User.class);
-               repository.saveAndFlush(newUser);
-               login(user, request, response);
-           }
+        for (int i = 0; i < userList.size(); i++) {
+            System.out.println(userList.get(i).getEmail());
+            if (userList.get(i).getEmail().equals(user.getEmail())) {
+                System.out.println("Login with Microsoft");
+                login(user, request, response);
+                return ResponseEntity.status(200).body(user);
+            }
         }
+
+        System.out.println("Register with Microsoft");
+        if(user.getRole() == null){
+            user.setRole(Role.guest);
+        }
+        User newUser = modelMapper.map(user, User.class);
+        repository.saveAndFlush(newUser);
+        login(user, request, response);
+        return ResponseEntity.status(201).body(user);
     }
 
     //AUTHENTICATION
@@ -260,15 +254,22 @@ public class UserService implements UserDetailsService {
         return cookie;
     }
 
-    public void login(UserPostMSDTO user, HttpServletRequest request, HttpServletResponse response){
+    public void login(UserPostMSDTO user, HttpServletRequest request, HttpServletResponse response) {
+        String secret = "secret";
         Algorithm algorithm = Algorithm.HMAC256(secret.getBytes(StandardCharsets.UTF_8));
+        List<Object> roles = new ArrayList<>();
+        roles.add(user.getRole().toString());
+        System.out.println(roles);
+
+        Integer jwtExpirationInMs = 30 * 60 * 1000;
         String access_token = JWT.create()
                 .withSubject(user.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() + jwtExpirationInMs))
                 .withIssuer(request.getRequestURI())
-                .withClaim("roles", Collections.singletonList(user.getRole()))
+                .withClaim("roles", roles)
                 .sign(algorithm);
 
+        Integer refreshExpirationDateInMs = 24 * 60 * 60 * 1000;
         String refresh_token = JWT.create()
                 .withSubject(user.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() + refreshExpirationDateInMs))

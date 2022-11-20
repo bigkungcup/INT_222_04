@@ -131,14 +131,14 @@ public class ApplicationExceptionHandler extends Exception {
         return errors;
     }
 
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    @ExceptionHandler(NullPointerException.class)
-//    public HandleValidationError handleNullPointerException(NullPointerException exc, ServletWebRequest request) {
-//        Map<String, String> errorMap = new HashMap<>();
-//        errorMap.put("Error:", "Field is Null");
-//        errors = new HandleValidationError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
-//                "Bad Request", "Validation", request.getRequest().getRequestURI(), errorMap);
-//        return errors;
-//    }
+    @ResponseStatus(HttpStatus.CREATED)
+    @ExceptionHandler(FileStorageException.class)
+    public HandleValidationError handleNullPointerException(FileStorageException exception, ServletWebRequest request) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("Error:", exception.getMessage());
+        errors = new HandleValidationError(Instant.now(), HttpStatus.CREATED.value(),
+                "created", "Validation", request.getRequest().getRequestURI(), errorMap);
+        return errors;
+    }
 
 }

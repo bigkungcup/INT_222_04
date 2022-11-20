@@ -514,7 +514,7 @@ public class EventService {
                         "Event Note: " + event.getEventNotes(), new Date());
     }
 
-    public Map<String, String> getFile(Path filePath, Event event) throws IOException {
+    public Map<String, String> getFile(Path filePath, Event event) throws IOException, HandleExceptionNotFound {
         Map<String, String> fileMap = new HashMap<>();
         if (Files.list(filePath).collect(Collectors.toList()).isEmpty()) {
             fileMap.put("fileName", "");
