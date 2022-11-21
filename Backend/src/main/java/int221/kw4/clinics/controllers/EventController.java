@@ -132,7 +132,7 @@ public class EventController {
                                  @PathVariable Integer eventId,
                                  @RequestPart(value = "file") @Nullable MultipartFile file,
                                  ServletWebRequest request
-    ) throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest, IOException {
+    ) throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest, IOException, HandleExceptionNotFound {
         return service.update(updateEvent, eventId, file, request);
     }
 }

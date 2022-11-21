@@ -314,15 +314,16 @@ public class EventService {
                     return modelMapper.map(repository.findAllByEventCategory_IdIn(categoryIds,
                             PageRequest.of(page, pageSize)), EventPageDTO.class);
                 }
-            } else if (user.getRole().toString().equals("guest")) {
-                if (eventCategoryId != 0) {
-                    return modelMapper.map(repository.findAllByBookingEmailAndEventCategory_Id(user.getEmail(), eventCategoryId,
-                            PageRequest.of(page, pageSize)), EventPageDTO.class);
-                } else if (eventCategoryId == 0) {
-                    return modelMapper.map(repository.findAllByBookingEmail(user.getEmail(),
-                            PageRequest.of(page, pageSize)), EventPageDTO.class);
-                }
             }
+//            else if (user.getRole().toString().equals("guest")) {
+//                if (eventCategoryId != 0) {
+//                    return modelMapper.map(repository.findAllByBookingEmailAndEventCategory_Id(user.getEmail(), eventCategoryId,
+//                            PageRequest.of(page, pageSize)), EventPageDTO.class);
+//                } else if (eventCategoryId == 0) {
+//                    return modelMapper.map(repository.findAllByBookingEmail(user.getEmail(),
+//                            PageRequest.of(page, pageSize)), EventPageDTO.class);
+//                }
+//            }
         }
         return null;
     }
@@ -340,7 +341,7 @@ public class EventService {
 
         if (!auth.getPrincipal().toString().equals("anonymousUser")) {
             User user = userRepository.findByEmail(auth.getPrincipal().toString());
-            HandleValidationError error = validationAdd(newEvent, request);
+            HandleValidationError error = addOverlap(newEvent, request);
             if (error != null) {
                 return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
             }
@@ -378,7 +379,7 @@ public class EventService {
                 throw new HandleExceptionBadRequest("The booking email must be the same as the email");
             }
         } else {
-            HandleValidationError error = validationAdd(newEvent, request);
+            HandleValidationError error = addOverlap(newEvent, request);
             if (error != null) {
                 return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
             }
@@ -430,7 +431,7 @@ public class EventService {
     }
 
     //    Update
-    public ResponseEntity update(EventEditDTO updateEvent, Integer eventId, MultipartFile file, ServletWebRequest request) throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest, IOException {
+    public ResponseEntity update(EventEditDTO updateEvent, Integer eventId, MultipartFile file, ServletWebRequest request) throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest, IOException, HandleExceptionNotFound {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByEmail(auth.getPrincipal().toString());
         Event eventById = repository.getById(eventId);
@@ -439,7 +440,7 @@ public class EventService {
         Path path = Paths.get(fileStorageProperties.getUploadDir() + "/" + userDir + "/" + "Event_" + eventById.getId());
 
         if (user.getRole().toString().equals("admin")) {
-            HandleValidationError error = validationUpdate(updateEvent, eventId, request);
+            HandleValidationError error = updateOverlap(updateEvent, eventId, request);
             if (error != null) {
                 return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
             }
@@ -452,12 +453,12 @@ public class EventService {
 //            sendEmail(event);
             return ResponseEntity.status(200).body(event);
         } else if (user.getRole().toString().equals("student")) {
-            HandleValidationError error = validationUpdate(updateEvent, eventId, request);
+            HandleValidationError error = updateOverlap(updateEvent, eventId, request);
             if (error != null) {
                 return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
             }
             if (user.getEmail().equals(eventById.getBookingEmail())) {
-                validationUpdate(updateEvent, eventId, request);
+                updateOverlap(updateEvent, eventId, request);
                 updateFile(file, path, eventById);
                 Event event = repository.findById(eventId).orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.BAD_REQUEST)
@@ -475,10 +476,16 @@ public class EventService {
         }
     }
 
-    public void updateFile(MultipartFile file, Path path, Event eventById) throws IOException {
+    public void updateFile(MultipartFile file, Path path, Event eventById) throws IOException, HandleExceptionNotFound {
         if (file != null) {
             if (Files.exists(path)) {
                 if (!Files.list(path).collect(Collectors.toList()).isEmpty()) {
+                    Path pathFile = Files.list(path).collect(Collectors.toList()).get(0);
+                    String fileName = fileStorageService.loadFileAsResource(pathFile.toString(), eventById).getFilename();
+                    if(Objects.equals(fileName, file.getOriginalFilename())) {
+                        fileStorageService.deleteFile(path + "/" + Files.list(path).collect(Collectors.toList()).get(0).getFileName());
+                        fileStorageService.storeFile(file, eventById);
+                    }
                     fileStorageService.deleteFile(path + "/" + Files.list(path).collect(Collectors.toList()).get(0).getFileName());
                     fileStorageService.storeFile(file, eventById);
                 } else if (Files.list(path).collect(Collectors.toList()).isEmpty()) {
@@ -543,14 +550,12 @@ public class EventService {
         System.out.println("PathFile: " + pathFile);
         String fileName = fileStorageService.loadFileAsResource(pathFile.toString(), event).getFilename();
         Resource resource = fileStorageService.loadFileAsResource(fileName, event);
-        System.out.println("Resource: " + resource);
-        System.out.println("FileName: " + fileName);
         fileMap.put("fileName", fileName);
 //        fileMap.put("pathFile", resource.getURI().toString());
         return fileMap;
     }
 
-    public HandleValidationError validationAdd(EventPostDTO newEvent, ServletWebRequest request) {
+    public HandleValidationError addOverlap(EventPostDTO newEvent, ServletWebRequest request) {
         Map<String, String> errorMap = new HashMap<>();
         Date newEventStartTime = Date.from(newEvent.getEventStartTime());
         Date newEventEndTime = findEndDate(Date.from(newEvent.getEventStartTime()), newEvent.getEventDuration());
@@ -572,7 +577,7 @@ public class EventService {
         return errors;
     }
 
-    public HandleValidationError validationUpdate(EventEditDTO updateEvent, Integer eventId, ServletWebRequest request) {
+    public HandleValidationError updateOverlap(EventEditDTO updateEvent, Integer eventId, ServletWebRequest request) {
         Map<String, String> errorMap = new HashMap<>();
         Date newEventStartTime = Date.from(updateEvent.getEventStartTime());
         Date newEventEndTime = findEndDate(Date.from(updateEvent.getEventStartTime()), updateEvent.getEventDuration());
@@ -592,7 +597,7 @@ public class EventService {
         if (errorMap.size() <= 0) return null;
 
         HandleValidationError errors = new HandleValidationError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
-                "Bad Requestss", "Validation", request.getRequest().getRequestURI(), errorMap);
+                "Bad Requests", "Validation", request.getRequest().getRequestURI(), errorMap);
         return errors;
     }
 

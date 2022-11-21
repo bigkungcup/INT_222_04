@@ -211,13 +211,24 @@ public class UserService implements UserDetailsService {
 
     public ResponseEntity loginWithMicrosoft(UserPostMSDTO user, HttpServletRequest request, HttpServletResponse response) {
         List<User> userList = repository.findAll();
+        User userDetail = repository.findByEmail(user.getEmail());
+
+        if(user.getRole() == null){
+            userDetail.setRole(Role.guest);
+            repository.saveAndFlush(userDetail);
+        }else {
+            if(!userDetail.getRole().toString().equals(user.getRole().toString())){
+                userDetail.setRole(user.getRole());
+                repository.saveAndFlush(userDetail);
+            }
+        }
+
 
         for (int i = 0; i < userList.size(); i++) {
             System.out.println(userList.get(i).getEmail());
             if (userList.get(i).getEmail().equals(user.getEmail())) {
                 System.out.println("Login with Microsoft");
                 login(user, request, response);
-                User userDetail = repository.findByEmail(user.getEmail());
                 return ResponseEntity.status(200).body(userDetail);
             }
         }
@@ -226,10 +237,10 @@ public class UserService implements UserDetailsService {
         if(user.getRole() == null){
             user.setRole(Role.guest);
         }
-        User userDetail = modelMapper.map(user, User.class);
-        repository.saveAndFlush(userDetail);
+        User detail = modelMapper.map(user, User.class);
+        repository.saveAndFlush(detail);
         login(user, request, response);
-        return ResponseEntity.status(201).body(userDetail);
+        return ResponseEntity.status(201).body(detail);
     }
 
     //AUTHENTICATION
@@ -259,8 +270,12 @@ public class UserService implements UserDetailsService {
         String secret = "secret";
         Algorithm algorithm = Algorithm.HMAC256(secret.getBytes(StandardCharsets.UTF_8));
         List<Object> roles = new ArrayList<>();
-        roles.add(user.getRole().toString());
-        System.out.println(roles);
+
+        if(user.getRole() == null){
+            roles.add("guest");
+        }else {
+            roles.add(user.getRole().toString());
+        }
 
         Integer jwtExpirationInMs = 30 * 60 * 1000;
         String access_token = JWT.create()
