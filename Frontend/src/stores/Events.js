@@ -103,7 +103,13 @@ export const useEvents = defineStore("Events", () => {
       login.getRefresh(getFilterEventList((page = 0)));
     } else if (res.status === 401 && login.logoutIcon == false) {
       login.noAuthorization = true;
-    }
+    } 
+
+    //เดี๋ยวก็ลบ
+    else if (res.status === 403 && login.logoutIcon == true) {
+      login.noAuthorizationAsGuest = true;
+    } 
+    
     console.log("error, cannot get event lists");
   };
 
@@ -215,7 +221,7 @@ export const useEvents = defineStore("Events", () => {
       };
 
   //Delete Event
-  const removeEvent = async (eventId) => {
+  const removeEvent = async (selectClinic,selectTime,eventId) => {
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/events/${eventId}`,
       {
@@ -227,7 +233,11 @@ export const useEvents = defineStore("Events", () => {
         (event) => event.id !== eventId
       );
       deletePopup.value = false;
-      getEventList(eventList.value.pageNumber);
+      getFilterEventList(selectClinic,selectTime,eventList.value.pageNumber);
+      if(eventList.value.content.length == 0 && eventList.value.pageNumber > 0){
+        eventList.value.pageNumber = eventList.value.pageNumber-1;
+        getFilterEventList(selectClinic,selectTime,eventList.value.pageNumber);
+      }
       console.log("deleteted succesfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(removeEvent(eventId));
@@ -411,17 +421,17 @@ export const useEvents = defineStore("Events", () => {
   };
 
   //Page
-  const NextPage = () => {
+  const NextPage = (selectClinic,selectTime) => {
     if (eventList.value.pageNumber < 0) {
       eventList.value.pageNumber = 0;
     }
-    getEventList(eventList.value.pageNumber + 1);
+    getFilterEventList(selectClinic,selectTime,eventList.value.pageNumber + 1);
   };
-  const BackPage = () => {
+  const BackPage = (selectClinic,selectTime) => {
     if (eventList.value.pageNumber < 0) {
       eventList.value.pageNumber = 0;
     }
-    getEventList(eventList.value.pageNumber - 1);
+    getFilterEventList(selectClinic,selectTime,eventList.value.pageNumber - 1);
   };
 
   return {

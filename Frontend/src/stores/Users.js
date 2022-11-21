@@ -253,7 +253,11 @@ export const useUsers = defineStore("Users", () => {
       login.getRefresh(removeUser(userId));
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else console.log("error, cannot delete");
-    getUserList();
+    getUserList(userList.value.pageNumber);
+    if(userList.value.content.length == 0 && userList.value.pageNumber > 0){
+      userList.value.pageNumber = userList.value.pageNumber-1;
+      getUserList(userList.value.pageNumber);
+    }
   };
 
   const checkBeforeEdit = () => {
@@ -268,6 +272,20 @@ export const useUsers = defineStore("Users", () => {
     return check
   }
 
+    //Page
+    const NextPage = () => {
+      if (userList.value.pageNumber < 0) {
+        userList.value.pageNumber = 0;
+      }
+      getUserList(userList.value.pageNumber + 1);
+    };
+    const BackPage = () => {
+      if (userList.value.pageNumber < 0) {
+        userList.value.pageNumber = 0;
+      }
+      getUserList(userList.value.pageNumber - 1);
+    };
+
   return {
     getUserList,
     getUserDetail,
@@ -279,6 +297,8 @@ export const useUsers = defineStore("Users", () => {
     resetNewUser,
     resetEditUser,
     checkBeforeEdit,
+    NextPage,
+    BackPage,
     userList,
     newUser,
     displayUser,
@@ -294,7 +314,7 @@ export const useUsers = defineStore("Users", () => {
     signUpSuccessfully,
     editUserSuccessfully,
     deletePopup,
-    editUserField
+    editUserField,
   };
 });
 

@@ -68,7 +68,7 @@ onBeforeMount(async () => {
           <button
             class="text-xl text-white rounded-3xl w-28 h-12 mx-2 bg-Web-pink hover:bg-white hover:text-Web-pink"
             v-show="event.eventList.pageNumber > 0"
-            @click="event.BackPage()"
+            @click="event.BackPage(selectClinic,selectTime)"
           >
             Back
           </button>
@@ -80,7 +80,7 @@ onBeforeMount(async () => {
         <button
           class="text-xl text-white rounded-3xl w-28 h-12 mx-2 bg-Web-pink hover:bg-white hover:text-Web-pink"
           v-show="event.eventList.pageNumber + 1 < event.eventList.totalPages"
-          @click="event.NextPage()"
+          @click="event.NextPage(selectClinic,selectTime)"
         >
           Next
         </button>

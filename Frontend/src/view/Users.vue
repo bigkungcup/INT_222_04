@@ -24,8 +24,7 @@ onBeforeMount(async () => {
         @delete="user.removeUser"
       />
 
-    </div>
-    <div class="grid grid-cols-3 py-6 place-items-center">
+      <div class="grid grid-cols-3 py-6 place-items-center">
         <div>
           <button
             class="text-xl text-white rounded-3xl w-28 h-12 mx-2 bg-Web-pink hover:bg-white hover:text-Web-pink"
@@ -47,6 +46,8 @@ onBeforeMount(async () => {
           Next
         </button>
       </div>
+    </div>
+
       <div class="grid row-span-7" v-show="user.userList.numberOfElements == 0">
         <UserEmptyList />
     </div>
