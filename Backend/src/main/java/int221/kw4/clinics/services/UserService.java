@@ -213,16 +213,12 @@ public class UserService implements UserDetailsService {
         List<User> userList = repository.findAll();
         User userDetail = repository.findByEmail(user.getEmail());
 
-        if(user.getRole() == null){
-            userDetail.setRole(Role.guest);
-            repository.saveAndFlush(userDetail);
-        }else {
-            if(!userDetail.getRole().toString().equals(user.getRole().toString())){
-                userDetail.setRole(user.getRole());
-                repository.saveAndFlush(userDetail);
-            }
+        if(userDetail != null){
+                if(!userDetail.getRole().toString().equals(user.getRole().toString())){
+                    userDetail.setRole(user.getRole());
+                    repository.saveAndFlush(userDetail);
+                }
         }
-
 
         for (int i = 0; i < userList.size(); i++) {
             System.out.println(userList.get(i).getEmail());
@@ -241,7 +237,7 @@ public class UserService implements UserDetailsService {
         repository.saveAndFlush(detail);
         login(user, request, response);
 
-        return ResponseEntity.status(200).body(userDetail);
+        return ResponseEntity.status(200).body(detail);
     }
 
     //AUTHENTICATION
@@ -271,12 +267,7 @@ public class UserService implements UserDetailsService {
         String secret = "secret";
         Algorithm algorithm = Algorithm.HMAC256(secret.getBytes(StandardCharsets.UTF_8));
         List<Object> roles = new ArrayList<>();
-
-        if(user.getRole() == null){
-            roles.add("guest");
-        }else {
-            roles.add(user.getRole().toString());
-        }
+        roles.add(user.getRole().toString());
 
         Integer jwtExpirationInMs = 30 * 60 * 1000;
         String access_token = JWT.create()
