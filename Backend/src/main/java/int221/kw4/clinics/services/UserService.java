@@ -234,13 +234,14 @@ public class UserService implements UserDetailsService {
         }
 
         System.out.println("Register with Microsoft");
-        if(user.getRole() == null){
+        if(user.getRole().toString().equals("guest")){
             user.setRole(Role.guest);
         }
         User detail = modelMapper.map(user, User.class);
         repository.saveAndFlush(detail);
         login(user, request, response);
-        return ResponseEntity.status(201).body(detail);
+
+        return ResponseEntity.status(200).body(userDetail);
     }
 
     //AUTHENTICATION
