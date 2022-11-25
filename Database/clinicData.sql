@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS `clinic`.`event` (
   CONSTRAINT `fk_event_user1`
     FOREIGN KEY (`userId`)
     REFERENCES `clinic`.`user` (`userId`)
-    ON DELETE NO ACTION
+    ON DELETE SET NULL
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS `clinic`.`event_category_owner` (
   CONSTRAINT `fk_user_has_eventCategory_user1`
     FOREIGN KEY (`userId`)
     REFERENCES `clinic`.`user` (`userId`)
-    ON DELETE NO ACTION
+    ON DELETE cascade
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_user_has_eventCategory_eventCategory1`
     FOREIGN KEY (`eventCategoryId`)
