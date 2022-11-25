@@ -492,14 +492,15 @@ public class EventService {
                     fileStorageService.storeFile(file, eventById);
                 }
             }
-        } else {
-            if (Files.exists(path)) {
-                if (!Files.list(path).collect(Collectors.toList()).isEmpty()) {
-                    System.out.println("File: " + path + "/" + Files.list(path).collect(Collectors.toList()).get(0).getFileName());
-                    fileStorageService.deleteFile(path + "/" + Files.list(path).collect(Collectors.toList()).get(0).getFileName());
-                }
-            }
         }
+//        else {
+//            if (Files.exists(path)) {
+//                if (!Files.list(path).collect(Collectors.toList()).isEmpty()) {
+//                    System.out.println("File: " + path + "/" + Files.list(path).collect(Collectors.toList()).get(0).getFileName());
+//                    fileStorageService.deleteFile(path + "/" + Files.list(path).collect(Collectors.toList()).get(0).getFileName());
+//                }
+//            }
+//        }
     }
 
     public Date findEndDate(Date date, Integer duration) {
