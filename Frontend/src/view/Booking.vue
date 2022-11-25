@@ -7,6 +7,7 @@ import BookingSeccessfully from "../components/BookingSuccessfully.vue";
 import ContinueAsGuest from "../components/ContinueAsGuest.vue";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
+import NoAuthorization from "../components/NoAuthorization.vue";
 
 const clinic = useClinics();
 const event = useEvents();
@@ -139,6 +140,10 @@ onBeforeMount(async () => {
   
   <div v-show="checkGuest">
     <ContinueAsGuest @toggle="checkGuest = false,asGuest = true"/>
+  </div>
+
+  <div v-show="login.getRoleToken() == 'lecturer'">
+    <NoAuthorization @toggle="checkGuest = false,asGuest = true"/>
   </div>
 </div>
 </template>

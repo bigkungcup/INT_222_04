@@ -8,11 +8,11 @@ defineEmits(["toggle"]);
       <div class="grid row-span-1.5 rounded-t-3xl place-items-center">
         <img src="../assets/images/Exclamation.png" class="animate-bounce mt-4" width="80" />
       </div>
-      <div class="grid font-bold text-white text-4xl place-items-center">
-        <p>Please login first to continue</p>
+      <div class="grid font-bold text-white text-4xl text-center place-items-center">
+        <p>You don't have permission to access this page.</p>
       </div>
       <div class="grid place-items-center">
-        <router-link :to="{ name: 'Login' }">
+        <router-link :to="{ name: 'Home' }">
           <button
             class="text-4xl px-5 text-white rounded-3xl w-36 py-2 mx-2 bg-Web-pink hover:bg-white hover:text-Web-pink"
             @click="$emit('toggle')">

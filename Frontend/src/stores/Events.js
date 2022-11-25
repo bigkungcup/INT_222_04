@@ -24,6 +24,7 @@ export const useEvents = defineStore("Events", () => {
   const showErrorFileText = ref(false)
   const eventList = ref([]);
   const eventListAll = ref([]);
+  const deleteFileCheck = ref(false)
 
   const newEvent = ref({
     bookingName: "",
@@ -66,7 +67,7 @@ export const useEvents = defineStore("Events", () => {
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getEventList((page = 0)));
     } else if (res.status === 401 && login.logoutIcon == false) {
-      login.noAuthorization = true;
+      login.noAuthentication = true;
     }
     console.log("error, cannot get event list");
   };
@@ -102,12 +103,12 @@ export const useEvents = defineStore("Events", () => {
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getFilterEventList((page = 0)));
     } else if (res.status === 401 && login.logoutIcon == false) {
-      login.noAuthorization = true;
+      login.noAuthentication = true;
     } 
 
     //เดี๋ยวก็ลบ
     else if (res.status === 403 && login.logoutIcon == true) {
-      login.noAuthorizationAsGuest = true;
+      login.noAuthorization = true;
     } 
     
     console.log("error, cannot get event lists");
@@ -125,6 +126,7 @@ export const useEvents = defineStore("Events", () => {
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getEventDetail(id));
     } else if (res.status === 401 && login.logoutIcon == false) {
+      login.noAuthentication = true;
     } else console.log("error, cannot get event");
   };
 
@@ -169,6 +171,7 @@ export const useEvents = defineStore("Events", () => {
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(createEvent());
     } else if (res.status === 401 && login.logoutIcon == false) {
+      login.noAuthentication = true;
     } else if (res.status === 417) {
     }else if (res.status === 400) {
       bookingValidate.value = false;
@@ -212,6 +215,7 @@ export const useEvents = defineStore("Events", () => {
         }else if (res.status === 401 && login.logoutIcon == true) {
           login.getRefresh(createEventWithGuest());
         } else if(res.status === 401 && login.logoutIcon == false){
+          login.noAuthentication = true;
         }else if (res.status === 400) {
           bookingValidate.value = false;
         }
@@ -242,7 +246,41 @@ export const useEvents = defineStore("Events", () => {
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(removeEvent(eventId));
     } else if (res.status === 401 && login.logoutIcon == false) {
+      login.noAuthentication = true;
     } else console.log("error, cannot delete");
+  };
+
+  //Delete File
+  const removeFile = async (eventId) => {
+    const res = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/files/${eventId}`,
+      {
+        method: "DELETE",
+      }
+    );
+    if (res.status === 200) {
+      // eventList.value.content = eventList.value.content.filter(
+      //   (event) => event.id !== eventId
+      // );
+      // if (editEvent.eventStartTime !== "" || editEvent.eventNotes !== "") {
+      //   showEditPopUp();
+      // }
+      await getEventDetail(eventId);
+      editFile.value = false;
+      resetEditFile();
+      editValidate.value = true;
+      deleteFileCheck.value = false;
+      editFileName.value = displayEvent.value.fileName;
+      console.log("edit successfully");
+    } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(removeFile(eventId));
+    } else if (res.status === 401 && login.logoutIcon == false) {
+      login.noAuthentication = true;
+    } else if (res.status === 400) {
+      editValidate.value = false;
+    }else {
+      console.log("error, cannot edit");
+    }
   };
 
   //Edit Event
@@ -296,6 +334,7 @@ export const useEvents = defineStore("Events", () => {
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(saveEvent(id));
     } else if (res.status === 401 && login.logoutIcon == false) {
+      login.noAuthentication = true;
     } else if (res.status === 400) {
       editValidate.value = false;
     }else {
@@ -355,6 +394,7 @@ export const useEvents = defineStore("Events", () => {
       fileName.innerText = inputFile.name;
       showErrorFileText.value = false;
       showFileName.value = true;
+      deleteFileCheck.value = false;
     } else {
       showErrorFileText.value = true;
       if(eventFile.value == null){
@@ -450,6 +490,7 @@ export const useEvents = defineStore("Events", () => {
     resetEditTime,
     resetEditFile,
     removeEvent,
+    removeFile,
     saveEvent,
     setMinTime,
     NextPage,
@@ -472,7 +513,8 @@ export const useEvents = defineStore("Events", () => {
     eventFile,
     editEventFile,
     fileUrl,
-    validEmail
+    validEmail,
+    deleteFileCheck 
   };
 });
 

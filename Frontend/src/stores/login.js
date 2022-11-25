@@ -8,16 +8,17 @@ export const useLogin = defineStore("Login", () => {
   const loginSuccessfully = ref(false);
   const token = ref();
   const logoutIcon = ref(localStorage.getItem("id") != null ? true : false);
+  const userName = ref(localStorage.getItem("name"));
   const msLogoutIcon = ref(false)
   const userPageIcon = ref(
     localStorage.getItem("role") == "admin" ? true : false
   );
   const logoutPopup = ref(false);
   const loginValidate = ref(true);
-  const noAuthorization = ref(false);
+  const noAuthentication = ref(false);
   
   //เดี๋ยวก็ลบ
-  const noAuthorizationAsGuest = ref(false);
+  const noAuthorization = ref(false);
 
   const loginAccount = ref({
     email: "",
@@ -107,6 +108,7 @@ export const useLogin = defineStore("Login", () => {
       if (localStorage.getItem("role") == "admin") {
         userPageIcon.value = true;
       }
+      userName.value = getNameToken();
       getAll;
       console.log("Refresh token success");
     } else if (res.status === 401) {
@@ -157,6 +159,7 @@ export const useLogin = defineStore("Login", () => {
     if (localStorage.getItem("role") == "admin") {
       userPageIcon.value = true;
     }
+    userName.value = getNameToken();
     loginSuccessfully.value = true;
     logoutIcon.value = true; 
     msLogoutIcon.value = true;
@@ -229,8 +232,9 @@ export const useLogin = defineStore("Login", () => {
     msLogoutIcon,
     userPageIcon,
     token,
+    noAuthentication,
     noAuthorization,
-    noAuthorizationAsGuest
+    userName
   };
 });
 
