@@ -88,6 +88,15 @@ public class UserService implements UserDetailsService {
         return modelMapper.map(userByEmail, User.class);
     }
 
+    public boolean checkEventInUser(Integer userId) throws HandleExceptionNotFound {
+        UserDTO userDTO = modelMapper.map(repository.findById(userId).orElseThrow(() -> new HandleExceptionNotFound("User not found")), UserDTO.class);
+        if (userDTO.getEvents().isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     //POST
     public ResponseEntity createUser(UserPostDTO newUser) throws HandleExceptionUnique {
         List<User> userList = repository.findAll();

@@ -54,7 +54,7 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "eventCategoryId")})
     private Set<EventCategory> eventCategories = new LinkedHashSet<>();
 
-    @JsonIgnore
+//    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private Set<Event> events = new LinkedHashSet<>();
 }

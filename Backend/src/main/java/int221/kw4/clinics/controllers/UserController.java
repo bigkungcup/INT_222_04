@@ -50,6 +50,11 @@ public class UserController {
         return service.getUserById(userId);
     }
 
+    @GetMapping("/checkEvent/{userId}")
+    public boolean checkUser(@PathVariable Integer userId) throws HandleExceptionNotFound {
+        return service.checkEventInUser(userId);
+    }
+
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity create(@Valid @RequestBody UserPostDTO newUser) throws HandleExceptionUnique {

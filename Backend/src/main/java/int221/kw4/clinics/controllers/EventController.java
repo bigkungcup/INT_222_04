@@ -7,14 +7,12 @@ import int221.kw4.clinics.advices.HandleExceptionBadRequest;
 import int221.kw4.clinics.advices.HandleExceptionForbidden;
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.advices.HandleExceptionOverlap;
-import int221.kw4.clinics.dtos.events.EventDTO;
-import int221.kw4.clinics.dtos.events.EventEditDTO;
-import int221.kw4.clinics.dtos.events.EventPageDTO;
-import int221.kw4.clinics.dtos.events.EventPostDTO;
+import int221.kw4.clinics.dtos.events.*;
 import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +28,7 @@ import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 
 
@@ -70,31 +69,6 @@ public class EventController {
         return service.getEventById(eventId);
     }
 
-//    @GetMapping("/eventByCategory/{eventCategoryId}")
-//    public EventPageDTO getAllEventByCategories(
-//            @PathVariable EventCategory eventCategoryId,
-//            @RequestParam(defaultValue = "0") int page,
-//            @RequestParam(defaultValue = "6") int pageSize
-//    ) throws HandleExceptionNotFound, HandleExceptionForbidden {
-//        return service.getEventByCategoryId(eventCategoryId, page, pageSize);
-//    }
-
-//    @GetMapping("/pastEvents")
-//    public EventPageDTO getAllEventByPast(
-//            @RequestParam(defaultValue = "0") int page,
-//            @RequestParam(defaultValue = "6") int pageSize
-//    ) throws HandleExceptionNotFound {
-//        return service.getPastEvent(Instant.now(), page, pageSize);
-//    }
-
-//    @GetMapping("/upComingEvents")
-//    public EventPageDTO getAllEventByUpComing(
-//            @RequestParam(defaultValue = "0") int page,
-//            @RequestParam(defaultValue = "6") int pageSize
-//    ) throws HandleExceptionNotFound {
-//        return service.getUpcomingEvent(Instant.now(), page, pageSize);
-//    }
-
     @GetMapping("/filter")
     public EventPageDTO getAllEventByCategories(@RequestParam @Nullable Integer eventCategoryId,
                                                 @RequestParam String time,
@@ -103,6 +77,27 @@ public class EventController {
     ) throws HandleExceptionNotFound, HandleExceptionForbidden {
         return service.getEventByEventCategoryAndTime(eventCategoryId, time, page, pageSize);
     }
+
+    @GetMapping("/filterBlind")
+    public EventPageBlindDTO getAllEventByCategoriesBlind(@RequestParam @Nullable Integer eventCategoryId,
+                                                          @RequestParam String time,
+                                                          @RequestParam(defaultValue = "0") int page,
+                                                          @RequestParam(defaultValue = "6") int pageSize
+    ) throws HandleExceptionNotFound, HandleExceptionForbidden {
+        return service.getEventBlind(eventCategoryId, time, page, pageSize);
+    }
+
+    @GetMapping("/eventTime")
+    public List<EventBlindDTO> getEventByTime(@RequestBody EventTimeDTO eventTime) throws HandleExceptionNotFound, HandleExceptionForbidden {
+        Instant startTime = eventTime.getEventStartTime();
+        Integer eventCategoryId = eventTime.getEventCategoryId();
+        return service.getEventByDate(startTime, eventCategoryId);
+    }
+
+//    @GetMapping("/eventTime")
+//    public List<EventBlindDTO> getEventByTime(@RequestBody @DateTimeFormat(pattern = "yyyy.MM.dd") Date date, @RequestBody Integer eventCategoryId ) throws HandleExceptionNotFound, HandleExceptionForbidden {
+//        return service.getEventByDate(date, eventCategoryId);
+//    }
 
     @PostMapping(value = "")
     @ResponseStatus(HttpStatus.CREATED)
