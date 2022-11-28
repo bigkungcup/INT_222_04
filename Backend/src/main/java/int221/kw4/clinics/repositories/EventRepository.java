@@ -1,5 +1,6 @@
 package int221.kw4.clinics.repositories;
 
+import int221.kw4.clinics.dtos.events.EventBlindDTO;
 import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.entities.EventCategory;
 import org.springframework.data.domain.Page;
@@ -52,7 +53,10 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
 
     Page<Event> findAll(Pageable pageable);
 
-    List<Event> findAllByEventStartTimeContainingAndEventCategory_Id(Instant date, Integer id);
+    List<Event> findAllByEventStartTimeContainingAndEventCategory_Id(String date, Integer id);
+
+    @Query(value = "SELECT * FROM event WHERE cast(eventStartTime as varchar) LIKE %:date% AND eventCategoryId = :id", nativeQuery = true)
+    List<Event> findAllByEventStartTimeContainingAndEventCategory_IdNative(@Param("date") String date, @Param("id") Integer id);
 
     @Query(value = "SELECT * FROM event WHERE cast(eventStartTime as date) = cast(:currentTime as date) AND eventCategoryId = :eventCategoryId", nativeQuery = true)
     List<Event> getEventByCurrentTime(@Param("currentTime") Instant currentTime, @Param("eventCategoryId") Integer eventCategoryId);

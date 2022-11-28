@@ -89,7 +89,7 @@ public class EventController {
 
     @GetMapping("/eventTime")
     public List<EventBlindDTO> getEventByTime(@RequestBody EventTimeDTO eventTime) throws HandleExceptionNotFound, HandleExceptionForbidden {
-        Instant startTime = eventTime.getEventStartTime();
+        String startTime = String.valueOf(eventTime.getEventStartTime());
         Integer eventCategoryId = eventTime.getEventCategoryId();
         return service.getEventByDate(startTime, eventCategoryId);
     }
