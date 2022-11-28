@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref,onBeforeMount } from "vue";
 import { useLogin } from "../stores/Login.js";
 import LoginSuccessfully from "../components/LoginSuccessfully.vue";
 
@@ -8,6 +8,10 @@ const login = useLogin();
 const togglePopup = () => {
     login.loginSuccessfully = !login.loginSuccessfully
 }
+
+onBeforeMount(async () => {
+    login.resetLoginAccount();
+});
 
 </script>
  
@@ -41,8 +45,15 @@ const togglePopup = () => {
                     class="bg-white border padding-input border-slate-300 rounded-lg h-16 w-5/6 text-3xl placeholder:italic placeholder:text-2xl"
                     v-model="login.loginAccount.password" placeholder="Enter Your Password"/>
             </form>
-            <div class="grid content-center font-bold text-Web-pink text-xl">
-                Forgot Password?
+            <div class="grid col-span-2" v-show="!login.loginValidate">
+                <div class="rounded-lg h-16 w-5/6 font-bold text-white text-xl bg-black/30 border-4 border-Web-pink">
+                   <p class="text-Web-pink text-center py-3">*Incorrect email or password</p> 
+                </div>
+            </div>
+            <div class="font-bold text-Web-pink text-xl">
+                <button class="hover:underline underline-offset-8" @click="login.msSignIn()">
+                Login with MS
+                </button>
             </div>
             <div class="grid content-center font-bold text-white text-xl text-center">
                 <button class="rounded-full bg-Web-pink py-2 w-2/5 hover:bg-white hover:text-Web-pink mx-24" @click="login.handleLogin()">

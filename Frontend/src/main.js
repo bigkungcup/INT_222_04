@@ -17,3 +17,4 @@ export function formatTime(date) {
   const options = { hour: "numeric", minute: "numeric" };
   return new Date(date).toLocaleString("th-TH", options);
 }
+

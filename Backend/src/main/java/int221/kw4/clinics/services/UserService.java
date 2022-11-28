@@ -1,12 +1,14 @@
 package int221.kw4.clinics.services;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import int221.kw4.clinics.advices.HandleExceptionBadRequest;
 import int221.kw4.clinics.advices.HandleExceptionForbidden;
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.advices.HandleExceptionUnique;
 import int221.kw4.clinics.dtos.users.*;
-import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.entities.EventCategory;
+import int221.kw4.clinics.entities.Role;
 import int221.kw4.clinics.entities.User;
 import int221.kw4.clinics.repositories.EventCategoryRepository;
 import int221.kw4.clinics.repositories.UserRepository;
@@ -25,8 +27,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Service
@@ -84,6 +88,15 @@ public class UserService implements UserDetailsService {
         return modelMapper.map(userByEmail, User.class);
     }
 
+    public boolean checkEventInUser(Integer userId) throws HandleExceptionNotFound {
+        UserDTO userDTO = modelMapper.map(repository.findById(userId).orElseThrow(() -> new HandleExceptionNotFound("User not found")), UserDTO.class);
+        if (userDTO.getEvents().isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     //POST
     public ResponseEntity createUser(UserPostDTO newUser) throws HandleExceptionUnique {
         List<User> userList = repository.findAll();
@@ -92,12 +105,12 @@ public class UserService implements UserDetailsService {
         newUser.setEmail(newUser.getEmail().trim());
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
 
-        for (int i = 0; i < userList.size(); i++) {
-            if (newUser.getName().equals(userList.get(i).getName()) && newUser.getEmail().equals(userList.get(i).getEmail())) {
+        for (User value : userList) {
+            if (newUser.getName().equals(value.getName()) && newUser.getEmail().equals(value.getEmail())) {
                 throw new HandleExceptionUnique("Name should be unique and email should be unique");
-            } else if (newUser.getName().equals(userList.get(i).getName())) {
+            } else if (newUser.getName().equals(value.getName())) {
                 throw new HandleExceptionUnique("Name should be Unique");
-            } else if (newUser.getEmail().equals(userList.get(i).getEmail())) {
+            } else if (newUser.getEmail().equals(value.getEmail())) {
                 throw new HandleExceptionUnique("Email should be Unique");
             }
         }
@@ -202,8 +215,38 @@ public class UserService implements UserDetailsService {
 //        emailService.sendSimpleMail(user.getEmail(), "Update User Successfully",
 //                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
 //                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
-
         return ResponseEntity.status(200).body(user);
+    }
+
+    public ResponseEntity loginWithMicrosoft(UserPostMSDTO user, HttpServletRequest request, HttpServletResponse response) {
+        List<User> userList = repository.findAll();
+        User userDetail = repository.findByEmail(user.getEmail());
+
+        if(userDetail != null){
+                if(!userDetail.getRole().toString().equals(user.getRole().toString())){
+                    userDetail.setRole(user.getRole());
+                    repository.saveAndFlush(userDetail);
+                }
+        }
+
+        for (int i = 0; i < userList.size(); i++) {
+            System.out.println(userList.get(i).getEmail());
+            if (userList.get(i).getEmail().equals(user.getEmail())) {
+                System.out.println("Login with Microsoft");
+                login(user, request, response);
+                return ResponseEntity.status(200).body(userDetail);
+            }
+        }
+
+        System.out.println("Register with Microsoft");
+        if(user.getRole().toString().equals("guest")){
+            user.setRole(Role.guest);
+        }
+        User detail = modelMapper.map(user, User.class);
+        repository.saveAndFlush(detail);
+        login(user, request, response);
+
+        return ResponseEntity.status(200).body(detail);
     }
 
     //AUTHENTICATION
@@ -219,6 +262,39 @@ public class UserService implements UserDetailsService {
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
+    }
+
+    public Cookie createCookie(String name, String value, Integer maxAge) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(maxAge);
+        cookie.setPath("/");
+        return cookie;
+    }
+
+    public void login(UserPostMSDTO user, HttpServletRequest request, HttpServletResponse response) {
+        String secret = "secret";
+        Algorithm algorithm = Algorithm.HMAC256(secret.getBytes(StandardCharsets.UTF_8));
+        List<Object> roles = new ArrayList<>();
+        roles.add(user.getRole().toString());
+
+        Integer jwtExpirationInMs = 30 * 60 * 1000;
+        String access_token = JWT.create()
+                .withSubject(user.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis() + jwtExpirationInMs))
+                .withIssuer(request.getRequestURI())
+                .withClaim("roles", roles)
+                .sign(algorithm);
+
+        Integer refreshExpirationDateInMs = 24 * 60 * 60 * 1000;
+        String refresh_token = JWT.create()
+                .withSubject(user.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis() + refreshExpirationDateInMs))
+                .withIssuer(request.getRequestURI().toString())
+                .sign(algorithm);
+
+        response.addCookie(createCookie("access_token", access_token, jwtExpirationInMs));
+        response.addCookie(createCookie("refresh_token", refresh_token, refreshExpirationDateInMs));
     }
 
 }

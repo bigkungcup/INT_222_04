@@ -11,7 +11,7 @@ import Users from "../view/Users.vue"
 import UserDetail from "../view/UserDetail.vue"
 import Login from "../view/Login.vue"
 import SignUp from "../view/SignUp.vue"
-// import Profile from "../view/Profile.vue"
+import Profile from "../view/Profile.vue"
 
 const history = createWebHashHistory('/kw4');
 const routes = [
@@ -75,11 +75,11 @@ const routes = [
     name: "Login",
     component: Login
   },
-  // {
-  //   path: "/profile",
-  //   name: "Profile",
-  //   component: Profile
-  // }
+  {
+    path: "/profile",
+    name: "Profile",
+    component: Profile
+  }
 ];
 
 const router = createRouter({ history, routes });

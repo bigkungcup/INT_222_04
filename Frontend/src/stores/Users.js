@@ -1,19 +1,25 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
 import { ref } from "vue";
+import { useLogin } from "./Login.js";
 
 export const useUsers = defineStore("Users", () => {
+  const login = useLogin()
   const deletePopup = ref(false);
   const editUserField = ref(false);
   const userList = ref([]);
   const userListAll = ref([]);
   const newUserClinic = ref('');
   const clinicList = ref([]);
-  const confirmPassword = ref();
-  const lecturerClinic = ref();
+  const confirmPassword = ref('');
+  const lecturerClinic = ref(1);
   const validEmail =
     /^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+  const signUpValidate = ref(true)
+  const editValidate = ref(true)
+  const userUnique = ref(true)
   const signUpSuccessfully = ref(false);
   const editUserSuccessfully = ref(false);
+  const checkEvent = ref(false)
 
   const newUser = ref({
     name: "",
@@ -45,7 +51,9 @@ export const useUsers = defineStore("Users", () => {
       password: "",
     };
     confirmPassword.value = "";
-    lecturerClinic.value = "";
+    lecturerClinic.value = 1;
+    signUpValidate.value = true;
+    userUnique.value = true;
   };
 
   const resetEditUser = () =>{
@@ -57,6 +65,9 @@ export const useUsers = defineStore("Users", () => {
     },
     newUserClinic.value = ""
     editUserField.value = false;
+    signUpValidate.value = true;
+    editValidate.value = true;
+    userUnique.value = true;
   };
 
   //Get User Page
@@ -71,6 +82,7 @@ export const useUsers = defineStore("Users", () => {
       userList.value = await res.json();
       console.log("get user lists successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(getUserList());
     } else if (res.status === 401 && login.logoutIcon == false) {
     }
     // else if (res.status === 403) {}
@@ -103,7 +115,7 @@ export const useUsers = defineStore("Users", () => {
       displayUser.value = await res.json();
       console.log("get successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
-      login.getRefresh(getUser());
+      login.getRefresh(getUserDetail(userId));
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else console.log("error, cannot get user");
   };
@@ -121,7 +133,7 @@ export const useUsers = defineStore("Users", () => {
           ? newUser.value.email
           : null,
         role: newUser.value.role,
-        password: newUser.value.password,
+        password: newUser.value.password == confirmPassword.value ? newUser.value.password : null,
       }),
     });
     if (res.status === 201) {
@@ -135,9 +147,13 @@ export const useUsers = defineStore("Users", () => {
       getUserAll();
       console.log("created successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
-      login.getRefresh(signUp(newUser));
-    } else if (res.status === 401) {
-    } else {
+      login.getRefresh(signUp());
+    } else if (res.status === 400) {
+      signUpValidate.value = false;
+    } else if (res.status === 500) {
+      userUnique.value = false;
+    } 
+    else {
       console.log("error, cannot create");
     }
   };
@@ -151,7 +167,8 @@ export const useUsers = defineStore("Users", () => {
         },
         body: JSON.stringify({
           name: editUser.value.name === "" ? displayUser.value.name : editUser.value.name,
-          email: editUser.value.email === "" ? displayUser.value.email : editUser.value.email,
+          email: editUser.value.email === "" ? displayUser.value.email : 
+                  editUser.value.email.match(validEmail) ? editUser.value.email : null,
           role: editUser.value.role === "" ? displayUser.value.role : editUser.value.role
         }),
       });
@@ -162,11 +179,14 @@ export const useUsers = defineStore("Users", () => {
           addLecturerClinic(userId,newUserClinic.value);
         }
         editUserSuccessfully.value = true;
-        // editUserField.value = false;
-        // resetEditUser();
         console.log("edit successfully");
       } else if (res.status === 401 && login.logoutIcon == true) {
+        login.getRefresh(saveUser(userId));
       } else if(res.status === 401 && login.logoutIcon == false){
+      } else if (res.status === 400) {
+        editValidate.value = false;
+      } else if (res.status === 500) {
+        userUnique.value = false;
       } else {
         console.log("error, cannot edit");
       }
@@ -188,6 +208,7 @@ export const useUsers = defineStore("Users", () => {
     if (res.status === 200) {
       console.log("created successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(addLecturerClinic(userId,lecturerClinicId));
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else {
       console.log("error, cannot create");
@@ -210,6 +231,7 @@ export const useUsers = defineStore("Users", () => {
       );
       console.log("Delete category success");
     } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(deleteLecturerClinic(userId, userClinicId));
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else console.log("Delete category not success");
   };
@@ -229,10 +251,35 @@ export const useUsers = defineStore("Users", () => {
       );
       console.log("deleteted succesfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
+      login.getRefresh(removeUser(userId));
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else console.log("error, cannot delete");
-    getUserList();
+    getUserList(userList.value.pageNumber);
+    if(userList.value.content.length == 0 && userList.value.pageNumber > 0){
+      userList.value.pageNumber = userList.value.pageNumber-1;
+      getUserList(userList.value.pageNumber);
+    }
   };
+
+      //Check event of user
+      const checkUserEvent = async (userId) => {
+        const res = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/users/checkEvent/${userId}`,
+          {
+            method: "GET",
+          }
+        );
+        if (res.status === 200) {
+          checkEvent.value = await res.json();
+          console.log(checkEvent.value);
+          console.log("check user event succesfully");
+        } else if (res.status === 401 && login.logoutIcon == true) {
+          login.getRefresh(checkUserEvent(userId));
+        } else if (res.status === 401 && login.logoutIcon == false) {
+        }
+        // else if (res.status === 403) {}
+        else console.log("error, cannot check user event");
+      };
 
   const checkBeforeEdit = () => {
     let check = false
@@ -246,6 +293,20 @@ export const useUsers = defineStore("Users", () => {
     return check
   }
 
+    //Page
+    const NextPage = () => {
+      if (userList.value.pageNumber < 0) {
+        userList.value.pageNumber = 0;
+      }
+      getUserList(userList.value.pageNumber + 1);
+    };
+    const BackPage = () => {
+      if (userList.value.pageNumber < 0) {
+        userList.value.pageNumber = 0;
+      }
+      getUserList(userList.value.pageNumber - 1);
+    };
+
   return {
     getUserList,
     getUserDetail,
@@ -256,19 +317,27 @@ export const useUsers = defineStore("Users", () => {
     removeUser,
     resetNewUser,
     resetEditUser,
+    checkUserEvent,
     checkBeforeEdit,
+    NextPage,
+    BackPage,
     userList,
     newUser,
     displayUser,
     editUser,
     newUserClinic,
     clinicList,
+    validEmail,
     confirmPassword,
     lecturerClinic,
+    signUpValidate,
+    editValidate,
+    userUnique,
     signUpSuccessfully,
     editUserSuccessfully,
     deletePopup,
-    editUserField
+    editUserField,
+    checkEvent
   };
 });
 

@@ -84,18 +84,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 .withIssuer(request.getRequestURI().toString())
                 .sign(algorithm);
 
-//        Cookie access_cookie = new Cookie("access_token", access_token);
-//        Cookie refresh_cookie = new Cookie("refresh_token", refresh_token);
-//
-//        access_cookie.setHttpOnly(true);
-//        refresh_cookie.setHttpOnly(true);
-//
-//        access_cookie.setPath("/");
-//        refresh_cookie.setPath("/");
-
-//        response.addCookie(access_cookie);
-//        response.addCookie(refresh_cookie);
-
         response.addCookie(createCookie("access_token", access_token, jwtExpirationInMs));
         response.addCookie(createCookie("refresh_token", refresh_token, refreshExpirationDateInMs));
 

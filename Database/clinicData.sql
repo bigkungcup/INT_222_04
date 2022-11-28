@@ -41,10 +41,10 @@ CREATE TABLE IF NOT EXISTS `clinic`.`user` (
   `userId` INT NOT NULL auto_increment,
   `name` VARCHAR(100) NOT NULL,
   `email` VARCHAR(50) NOT NULL,
-  `role` ENUM('student', 'lecturer', 'admin') NOT NULL,
+  `role` ENUM('student', 'lecturer', 'admin','guest') NOT NULL,
   `createdOn` DATETIME NOT NULL default current_timestamp,
   `updatedOn` DATETIME NOT NULL default current_timestamp on update current_timestamp,
-  `password` VARCHAR(90) NOT NULL,
+  `password` VARCHAR(90) NULL,
   PRIMARY KEY (`userId`),
   UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE,
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE)
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS `clinic`.`event` (
   CONSTRAINT `fk_event_user1`
     FOREIGN KEY (`userId`)
     REFERENCES `clinic`.`user` (`userId`)
-    ON DELETE NO ACTION
+    ON DELETE SET NULL
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS `clinic`.`event_category_owner` (
   CONSTRAINT `fk_user_has_eventCategory_user1`
     FOREIGN KEY (`userId`)
     REFERENCES `clinic`.`user` (`userId`)
-    ON DELETE NO ACTION
+    ON DELETE cascade
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_user_has_eventCategory_eventCategory1`
     FOREIGN KEY (`eventCategoryId`)

@@ -54,7 +54,7 @@ defineProps({
         </div> 
     </div>
     <div v-show="deletePopUp">
-      <DeleteConfirmation @toggle="deletePopUp = false" @delete="$emit('delete',eventId)"/>
+      <DeleteConfirmation @toggle="deletePopUp = false" @delete="$emit('delete',selectClinic,selectTime,eventId)" :data="'event'" :checkEvent="false"/>
     </div>
 </div>
 </template>

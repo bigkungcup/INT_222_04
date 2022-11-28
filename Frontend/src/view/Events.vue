@@ -2,16 +2,33 @@
 import { ref, onBeforeMount } from "vue";
 import { useClinics } from "../stores/Clinics.js";
 import { useEvents } from "../stores/Events.js";
+import { useUsers } from "../stores/Users.js";
+import { useLogin } from "../stores/Login.js";
 import EventList from "../components/EventList.vue";
 import EventEmptyListVue from "../components/EventEmptyList.vue";
 
 const clinic = useClinics();
 const event = useEvents();
+const user = useUsers();
+const login = useLogin();
 const eventId = ref();
+const clinicFilter = ref()
+const selectClinic = ref(0)
+const selectTime = ref('all')
+const selectEventList = ref('own')
+
+const checkRole = async () => {
+  await event.getFilterEventList();
+    if(localStorage.getItem('role') == 'lecturer'){
+      await user.getUserDetail(localStorage.getItem('id'));
+      clinicFilter.value = user.displayUser.eventCategories;
+    }else clinicFilter.value = clinic.clinicList;
+  }
 
 onBeforeMount(async () => {
+  event.eventList = {};
   await clinic.getClinics();
-  await event.getEventList();
+  await checkRole();
 });
 </script>
 
@@ -24,20 +41,29 @@ onBeforeMount(async () => {
         <span>Clinic:</span>
         <select
           class="rounded-lg h-12 w-80 font-bold text-white text-xl bg-black/30 border-4 border-Web-pink padding-select"
-        >
+         v-model="selectClinic" @change="event.getFilterEventList(selectClinic,selectTime)">
           <option default value="0">All</option>
-          <option v-for="list in clinic.clinicList" :value="list.id">
+          <option v-for="list in clinicFilter" :value="list.id">
             {{ list.eventCategoryName }}
           </option>
         </select>
         <span>Time:</span>
         <select
           class="rounded-lg h-12 w-60 font-bold text-white text-xl bg-black/30 border-4 border-Web-pink padding-select"
-        >
+        v-model="selectTime" @change="event.getFilterEventList(selectClinic,selectTime)">
           <option default value="all">All</option>
           <option value="past">Past Events</option>
           <option value="upComing">Up-coming Events</option>
         </select>
+        <span v-show="login.getRoleToken() == 'student'">
+        <span>Event:</span>
+        <select
+          class="rounded-lg h-12 w-60 font-bold text-white text-xl bg-black/30 border-4 border-Web-pink padding-select ml-4"
+          v-model="selectEventList" @change="">
+          <option default value="all">All</option>
+          <option value="own">Own</option>     
+        </select>
+      </span>
       </div>
     </div>
     <div class="grid row-span-7" v-show="event.eventList.numberOfElements != 0">
@@ -47,12 +73,12 @@ onBeforeMount(async () => {
         :eventId="eventId"
         @delete="event.removeEvent"
       />
-      <div class="grid grid-cols-3 py-6 place-items-center" v-show="event.eventList.numberOfElements != 0">
+      <div class="grid grid-cols-3 py-6 place-items-center" v-show="event.eventList.numberOfElements != 0 && event.eventList.numberOfElements != null">
         <div>
           <button
             class="text-xl text-white rounded-3xl w-28 h-12 mx-2 bg-Web-pink hover:bg-white hover:text-Web-pink"
             v-show="event.eventList.pageNumber > 0"
-            @click="event.BackPage()"
+            @click="event.BackPage(selectClinic,selectTime)"
           >
             Back
           </button>
@@ -64,7 +90,7 @@ onBeforeMount(async () => {
         <button
           class="text-xl text-white rounded-3xl w-28 h-12 mx-2 bg-Web-pink hover:bg-white hover:text-Web-pink"
           v-show="event.eventList.pageNumber + 1 < event.eventList.totalPages"
-          @click="event.NextPage()"
+          @click="event.NextPage(selectClinic,selectTime)"
         >
           Next
         </button>

@@ -4,10 +4,7 @@ import int221.kw4.clinics.advices.HandleExceptionForbidden;
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.advices.HandleExceptionUnique;
 import int221.kw4.clinics.dtos.securities.LoginDTO;
-import int221.kw4.clinics.dtos.users.UserDTO;
-import int221.kw4.clinics.dtos.users.UserEditDTO;
-import int221.kw4.clinics.dtos.users.UserPageDTO;
-import int221.kw4.clinics.dtos.users.UserPostDTO;
+import int221.kw4.clinics.dtos.users.*;
 import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.services.LoginService;
 import int221.kw4.clinics.services.UserService;
@@ -17,6 +14,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.ServletWebRequest;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
@@ -51,6 +50,11 @@ public class UserController {
         return service.getUserById(userId);
     }
 
+    @GetMapping("/checkEvent/{userId}")
+    public boolean checkUser(@PathVariable Integer userId) throws HandleExceptionNotFound {
+        return service.checkEventInUser(userId);
+    }
+
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity create(@Valid @RequestBody UserPostDTO newUser) throws HandleExceptionUnique {
@@ -67,6 +71,12 @@ public class UserController {
     @PostMapping("/match")
     public ResponseEntity login(@RequestBody LoginDTO login, ServletWebRequest request, HttpServletResponse httpStatus) {
         return loginService.MatchPassword(login, request, httpStatus);
+    }
+
+    @PostMapping("/loginWithMS")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity loginWithMicrosoft(@RequestBody UserPostMSDTO login, HttpServletRequest request, HttpServletResponse httpStatus) {
+       return service.loginWithMicrosoft(login, request, httpStatus);
     }
 
     @DeleteMapping("/{userId}")

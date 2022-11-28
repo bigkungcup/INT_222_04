@@ -35,6 +35,4 @@ public class EventPostDTO {
     private Integer eventCategoryId;
 
     private User user;
-
-    private MultipartFile file;
 }

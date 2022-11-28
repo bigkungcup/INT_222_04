@@ -1,5 +1,15 @@
 <script setup>
 defineEmits(["toggle","delete"]);
+defineProps({
+    data: {
+        type: String,
+        require: true
+    },
+    checkEvent: {
+        type: Boolean,
+        require: true
+    }
+  })
 
 </script>
  
@@ -10,8 +20,9 @@ defineEmits(["toggle","delete"]);
         <img src="../assets/images/Exclamation.png" class="animate-pulse" width="80" />
       </div>
       <div class="grid font-bold text-white text-4xl place-items-center">
+        <p v-show="checkEvent">This user has an event.</p>
         <p>Are you sure to delete</p>
-        <p>this record?</p>
+        <p>this {{ data }}?</p>
       </div>
       <div class="flex place-content-center py-2">
           <button

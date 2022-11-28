@@ -67,18 +67,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/token/refresh", "/api/token/remove").permitAll()
                 .antMatchers("/api/login").permitAll()
                 .antMatchers("/api/events/guest").permitAll()
-                .antMatchers("/Files/Uploads/**").permitAll();
+                .antMatchers("/Files/Uploads/**").permitAll()
+                .antMatchers("/api/users/loginWithMS").permitAll();
 
         http.authorizeRequests().antMatchers("/api/users/register/{userId}/eventCategory").hasAnyAuthority("lecturer", "admin")
                 .antMatchers("/api/users/{userId}/eventCategory/{eventCategoryId}").hasAnyAuthority("lecturer", "admin")
-                .antMatchers("/api/users/{userId}").hasAnyAuthority("admin", "lecturer", "student");
+                .antMatchers(GET,"/api/users/{userId}").hasAnyAuthority("admin", "lecturer", "student", "guest")
+                .antMatchers(GET, "api/user/checkEvent/{userId}").hasAnyAuthority("admin", "lecturer", "student", "guest")
+                .antMatchers(DELETE,"/api/users/{userId}").hasAnyAuthority("admin")
+                .antMatchers(PUT,"/api/users/{userId}").hasAnyAuthority("admin");
 
         http.authorizeRequests().antMatchers("/api/events/lecturer/{userId}").hasAnyAuthority("lecturer", "admin")
                 .antMatchers(GET, "/api/events/**").hasAnyAuthority("lecturer", "admin", "student");
 
         http.authorizeRequests().antMatchers("/api/users/**").hasAnyAuthority("admin");
 
-        http.authorizeRequests().antMatchers(POST, "/api/events/**").hasAnyAuthority("student", "admin")
+        http.authorizeRequests().antMatchers(POST, "/api/events/**").hasAnyAuthority("student", "admin", "guest")
                 .antMatchers(PUT, "/api/events/**").hasAnyAuthority("student", "admin")
                 .antMatchers(DELETE, "/api/events/**").hasAnyAuthority("student", "admin")
                 .antMatchers(GET, "/api/files/**").hasAnyAuthority("student", "admin");

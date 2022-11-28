@@ -43,7 +43,7 @@ public class User {
     @LastModifiedBy
     private Instant updatedOn;
 
-    @Column(name = "password", nullable = false, length = 90)
+    @Column(name = "password", nullable = true, length = 90)
     private String password;
 
     //    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -54,7 +54,7 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "eventCategoryId")})
     private Set<EventCategory> eventCategories = new LinkedHashSet<>();
 
-    @JsonIgnore
+//    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private Set<Event> events = new LinkedHashSet<>();
 }

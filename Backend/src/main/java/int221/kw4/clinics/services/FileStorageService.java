@@ -8,8 +8,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 
 import int221.kw4.clinics.advices.FileStorageException;
+import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.advices.MyFileNotFoundException;
 import int221.kw4.clinics.dtos.events.EventPostDTO;
 import int221.kw4.clinics.entities.Event;
@@ -27,11 +29,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileStorageService {
 
     private final Path fileStorageLocation;
-
-    private final EventRepository eventRepository;
+    @Autowired
+    private EventRepository eventRepository;
 
     @Autowired
-    public FileStorageService(FileStorageProperties fileStorageProperties, EventRepository eventRepository) {
+    public FileStorageService(FileStorageProperties fileStorageProperties) {
         this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
                 .toAbsolutePath().normalize();
 
@@ -40,41 +42,47 @@ public class FileStorageService {
         } catch (Exception ex) {
             throw new FileStorageException("Could not create the directory where the uploaded files will be stored.", ex);
         }
-        this.eventRepository = eventRepository;
     }
 
     public String storeFile(MultipartFile file, Event event) {
         String userDir = event.getUser() != null ? "User/" + "User_" + event.getUser().getId() : "Guest";
         String eventDir = "Event_" + event.getId().toString();
-        if(file == null){
+        if (file == null || file.isEmpty()) {
             try {
                 Path fileDir = this.fileStorageLocation.resolve(userDir).resolve(eventDir);
-                Path targetLocation = Files.createDirectories(fileDir);
+                Files.createDirectories(fileDir);
+                return null;
             }catch (Exception ex){
                 throw new FileStorageException("Could not create the directory where the uploaded files will be stored.", ex);
             }
         }
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        System.out.println("fileName: " + fileName);
-        System.out.println("userDir: " + userDir);
-        System.out.println("eventDir: " + eventDir);
 
-        try {
-            if(fileName.contains("..")) {
-                throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
+        if(file != null && !file.isEmpty()){
+            String fileName = StringUtils.cleanPath((file.getOriginalFilename()));
+            System.out.println("fileName: " + fileName);
+            System.out.println("userDir: " + userDir);
+            System.out.println("eventDir: " + eventDir);
+
+            try {
+                if (fileName.contains("..") || fileName.contains(" ")) {
+                    Path fileDir = this.fileStorageLocation.resolve(userDir).resolve(eventDir);
+                    Files.createDirectories(fileDir);
+                    throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
+                }
+                Path fileDir = this.fileStorageLocation.resolve(userDir).resolve(eventDir);
+                System.out.println("fileDir: " + fileDir);
+                Path targetLocation = Files.createDirectories(fileDir).resolve(fileName);
+                System.out.println("targetLocation: " + targetLocation);
+                Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+                return fileName;
+            } catch (IOException ex) {
+                throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
             }
-            Path fileDir = this.fileStorageLocation.resolve(userDir).resolve(eventDir);
-            System.out.println("fileDir: " + fileDir.toString());
-            Path targetLocation = Files.createDirectories(fileDir).resolve(fileName);
-            System.out.println("targetLocation: " + targetLocation.toString());
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-            return fileName;
-        } catch (IOException ex) {
-            throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
         }
+        return null;
     }
 
-    public Resource loadFileAsResource(String fileName, Event event) {
+    public Resource loadFileAsResource(String fileName, Event event) throws HandleExceptionNotFound {
         String userDir = event.getUser() != null ? "User/" + "User_" + event.getUser().getId() : "Guest";
         String eventDir = "Event_" + event.getId().toString();
         try {
@@ -85,14 +93,14 @@ public class FileStorageService {
             if(resource.exists()) {
                 return resource;
             } else {
-                throw new MyFileNotFoundException("File not found " + "eventNo" + fileName);
+                throw new HandleExceptionNotFound("File not found " + "eventNo" + fileName);
             }
         } catch (MalformedURLException ex) {
-            throw new MyFileNotFoundException("File not found " + "eventNo" + fileName, ex);
+            throw new FileStorageException("File not found " + "eventNo" + fileName, ex);
         }
     }
 
-    public Resource loadFileAsResource(String fileName, Integer id) {
+    public Resource loadFileAsResource(String fileName, Integer id) throws HandleExceptionNotFound {
         Event event = eventRepository.findById(id).orElseThrow(() -> new MyFileNotFoundException("Event not found with id " + id));
         String userDir = event.getUser() != null ? "User/" + "User_" + event.getUser().getId() : "Guest";
         String eventDir = "Event_" + event.getId().toString();
@@ -104,10 +112,10 @@ public class FileStorageService {
             if(resource.exists()) {
                 return resource;
             } else {
-                throw new MyFileNotFoundException("File not found " + "eventNo" + fileName);
+                throw new HandleExceptionNotFound("File not found " + "eventNo" + fileName);
             }
         } catch (MalformedURLException ex) {
-            throw new MyFileNotFoundException("File not found " + "eventNo" + fileName, ex);
+            throw new FileStorageException("File not found " + "eventNo" + fileName, ex);
         }
     }
 
@@ -116,7 +124,7 @@ public class FileStorageService {
             Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
             Files.delete(filePath);
         } catch (IOException ex) {
-            throw new MyFileNotFoundException("File not found " + fileName, ex);
+            throw new FileStorageException("File not found " + fileName, ex);
         }
     }
 
@@ -124,7 +132,7 @@ public class FileStorageService {
         try {
             FileUtils.deleteDirectory(new File(dir));
         } catch (IOException ex) {
-            throw new MyFileNotFoundException("Dir not found " + dir, ex);
+            throw new FileStorageException("Dir not found " + dir, ex);
         }
     }
 }

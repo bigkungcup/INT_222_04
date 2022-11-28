@@ -124,8 +124,6 @@ public class ApplicationExceptionHandler extends Exception {
     @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public HandleValidationError handleMaxSizeException(MaxUploadSizeExceededException exc, ServletWebRequest request) {
-//        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
-//                .body(new FileStorageException("Unable to upload. File is too large!"));
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("Error:", "Unable to upload. File is too large!");
         errors = new HandleValidationError(Instant.now(), HttpStatus.EXPECTATION_FAILED.value(),
@@ -134,12 +132,12 @@ public class ApplicationExceptionHandler extends Exception {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @ExceptionHandler(NullPointerException.class)
-    public HandleValidationError handleNullPointerException(NullPointerException exc, ServletWebRequest request) {
+    @ExceptionHandler(FileStorageException.class)
+    public HandleValidationError handleNullPointerException(FileStorageException exception, ServletWebRequest request) {
         Map<String, String> errorMap = new HashMap<>();
-        errorMap.put("Error:", "Field is empty");
+        errorMap.put("Error:", exception.getMessage());
         errors = new HandleValidationError(Instant.now(), HttpStatus.CREATED.value(),
-                "Created", "Validation", request.getRequest().getRequestURI(), errorMap);
+                "created", "Validation", request.getRequest().getRequestURI(), errorMap);
         return errors;
     }
 

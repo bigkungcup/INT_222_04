@@ -32,7 +32,7 @@ onBeforeUpdate(async () => {
             <div class="grid row-span-6 content-center">
 
             <div class="mb-2" v-show="!user.editUserField"><span class="bg-Web-pink p-2 text-white rounded-xl -ml-2">{{ user.displayUser.role }}</span></div>
-            <div class="flex space-x-3 text-white mb-6" v-show="user.editUserField">
+            <div class="flex space-x-3 text-white" v-show="user.editUserField">
             <div v-for="list in [{ role:'student' },{ role:'lecturer' },{ role:'admin' }]" class="grid">
               <button :class="['p-2 rounded-xl',list.role == user.editUser.role && list.role == user.displayUser.role ? 'bg-Web-pink'
                                                 :list.role == user.editUser.role && list.role != user.displayUser.role ? 'bg-Web-pink'
@@ -41,7 +41,7 @@ onBeforeUpdate(async () => {
           </div>
 
             <p class="mb-2" v-show="!user.editUserField">{{ user.displayUser.name }}</p>
-            <div class="flex mb-6" v-show="user.editUserField">
+            <div class="flex mt-6" v-show="user.editUserField">
             <p class="text-Web-violet font-bold mr-3">Name :</p>
             <input
               type="text"
@@ -50,9 +50,10 @@ onBeforeUpdate(async () => {
               placeholder="Enter Your Name"
             />
           </div>
+          <p class="text-Web-pink text-lg text-light pt-3 ml-24" v-show="user.editUser.name.length > 100 && !user.editValidate">*Name can't be longer than 100 characters.</p>
 
             <p class="font-light mb-2" v-show="!user.editUserField">{{ user.displayUser.email }}</p>
-            <div class="flex mb-6" v-show="user.editUserField">
+            <div class="flex mt-6" v-show="user.editUserField">
             <p class="text-Web-violet font-bold mr-3">Email :</p>
             <input
               type="text"
@@ -61,6 +62,9 @@ onBeforeUpdate(async () => {
               placeholder="Enter Your Email"
             />
           </div>
+          <p class="text-Web-pink text-lg text-light pt-3 ml-24" v-show="user.editUser.email.match(user.validEmail) && user.editUser.email.length > 50 && !user.editValidate">*Email can't be longer than 50 characters.</p>
+          <p class="text-Web-pink text-lg text-light pt-3 ml-24" v-show="!(user.editUser.email.match(user.validEmail)) && user.editUser.email != '' && !user.editValidate">*Please enter a valid email address.</p>
+          <p class="text-Web-pink text-lg text-light pt-3 ml-24" v-show="!user.userUnique">*Username or email already exists.</p>
 
             <div class="mb-2" v-show="user.displayUser.role == 'lecturer'">
               <div v-show="!user.editUserField">

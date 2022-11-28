@@ -2,10 +2,7 @@ package int221.kw4.clinics.services;
 
 import int221.kw4.clinics.advices.*;
 
-import int221.kw4.clinics.dtos.events.EventDTO;
-import int221.kw4.clinics.dtos.events.EventEditDTO;
-import int221.kw4.clinics.dtos.events.EventPageDTO;
-import int221.kw4.clinics.dtos.events.EventPostDTO;
+import int221.kw4.clinics.dtos.events.*;
 import int221.kw4.clinics.entities.Event;
 import int221.kw4.clinics.entities.EventCategory;
 import int221.kw4.clinics.entities.User;
@@ -15,6 +12,7 @@ import int221.kw4.clinics.repositories.EventRepository;
 import int221.kw4.clinics.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -107,14 +105,12 @@ public class EventService {
                             "Event ID: " + eventId + " does not exist !!!"));
             EventDTO eventDTO = modelMapper.map(eventListById, EventDTO.class);
             eventDTO.setFileName(getFile(path, eventListById).get("fileName"));
-            eventDTO.setFileUrl(getFile(path, eventListById).get("pathFile"));
             return eventDTO;
         } else if (user.getRole().toString().equals("student")) {
             if (user.getEmail().equals(event.getBookingEmail())) {
                 Event eventListById = repository.findByIdAndBookingEmail(eventId, user.getEmail());
                 EventDTO eventDTO = modelMapper.map(eventListById, EventDTO.class);
                 eventDTO.setFileName(getFile(path, eventListById).get("fileName"));
-                eventDTO.setFileUrl(getFile(path, eventListById).get("pathFile"));
                 return eventDTO;
             } else {
                 throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
@@ -127,13 +123,12 @@ public class EventService {
                                 "Event ID: " + eventId + " does not exist !!!"));
                 EventDTO eventDTO = modelMapper.map(eventListById, EventDTO.class);
                 eventDTO.setFileName(getFile(path, eventListById).get("fileName"));
-                eventDTO.setFileUrl(getFile(path, eventListById).get("pathFile"));
                 return eventDTO;
             } else {
                 throw new HandleExceptionForbidden("The event category is not the same as lecturer's category");
             }
         } else {
-            throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
+            throw new HandleExceptionForbidden("The event booking email is not the same as email");
         }
     }
 
@@ -153,93 +148,166 @@ public class EventService {
         }
 
     }
-
-    public EventPageDTO getEventByCategoryId(EventCategory eventCategoryId, Integer page, Integer pageSize) throws HandleExceptionNotFound, HandleExceptionForbidden {
+    public EventPageDTO getEventByEventCategoryAndTime(Integer eventCategoryId, String time, Integer page, Integer pageSize) throws HandleExceptionNotFound, HandleExceptionForbidden {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByEmail(auth.getPrincipal().toString());
-        System.out.println("User1: " + auth.getPrincipal());
-        System.out.println("User2: " + user);
 
-        if (user.getRole().toString().equals("admin")) {
-            return modelMapper.map(repository.findAllByEventCategory(eventCategoryId,
-                    PageRequest.of(page, pageSize)), EventPageDTO.class);
-        } else if (user.getRole().toString().equals("student")) {
-            return modelMapper.map(repository.findAllByEventCategoryAndBookingEmail(eventCategoryId, user.getEmail(),
-                    PageRequest.of(page, pageSize)), EventPageDTO.class);
-        } else if (user.getRole().toString().equals("lecturer")) {
-            List<Integer> categoryIds = user.getEventCategories().stream().map(EventCategory::getId).collect(Collectors.toList());
-            if (categoryIds.contains(eventCategoryId.getId())) {
-                return modelMapper.map(repository.findAllByEventCategory(eventCategoryId,
-                        PageRequest.of(page, pageSize)), EventPageDTO.class);
-            } else {
-                throw new HandleExceptionForbidden("The event category is not the same as lecturer's category");
-            }
-        } else {
-            throw new HandleExceptionNotFound("The event booking email is not the same as student's email");
+        switch (time) {
+            case "past":
+                if (user.getRole().toString().equals("admin")) {
+                    if (eventCategoryId != 0) {
+                        return modelMapper.map(repository.findAllByEventCategory_IdAndEventStartTimeBeforeOrderByEventStartTimeDesc(eventCategoryId, Instant.now(),
+                                PageRequest.of(page, pageSize)), EventPageDTO.class);
+                    } else {
+                        return modelMapper.map(repository.findAllByEventStartTimeBeforeOrderByEventStartTimeDesc(Instant.now(),
+                                PageRequest.of(page, pageSize)), EventPageDTO.class);
+                    }
+                } else if (user.getRole().toString().equals("student")) {
+                    if (eventCategoryId != 0) {
+                        return modelMapper.map(repository.findAllByBookingEmailAndEventCategory_IdAndEventStartTimeBeforeOrderByEventStartTimeDesc(user.getEmail(), eventCategoryId, Instant.now(),
+                                PageRequest.of(page, pageSize)), EventPageDTO.class);
+                    } else {
+                        return modelMapper.map(repository.findAllByBookingEmailAndEventStartTimeBeforeOrderByEventStartTimeDesc(user.getEmail(), Instant.now(),
+                                PageRequest.of(page, pageSize)), EventPageDTO.class);
+                    }
+                } else if (user.getRole().toString().equals("lecturer")) {
+                    List<Integer> categoryIds = user.getEventCategories().stream().map(EventCategory::getId).collect(Collectors.toList());
+                    if (eventCategoryId != 0) {
+                        if (categoryIds.contains(eventCategoryId)) {
+                            return modelMapper.map(repository.findAllByEventCategory_IdAndEventStartTimeBeforeOrderByEventStartTimeDesc(eventCategoryId, Instant.now(),
+                                    PageRequest.of(page, pageSize)), EventPageDTO.class);
+                        } else {
+                            throw new HandleExceptionForbidden("The event category is not the same as lecturer's category");
+                        }
+                    } else {
+                        return modelMapper.map(repository.findAllByEventCategory_IdInAndEventStartTimeBeforeOrderByEventStartTimeDesc(categoryIds, Instant.now(),
+                                PageRequest.of(page, pageSize)), EventPageDTO.class);
+                    }
+                }
+                break;
+            case "upComing":
+                if (user.getRole().toString().equals("admin")) {
+                    if (eventCategoryId != 0) {
+                        return modelMapper.map(repository.findAllByEventCategory_IdAndEventStartTimeAfterOrderByEventStartTimeAsc(eventCategoryId, Instant.now(),
+                                PageRequest.of(page, pageSize)), EventPageDTO.class);
+                    } else {
+                        return modelMapper.map(repository.findAllByEventStartTimeAfterOrderByEventStartTimeAsc(Instant.now(),
+                                PageRequest.of(page, pageSize)), EventPageDTO.class);
+                    }
+                } else if (user.getRole().toString().equals("student")) {
+                    if (eventCategoryId != 0) {
+                        return modelMapper.map(repository.findAllByBookingEmailAndEventCategory_IdAndEventStartTimeAfterOrderByEventStartTimeAsc(user.getEmail(), eventCategoryId, Instant.now(),
+                                PageRequest.of(page, pageSize)), EventPageDTO.class);
+
+                    } else {
+                        return modelMapper.map(repository.findAllByBookingEmailAndEventStartTimeAfterOrderByEventStartTimeAsc(user.getEmail(), Instant.now(),
+                                PageRequest.of(page, pageSize)), EventPageDTO.class);
+                    }
+                } else if (user.getRole().toString().equals("lecturer")) {
+                    List<Integer> categoryIds = user.getEventCategories().stream().map(EventCategory::getId).collect(Collectors.toList());
+                    if (eventCategoryId != 0) {
+                        if (categoryIds.contains(eventCategoryId)) {
+                            return modelMapper.map(repository.findAllByEventCategory_IdAndEventStartTimeAfterOrderByEventStartTimeAsc(eventCategoryId, Instant.now(),
+                                    PageRequest.of(page, pageSize)), EventPageDTO.class);
+                        } else {
+                            throw new HandleExceptionForbidden("The event category is not the same as lecturer's category");
+                        }
+                    } else {
+                        return modelMapper.map(repository.findAllByEventCategory_IdInAndEventStartTimeAfterOrderByEventStartTimeAsc(categoryIds, Instant.now(),
+                                PageRequest.of(page, pageSize)), EventPageDTO.class);
+                    }
+                }
+                break;
+            case "all":
+                if (user.getRole().toString().equals("admin")) {
+                    if (eventCategoryId != 0) {
+                        return modelMapper.map(repository.findAllByEventCategory_Id(eventCategoryId,
+                                PageRequest.of(page, pageSize)), EventPageDTO.class);
+                    } else {
+                        return modelMapper.map(repository.findAll(PageRequest.of(page, pageSize)), EventPageDTO.class);
+                    }
+                } else if (user.getRole().toString().equals("student")) {
+                    if (eventCategoryId != 0) {
+                        return modelMapper.map(repository.findAllByBookingEmailAndEventCategory_Id(user.getEmail(), eventCategoryId,
+                                PageRequest.of(page, pageSize)), EventPageDTO.class);
+                    } else {
+                        return modelMapper.map(repository.findAllByBookingEmail(user.getEmail(),
+                                PageRequest.of(page, pageSize)), EventPageDTO.class);
+                    }
+                } else if (user.getRole().toString().equals("lecturer")) {
+                    List<Integer> categoryIds = user.getEventCategories().stream().map(EventCategory::getId).collect(Collectors.toList());
+                    if (eventCategoryId != 0) {
+                        if (categoryIds.contains(eventCategoryId)) {
+                            return modelMapper.map(repository.findAllByEventCategory_Id(eventCategoryId,
+                                    PageRequest.of(page, pageSize)), EventPageDTO.class);
+                        } else {
+                            throw new HandleExceptionForbidden("The event category is not the same as lecturer's category");
+                        }
+                    } else {
+                        return modelMapper.map(repository.findAllByEventCategory_IdIn(categoryIds,
+                                PageRequest.of(page, pageSize)), EventPageDTO.class);
+                    }
+                }
+                break;
         }
+        return null;
     }
 
-//    public EventPageDTO getEventByCategory(List<Integer> categoryIds,Integer page, Integer pageSize) throws HandleExceptionNotFound, HandleExceptionForbidden {
-//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//        User user = userRepository.findByEmail(auth.getPrincipal().toString());
-//
-//
-//        if (user.getRole().toString().equals("admin")) {
-//            return modelMapper.map(repository.findByEventCategory_IdIn(categoryIds,
-//                    PageRequest.of(page, pageSize)), EventPageDTO.class);
-//        }
-//        return null;
-//    }
-
-    public EventPageDTO getPastEvent(Instant instant, Integer page, Integer pageSize) throws HandleExceptionNotFound {
+    public EventPageBlindDTO getEventBlind(Integer eventCategoryId, String time, Integer page, Integer pageSize) throws HandleExceptionNotFound, HandleExceptionForbidden {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByEmail(auth.getPrincipal().toString());
-        System.out.println("User1: " + auth.getPrincipal());
-        System.out.println("User2: " + user.getEmail());
 
-        if (user.getRole().toString().equals("admin")) {
-            return modelMapper.map(repository.findAllByEventStartTimeBeforeOrderByEventStartTimeDesc(instant,
-                    PageRequest.of(page, pageSize)), EventPageDTO.class);
-        } else if (user.getRole().toString().equals("student")) {
-            return modelMapper.map(repository.findAllByBookingEmailAndEventStartTimeBeforeOrderByEventStartTimeDesc(user.getEmail(), instant,
-                    PageRequest.of(page, pageSize)), EventPageDTO.class);
-        } else if (user.getRole().toString().equals("lecturer")) {
-            List<Integer> categoryIds = user.getEventCategories().stream().map(EventCategory::getId).collect(Collectors.toList());
-            return modelMapper.map(repository.findAllByEventCategory_IdInAndEventStartTimeBeforeOrderByEventStartTimeDesc(categoryIds, instant,
-                    PageRequest.of(page, pageSize)), EventPageDTO.class);
-        } else {
-            throw new HandleExceptionNotFound("The event booking email is not the same as student's email");
+        switch (time) {
+            case "past":
+               if (user.getRole().toString().equals("admin") || user.getRole().toString().equals("student") || user.getRole().toString().equals("lecturer") ||
+                       auth.getPrincipal().toString().equals("anonymousUser") || user.getRole().toString().equals("guest")) {
+                    if (eventCategoryId != 0) {
+                        return modelMapper.map(repository.findAllByEventCategory_IdAndEventStartTimeBeforeOrderByEventStartTimeDesc(eventCategoryId, Instant.now(),
+                                PageRequest.of(page, pageSize)), EventPageBlindDTO.class);
+                    } else {
+                        return modelMapper.map(repository.findAllByEventStartTimeBeforeOrderByEventStartTimeDesc(Instant.now(),
+                                PageRequest.of(page, pageSize)), EventPageBlindDTO.class);
+                    }
+                }
+                break;
+            case "upComing":
+               if (user.getRole().toString().equals("admin") || user.getRole().toString().equals("student") || user.getRole().toString().equals("lecturer") ||
+                       auth.getPrincipal().toString().equals("anonymousUser") || user.getRole().toString().equals("guest")) {
+                    if (eventCategoryId != 0) {
+                        return modelMapper.map(repository.findAllByEventCategory_IdAndEventStartTimeAfterOrderByEventStartTimeAsc(eventCategoryId, Instant.now(),
+                                PageRequest.of(page, pageSize)),EventPageBlindDTO.class);
+
+                    } else {
+                        return modelMapper.map(repository.findAllByEventStartTimeAfterOrderByEventStartTimeAsc(Instant.now(),
+                                PageRequest.of(page, pageSize)), EventPageBlindDTO.class);
+                    }
+                }
+                break;
+            case "all":
+               if (user.getRole().toString().equals("admin") || user.getRole().toString().equals("student") || user.getRole().toString().equals("lecturer") ||
+                       auth.getPrincipal().toString().equals("anonymousUser") || user.getRole().toString().equals("guest")) {
+                    if (eventCategoryId != 0) {
+                        return modelMapper.map(repository.findAllByEventCategory_Id(eventCategoryId,
+                                PageRequest.of(page, pageSize)), EventPageBlindDTO.class);
+                    } else {
+                        return modelMapper.map(repository.findAll(PageRequest.of(page, pageSize)), EventPageBlindDTO.class);
+                    }
+                }
+                break;
         }
+        return null;
     }
 
-    public EventPageDTO getUpcomingEvent(Instant instant, Integer page, Integer pageSize) throws HandleExceptionNotFound {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = userRepository.findByEmail(auth.getPrincipal().toString());
-        System.out.println("User1: " + auth.getPrincipal());
-        System.out.println("User2: " + user);
-
-        if (user.getRole().toString().equals("admin")) {
-            return modelMapper.map(repository.findAllByEventStartTimeAfterOrderByEventStartTimeAsc(instant,
-                            PageRequest.of(page, pageSize)),
-                    EventPageDTO.class);
-        } else if (user.getRole().toString().equals("student")) {
-            return modelMapper.map(repository.findAllByBookingEmailAndEventStartTimeAfterOrderByEventStartTimeAsc(user.getEmail(), instant,
-                            PageRequest.of(page, pageSize)),
-                    EventPageDTO.class);
-        } else if (user.getRole().toString().equals("lecturer")) {
-            List<Integer> categoryIds = user.getEventCategories().stream().map(EventCategory::getId).collect(Collectors.toList());
-            return modelMapper.map(repository.findAllByEventCategory_IdInAndEventStartTimeAfterOrderByEventStartTimeAsc(categoryIds, instant,
-                            PageRequest.of(page, pageSize)),
-                    EventPageDTO.class);
-        } else {
-            throw new HandleExceptionNotFound("The event booking email is not the same as student's email");
-        }
-    }
-
-    public List<EventDTO> getEventByCurrentTime(Instant instantTime, Integer eventCategoryId) {
+    public List<EventBlindDTO> getEventByCurrentTime(Instant instantTime, Integer eventCategoryId) {
         List<Event> eventList = repository.getEventByCurrentTime(instantTime, eventCategoryId);
-        return listMapper.mapList(eventList, EventDTO.class, modelMapper);
+        return listMapper.mapList(eventList, EventBlindDTO.class, modelMapper);
     }
+
+    public List<EventBlindDTO> getEventByDate(Instant date, Integer eventCategoryId) {
+        List<Event> eventList = repository.findAllByEventStartTimeContainingAndEventCategory_Id(date, eventCategoryId);
+        return listMapper.mapList(eventList, EventBlindDTO.class, modelMapper);
+    }
+
 
     //    Post
     public ResponseEntity addEvent(EventPostDTO newEvent, MultipartFile file, ServletWebRequest request) throws HandleExceptionOverlap, HandleExceptionBadRequest {
@@ -249,12 +317,10 @@ public class EventService {
 
         if (!auth.getPrincipal().toString().equals("anonymousUser")) {
             User user = userRepository.findByEmail(auth.getPrincipal().toString());
-
-            HandleValidationError error = validationAdd(newEvent, request);
+            HandleValidationError error = addOverlap(newEvent, request);
             if (error != null) {
                 return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
             }
-
             if (user.getRole().toString().equals("admin")) {
                 newEvent.setUser(user);
                 Event event = mapEvent(newEvent);
@@ -262,6 +328,7 @@ public class EventService {
                 fileStorageService.storeFile(file, event);
 //                sendEmail(event);
                 return ResponseEntity.status(201).body(event);
+
             } else if (user.getRole().toString().equals("student")) {
                 if (user.getEmail().equals(newEvent.getBookingEmail())) {
                     newEvent.setUser(user);
@@ -273,17 +340,29 @@ public class EventService {
                 } else {
                     throw new HandleExceptionBadRequest("The booking email must be the same as the student's email");
                 }
+            } else if (user.getRole().toString().equals("guest")) {
+                if (user.getEmail().equals(newEvent.getBookingEmail())) {
+                    newEvent.setUser(user);
+                    Event event = mapEvent(newEvent);
+                    repository.saveAndFlush(event);
+                    fileStorageService.storeFile(file, event);
+//                    sendEmail(event);
+                    return ResponseEntity.status(201).body(event);
+                } else {
+                    throw new HandleExceptionBadRequest("The booking email must be the same as the student's email");
+                }
             } else {
-                throw new HandleExceptionBadRequest("The booking email must be the same as the student's email");
+                throw new HandleExceptionBadRequest("The booking email must be the same as the email");
             }
         } else {
-            HandleValidationError error = validationAdd(newEvent, request);
+            HandleValidationError error = addOverlap(newEvent, request);
             if (error != null) {
                 return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
             }
             Event event = mapEvent(newEvent);
             System.out.println("Event: " + event);
             repository.saveAndFlush(event);
+            fileStorageService.storeFile(file, event);
 //            sendEmail(event);
             return ResponseEntity.status(201).body(event);
         }
@@ -323,12 +402,12 @@ public class EventService {
                 throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
             }
         } else {
-            throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
+            throw new HandleExceptionForbidden("The event booking email is not the same as email");
         }
     }
 
     //    Update
-    public ResponseEntity update(EventEditDTO updateEvent, Integer eventId, MultipartFile file, ServletWebRequest request) throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest, IOException {
+    public ResponseEntity update(EventEditDTO updateEvent, Integer eventId, MultipartFile file, ServletWebRequest request) throws HandleExceptionOverlap, HandleExceptionForbidden, HandleExceptionBadRequest, IOException, HandleExceptionNotFound {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByEmail(auth.getPrincipal().toString());
         Event eventById = repository.getById(eventId);
@@ -337,7 +416,7 @@ public class EventService {
         Path path = Paths.get(fileStorageProperties.getUploadDir() + "/" + userDir + "/" + "Event_" + eventById.getId());
 
         if (user.getRole().toString().equals("admin")) {
-            HandleValidationError error= validationUpdate(updateEvent, eventId, request);
+            HandleValidationError error = updateOverlap(updateEvent, eventId, request);
             if (error != null) {
                 return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
             }
@@ -350,16 +429,17 @@ public class EventService {
 //            sendEmail(event);
             return ResponseEntity.status(200).body(event);
         } else if (user.getRole().toString().equals("student")) {
-            HandleValidationError error= validationUpdate(updateEvent, eventId, request);
+            HandleValidationError error = updateOverlap(updateEvent, eventId, request);
             if (error != null) {
                 return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
             }
             if (user.getEmail().equals(eventById.getBookingEmail())) {
-                validationUpdate(updateEvent, eventId, request);
+                updateOverlap(updateEvent, eventId, request);
                 updateFile(file, path, eventById);
                 Event event = repository.findById(eventId).orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.BAD_REQUEST)
                 );
+                event.setEventCategory(updateEvent.getEventCategory());
                 modelMapper.map(updateEvent, event);
                 repository.saveAndFlush(event);
 //                sendEmail(event);
@@ -368,27 +448,35 @@ public class EventService {
                 throw new HandleExceptionForbidden("The booking email must be the same as the student's email");
             }
         } else {
-            throw new HandleExceptionForbidden("The event booking email is not the same as student's email");
+            throw new HandleExceptionForbidden("The event booking email is not the same as email");
         }
     }
 
-    public void updateFile(MultipartFile file, Path path, Event eventById) throws IOException {
+    public void updateFile(MultipartFile file, Path path, Event eventById) throws IOException, HandleExceptionNotFound {
         if (file != null) {
             if (Files.exists(path)) {
                 if (!Files.list(path).collect(Collectors.toList()).isEmpty()) {
+                    Path pathFile = Files.list(path).collect(Collectors.toList()).get(0);
+                    String fileName = fileStorageService.loadFileAsResource(pathFile.toString(), eventById).getFilename();
+                    if(Objects.equals(fileName, file.getOriginalFilename())) {
+                        fileStorageService.deleteFile(path + "/" + Files.list(path).collect(Collectors.toList()).get(0).getFileName());
+                        fileStorageService.storeFile(file, eventById);
+                    }
                     fileStorageService.deleteFile(path + "/" + Files.list(path).collect(Collectors.toList()).get(0).getFileName());
                     fileStorageService.storeFile(file, eventById);
-                } else {
+                } else if (Files.list(path).collect(Collectors.toList()).isEmpty()) {
                     fileStorageService.storeFile(file, eventById);
-                }
-            }
-        } else {
-            if (Files.exists(path)) {
-                if (!Files.list(path).collect(Collectors.toList()).isEmpty()) {
-                    fileStorageService.deleteFile(path + "/" + getFile(path, eventById).get("fileName"));
                 }
             }
         }
+//        else {
+//            if (Files.exists(path)) {
+//                if (!Files.list(path).collect(Collectors.toList()).isEmpty()) {
+//                    System.out.println("File: " + path + "/" + Files.list(path).collect(Collectors.toList()).get(0).getFileName());
+//                    fileStorageService.deleteFile(path + "/" + Files.list(path).collect(Collectors.toList()).get(0).getFileName());
+//                }
+//            }
+//        }
     }
 
     public Date findEndDate(Date date, Integer duration) {
@@ -428,7 +516,7 @@ public class EventService {
                         "Event Note: " + event.getEventNotes(), new Date());
     }
 
-    public Map<String, String> getFile(Path filePath, Event event) throws IOException {
+    public Map<String, String> getFile(Path filePath, Event event) throws IOException, HandleExceptionNotFound {
         Map<String, String> fileMap = new HashMap<>();
         if (Files.list(filePath).collect(Collectors.toList()).isEmpty()) {
             fileMap.put("fileName", "");
@@ -438,25 +526,21 @@ public class EventService {
         Path pathFile = Files.list(filePath).collect(Collectors.toList()).get(0);
         System.out.println("PathFile: " + pathFile);
         String fileName = fileStorageService.loadFileAsResource(pathFile.toString(), event).getFilename();
-        URL resource = fileStorageService.loadFileAsResource(fileName, event).getURL();
-        System.out.println("Resource: " + resource);
-        System.out.println("FileName: " + fileName);
+        Resource resource = fileStorageService.loadFileAsResource(fileName, event);
         fileMap.put("fileName", fileName);
-        fileMap.put("pathFile", resource.toString());
+//        fileMap.put("pathFile", resource.getURI().toString());
         return fileMap;
     }
 
-    public HandleValidationError validationAdd(EventPostDTO newEvent, ServletWebRequest request) {
+    public HandleValidationError addOverlap(EventPostDTO newEvent, ServletWebRequest request) {
         Map<String, String> errorMap = new HashMap<>();
         Date newEventStartTime = Date.from(newEvent.getEventStartTime());
         Date newEventEndTime = findEndDate(Date.from(newEvent.getEventStartTime()), newEvent.getEventDuration());
-        List<EventDTO> eventList = getEventByCurrentTime(newEvent.getEventStartTime(), newEvent.getEventCategoryId());
-        Pattern pattern = Pattern.compile("[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+[.]+[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$");
-        Matcher matcher = pattern.matcher(newEvent.getBookingEmail());
+        List<EventBlindDTO> eventList = getEventByCurrentTime(newEvent.getEventStartTime(), newEvent.getEventCategoryId());
 
-        for (int i = 0; i < eventList.size(); i++) {
-            Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
-            Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()), eventList.get(i).getEventDuration());
+        for (EventBlindDTO eventBlindDTO : eventList) {
+            Date eventStartTime = Date.from(eventBlindDTO.getEventStartTime());
+            Date eventEndTime = findEndDate(Date.from(eventBlindDTO.getEventStartTime()), eventBlindDTO.getEventCategory().getEventDuration());
             if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
                     newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
                     newEventEndTime.equals(eventStartTime)) {
@@ -464,32 +548,22 @@ public class EventService {
             }
         }
 
-        if (newEvent.getBookingName() == null || newEvent.getBookingName().isEmpty()) errorMap.put("bookingName", "Name shouldn't be null");
-        if (newEvent.getBookingName().length() >= 100) errorMap.put("bookingName", "Booking name must be less than 100 characters");
-        if (newEvent.getBookingEmail() == null || newEvent.getBookingEmail().isEmpty()) errorMap.put("bookingEmail", "Email shouldn't be null");
-        if (newEvent.getBookingEmail().length() >= 45) errorMap.put("bookingEmail", "Booking email must be less than 100 characters");
-        if (!matcher.matches()) errorMap.put("bookingEmail", "Booking email is invalid syntax");
-        if (newEvent.getEventStartTime() == null || newEvent.getEventStartTime().toString().isEmpty()) errorMap.put("eventStartTime", "startTime shouldn't be null");
-        if (newEvent.getEventStartTime().isBefore(Instant.now())) errorMap.put("eventStartTime", "Event start time shouldn't be past");
-        if (newEvent.getEventCategoryId() == null) errorMap.put("eventCategoryId", "Category shouldn't be null");
-        if (newEvent.getEventNotes().length() >= 500) errorMap.put("eventNotes", "Event notes must be less than 500 characters");
         if (errorMap.size() <= 0) return null;
-
-        HandleValidationError errors = new HandleValidationError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
-                "Bad Requestss", "Validation", request.getRequest().getRequestURI(), errorMap);
-        return errors;
+        return new HandleValidationError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
+                "Bad Requests", "Validation", request.getRequest().getRequestURI(), errorMap);
     }
 
-    public HandleValidationError validationUpdate(EventEditDTO updateEvent, Integer eventId, ServletWebRequest request) {
+    public HandleValidationError updateOverlap(EventEditDTO updateEvent, Integer eventId, ServletWebRequest request) {
         Map<String, String> errorMap = new HashMap<>();
         Date newEventStartTime = Date.from(updateEvent.getEventStartTime());
         Date newEventEndTime = findEndDate(Date.from(updateEvent.getEventStartTime()), updateEvent.getEventDuration());
-        List<EventDTO> eventList = getAllEvent();
+//        List<EventDTO> eventList = getAllEvent();
+        List<EventBlindDTO> eventList = getEventByCurrentTime(updateEvent.getEventStartTime(), updateEvent.getEventCategory().getId());
 
-        for (EventDTO eventDTO : eventList) {
-            if (updateEvent.getEventCategory().getId() == eventDTO.getEventCategory().getId() && eventDTO.getId() != eventId) {
+        for (EventBlindDTO eventDTO : eventList) {
+            if (updateEvent.getEventCategory().getId().equals(eventDTO.getEventCategory().getId()) && !eventDTO.getEventCategory().getId().equals(eventId)) {
                 Date eventStartTime = Date.from(eventDTO.getEventStartTime());
-                Date eventEndTime = findEndDate(Date.from(eventDTO.getEventStartTime()), eventDTO.getEventDuration());
+                Date eventEndTime = findEndDate(Date.from(eventDTO.getEventStartTime()), eventDTO.getEventCategory().getEventDuration());
                 if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
                         newEventStartTime.equals(eventStartTime) || newEventStartTime.equals(eventEndTime) ||
                         newEventEndTime.equals(eventStartTime)) {
@@ -497,15 +571,10 @@ public class EventService {
                 }
             }
         }
-
-        if (updateEvent.getEventStartTime() == null || updateEvent.getEventStartTime().toString().isEmpty()) errorMap.put("eventStartTime", "startTime shouldn't be null");
-        if (updateEvent.getEventStartTime().isBefore(Instant.now())) errorMap.put("eventStartTime", "Event start time shouldn't be past");
-        if (updateEvent.getEventNotes().length() >= 500) errorMap.put("eventNotes", "Event notes must be less than 500 characters");
         if (errorMap.size() <= 0) return null;
 
-        HandleValidationError errors = new HandleValidationError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
-                "Bad Requestss", "Validation", request.getRequest().getRequestURI(), errorMap);
-        return errors;
+        return new HandleValidationError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
+                "Bad Requests", "Validation", request.getRequest().getRequestURI(), errorMap);
     }
 
 }
