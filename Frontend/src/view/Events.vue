@@ -15,6 +15,7 @@ const eventId = ref();
 const clinicFilter = ref()
 const selectClinic = ref(0)
 const selectTime = ref('all')
+const selectEventList = ref('own')
 
 const checkRole = async () => {
   await event.getFilterEventList();
@@ -54,6 +55,15 @@ onBeforeMount(async () => {
           <option value="past">Past Events</option>
           <option value="upComing">Up-coming Events</option>
         </select>
+        <span v-show="login.getRoleToken() == 'student'">
+        <span>Event:</span>
+        <select
+          class="rounded-lg h-12 w-60 font-bold text-white text-xl bg-black/30 border-4 border-Web-pink padding-select ml-4"
+          v-model="selectEventList" @change="">
+          <option default value="all">All</option>
+          <option value="own">Own</option>     
+        </select>
+      </span>
       </div>
     </div>
     <div class="grid row-span-7" v-show="event.eventList.numberOfElements != 0">

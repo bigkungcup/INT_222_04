@@ -21,7 +21,9 @@ onBeforeMount(async () => {
         :userList="user.userList"
         :deletePopUp="user.deletePopup"
         :userId="userId"
+        :checkEvent="user.checkEvent"
         @delete="user.removeUser"
+        @check="user.checkUserEvent"
       />
 
       <div class="grid grid-cols-3 py-6 place-items-center">

@@ -19,6 +19,7 @@ export const useUsers = defineStore("Users", () => {
   const userUnique = ref(true)
   const signUpSuccessfully = ref(false);
   const editUserSuccessfully = ref(false);
+  const checkEvent = ref(false)
 
   const newUser = ref({
     name: "",
@@ -260,6 +261,26 @@ export const useUsers = defineStore("Users", () => {
     }
   };
 
+      //Check event of user
+      const checkUserEvent = async (userId) => {
+        const res = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/users/checkEvent/${userId}`,
+          {
+            method: "GET",
+          }
+        );
+        if (res.status === 200) {
+          checkEvent.value = await res.json();
+          console.log(checkEvent.value);
+          console.log("check user event succesfully");
+        } else if (res.status === 401 && login.logoutIcon == true) {
+          login.getRefresh(checkUserEvent(userId));
+        } else if (res.status === 401 && login.logoutIcon == false) {
+        }
+        // else if (res.status === 403) {}
+        else console.log("error, cannot check user event");
+      };
+
   const checkBeforeEdit = () => {
     let check = false
     if((editUser.value.name == displayUser.value.name || editUser.value.name == "") && (editUser.value.email == displayUser.value.email || editUser.value.email == "") && (editUser.value.role == displayUser.value.role || editUser.value.role == "")){
@@ -296,6 +317,7 @@ export const useUsers = defineStore("Users", () => {
     removeUser,
     resetNewUser,
     resetEditUser,
+    checkUserEvent,
     checkBeforeEdit,
     NextPage,
     BackPage,
@@ -315,6 +337,7 @@ export const useUsers = defineStore("Users", () => {
     editUserSuccessfully,
     deletePopup,
     editUserField,
+    checkEvent
   };
 });
 
