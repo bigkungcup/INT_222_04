@@ -55,7 +55,7 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
 
     List<Event> findAllByEventStartTimeContainingAndEventCategory_Id(String date, Integer id);
 
-    @Query(value = "SELECT * FROM event WHERE cast(eventStartTime as varchar) LIKE %:date% AND eventCategoryId = :id", nativeQuery = true)
+    @Query(value = "SELECT * FROM event WHERE eventStartTime LIKE %:date% AND eventCategoryId = :id", nativeQuery = true)
     List<Event> findAllByEventStartTimeContainingAndEventCategory_IdNative(@Param("date") String date, @Param("id") Integer id);
 
     @Query(value = "SELECT * FROM event WHERE cast(eventStartTime as date) = cast(:currentTime as date) AND eventCategoryId = :eventCategoryId", nativeQuery = true)
