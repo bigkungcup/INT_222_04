@@ -13,6 +13,10 @@ const toggleNoAuthorizationPopup = () => {
   login.noAuthorization = !login.noAuthorization
 }
 
+const toggleNoAuthenticationPopup = () => {
+  login.noAuthentication = !login.noAuthentication
+}
+
 
 </script>
 
@@ -25,7 +29,7 @@ const toggleNoAuthorizationPopup = () => {
     </div> 
 
     <div v-show="login.noAuthorization">
-        <NoAuthorization @toggle="togglenoAuthorizationPopup()"/>
+        <NoAuthorization @toggle="toggleNoAuthorizationPopup()"/>
     </div>
 
   </div>

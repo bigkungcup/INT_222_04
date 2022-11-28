@@ -20,11 +20,7 @@ onBeforeMount(async () => {
   event.resetEditField();
   event.resetEditTime();
   event.editFile = false;
-  event.createFileUrl(params.id,event.displayEvent.fileName)
   setEditFileName()
-  // if(window.location.host == 'localhost:3000'){
-  // fileUrl.value = window.location.protocol + "//" + window.location.host +"/api/files/" + params.id  + "/" + event.displayEvent.fileName
-  // } else { fileUrl.value = 'https://10.4.56.93/api/files/' + params.id  + "/" + event.displayEvent.fileName }
 });
 </script>
 
@@ -148,11 +144,11 @@ onBeforeMount(async () => {
 
   <div class="grid grid-cols-2 h-26 mt-6 text-white text-2xl bg-white rounded-2xl">
         <p class="flex text-Web-violet font-bold my-8 mx-14">File :
-        <a :href="event.fileUrl" v-show="!event.editFile && event.displayEvent.fileName != ''" download>
+        <button v-show="!event.editFile && event.displayEvent.fileName != ''" @click="event.getDownloadFile(params.id,event.displayEvent.fileName)">
           <div class="border-2 border-Web-violet rounded-lg ml-6 text-Web-violet hover:bg-Web-violet hover:text-white text-center text-lg py-1 px-2 -mt-1">
             {{ event.displayEvent.fileName }}
           </div>
-        </a>
+        </button>
         <p class="ml-2" v-show="event.displayEvent.fileName == '' && !event.editFile">No File</p>
         <label for="file" v-show="event.editFile">
                 <div v-show="!event.showFileName" class="border-2 border-Web-violet rounded-lg ml-6 text-Web-violet hover:bg-Web-violet hover:text-white text-center text-lg py-1 px-2">

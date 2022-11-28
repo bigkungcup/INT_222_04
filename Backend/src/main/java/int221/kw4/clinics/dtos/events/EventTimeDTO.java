@@ -12,7 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 @ToString
 public class EventTimeDTO {
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Instant eventStartTime;
+//    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private String eventStartTime;
     private Integer eventCategoryId;
 }

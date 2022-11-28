@@ -130,6 +130,22 @@ export const useEvents = defineStore("Events", () => {
     } else console.log("error, cannot get event");
   };
 
+    //Download File
+    const getDownloadFile = async (eventId,fileName) => {
+      const res = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/files/${eventId}/${fileName}`,
+        {
+          method: "GET",
+        }
+      );
+      if (res.status === 200) {
+        window.open(res.url,'_blank')
+        console.log("Download file successfully");
+      } else if (res.status === 401 && login.logoutIcon == true) {
+        login.getRefresh(getDownloadFile(eventId,fileName));
+      } else if (res.status === 401 && login.logoutIcon == false) {
+      } else console.log("error, cannot get all event list");
+    };
 
   //Create Event
   const createEvent = async () => {
@@ -288,7 +304,7 @@ export const useEvents = defineStore("Events", () => {
     const event = {
       // bookingName: displayEvent.value.bookingName,
       // bookingEmail: displayEvent.value.bookingEmail,
-      eventCategory: editEvent.value.eventCategory,
+      eventCategory: editEvent.value.eventCategory === {} ? displayEvent.value.eventCategory : editEvent.value.eventCategory,
       eventStartTime:
         editEvent.value.eventStartTime === ""
           ? displayEvent.value.eventStartTime
@@ -305,9 +321,11 @@ export const useEvents = defineStore("Events", () => {
       eventDuration: displayEvent.value.eventDuration,
     }
 
+    console.log(editEventFile.value);
     const formData = new FormData();
     formData.append('event',new Blob([JSON.stringify(event)],{ type: 'application/json' }))
     formData.append('file',editEventFile.value == null ? undefined : editEventFile.value)
+    console.log(editEventFile.value);
     console.log(formData);
 
     const res = await fetch(
@@ -323,7 +341,6 @@ export const useEvents = defineStore("Events", () => {
       //   showEditPopUp();
       // }
       await getEventDetail(id);
-      createFileUrl(id,displayEvent.value.fileName)
       editFile.value = false;
       resetEditField();
       resetEditTime();
@@ -415,19 +432,13 @@ export const useEvents = defineStore("Events", () => {
         showErrorFileText.value = false;
         showFileName.value = true;
         editFileName.value = '';
+        deleteFileCheck.value = false;
       } else {
         showErrorFileText.value = true;
         if(editEventFile.value == null){
           showFileName.value = false;
         } else {showFileName.value = true;} 
       }
-    }
-
-    //Create File Url
-    const createFileUrl = (id,fileName) => {
-      if(window.location.host == 'localhost:3000'){
-        fileUrl.value = window.location.protocol + "//" + window.location.host +"/api/files/" + id  + "/" + fileName
-      } else { fileUrl.value = 'https://10.4.56.93/api/files/' + id  + "/" + fileName }
     }
 
   const setMinTime = (eventStartTime) => {
@@ -479,11 +490,12 @@ export const useEvents = defineStore("Events", () => {
     getEventList,
     getFilterEventList,
     getEventDetail,
+    getDownloadFile,
     createEvent,
     createEventWithGuest,
     chooseFile,
     chooseEditFile,
-    createFileUrl,
+    // createFileUrl,
     resetNewEvent,
     resetNewEventFile,
     resetEditField,

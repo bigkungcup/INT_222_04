@@ -64,6 +64,11 @@ public class EventController {
         return service.getAllEvent();
     }
 
+    @GetMapping("/blindEvent")
+    public List<EventBlindDTO> getAllBlindEvent() {
+        return service.getAllEventBlind();
+    }
+
     @GetMapping("/{eventId}")
     public EventDTO getEventById(@PathVariable Integer eventId) throws HandleExceptionNotFound, HandleExceptionForbidden, IOException {
         return service.getEventById(eventId);
@@ -89,15 +94,10 @@ public class EventController {
 
     @GetMapping("/eventTime")
     public List<EventBlindDTO> getEventByTime(@RequestBody EventTimeDTO eventTime) throws HandleExceptionNotFound, HandleExceptionForbidden {
-        Instant startTime = eventTime.getEventStartTime();
+        String startTime = eventTime.getEventStartTime();
         Integer eventCategoryId = eventTime.getEventCategoryId();
         return service.getEventByDate(startTime, eventCategoryId);
     }
-
-//    @GetMapping("/eventTime")
-//    public List<EventBlindDTO> getEventByTime(@RequestBody @DateTimeFormat(pattern = "yyyy.MM.dd") Date date, @RequestBody Integer eventCategoryId ) throws HandleExceptionNotFound, HandleExceptionForbidden {
-//        return service.getEventByDate(date, eventCategoryId);
-//    }
 
     @PostMapping(value = "")
     @ResponseStatus(HttpStatus.CREATED)

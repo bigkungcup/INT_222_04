@@ -87,6 +87,11 @@ public class EventService {
         return listMapper.mapList(eventList, EventDTO.class, modelMapper);
     }
 
+    public List<EventBlindDTO> getAllEventBlind() {
+        List<Event> eventList = repository.findAll();
+        return listMapper.mapList(eventList, EventBlindDTO.class, modelMapper);
+    }
+
     public EventDTO getEventById(Integer eventId) throws HandleExceptionNotFound, HandleExceptionForbidden, IOException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByEmail(auth.getPrincipal().toString());
@@ -303,8 +308,8 @@ public class EventService {
         return listMapper.mapList(eventList, EventBlindDTO.class, modelMapper);
     }
 
-    public List<EventBlindDTO> getEventByDate(Instant date, Integer eventCategoryId) {
-        List<Event> eventList = repository.findAllByEventStartTimeContainingAndEventCategory_Id(date, eventCategoryId);
+    public List<EventBlindDTO> getEventByDate(String date, Integer eventCategoryId) {
+        List<Event> eventList = repository.findAllByEventStartTimeContainingAndEventCategory_IdNative(date, eventCategoryId);
         return listMapper.mapList(eventList, EventBlindDTO.class, modelMapper);
     }
 
@@ -557,11 +562,11 @@ public class EventService {
         Map<String, String> errorMap = new HashMap<>();
         Date newEventStartTime = Date.from(updateEvent.getEventStartTime());
         Date newEventEndTime = findEndDate(Date.from(updateEvent.getEventStartTime()), updateEvent.getEventDuration());
-//        List<EventDTO> eventList = getAllEvent();
-        List<EventBlindDTO> eventList = getEventByCurrentTime(updateEvent.getEventStartTime(), updateEvent.getEventCategory().getId());
+        List<EventBlindDTO> eventList = getAllEventBlind();
+//        List<EventBlindDTO> eventList = getEventByCurrentTime(updateEvent.getEventStartTime(), updateEvent.getEventCategory().getId());
 
         for (EventBlindDTO eventDTO : eventList) {
-            if (updateEvent.getEventCategory().getId().equals(eventDTO.getEventCategory().getId()) && !eventDTO.getEventCategory().getId().equals(eventId)) {
+            if (updateEvent.getEventCategory().getId().equals(eventDTO.getEventCategory().getId()) && !eventDTO.getId().equals(eventId)) {
                 Date eventStartTime = Date.from(eventDTO.getEventStartTime());
                 Date eventEndTime = findEndDate(Date.from(eventDTO.getEventStartTime()), eventDTO.getEventCategory().getEventDuration());
                 if (newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventStartTime) ||
