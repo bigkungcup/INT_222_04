@@ -7,9 +7,9 @@ import { myMSALObj,loginRequest } from "../services/authConfig.js";
 export const useLogin = defineStore("Login", () => {
   const loginSuccessfully = ref(false);
   const token = ref();
-  const logoutIcon = ref(localStorage.getItem("id") != null ? true : false);
+  const logoutIcon = ref(localStorage.getItem("name") != null ? true : false);
   const userName = ref(localStorage.getItem("name"));
-  const msLogoutIcon = ref(false)
+  const msLogoutIcon = ref(localStorage.getItem("msal.idtoken") != null ? true : false)
   const userPageIcon = ref(
     localStorage.getItem("role") == "admin" ? true : false
   );
@@ -49,8 +49,9 @@ export const useLogin = defineStore("Login", () => {
     return localStorage.getItem("id");
   };
 
+
   const setToken = (token) => {
-    localStorage.setItem("id", token.id);
+    // localStorage.setItem("id", token.id);
     localStorage.setItem("name", token.name);
     localStorage.setItem("email", token.email);
     localStorage.setItem("role", token.role);
@@ -60,7 +61,7 @@ export const useLogin = defineStore("Login", () => {
     localStorage.removeItem("role");
     localStorage.removeItem("email");
     localStorage.removeItem("name");
-    localStorage.removeItem("id");
+    // localStorage.removeItem("id");
   };
 
   const delete_cookie = (name) => {
@@ -104,7 +105,9 @@ export const useLogin = defineStore("Login", () => {
     if (res.status === 200) {
       token.value = await res.json();
       resetToken();
+      localStorage.removeItem("id");
       setToken(token.value);
+      localStorage.setItem("id", token.value.id);
       if (localStorage.getItem("role") == "admin") {
         userPageIcon.value = true;
       }
@@ -127,6 +130,7 @@ export const useLogin = defineStore("Login", () => {
       delete_cookie("refresh_token");
       delete_cookie("access_token");
       resetToken();
+      localStorage.removeItem("id");
       logoutPopup.value = false;
       logoutIcon.value = false;
       userPageIcon.value = false;
@@ -139,18 +143,21 @@ export const useLogin = defineStore("Login", () => {
     let response = await myMSALObj.loginPopup(loginRequest);
     console.log(response);
     resetToken();
-    localStorage.setItem("name", response.account.name);
-    localStorage.setItem("email", response.account.userName);
-    localStorage.setItem("role", response.account.idTokenClaims.roles == undefined ? "guest" : response.account.idTokenClaims.roles[0] ); 
-    console.log(localStorage.getItem("email"));
+    // localStorage.setItem("name", response.account.name);
+    // localStorage.setItem("email", response.account.userName);
+    // localStorage.setItem("role", response.account.idTokenClaims.roles == undefined ? "guest" : response.account.idTokenClaims.roles[0] ); 
+    // console.log(localStorage.getItem("email"));
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/loginWithMS`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        role: localStorage.getItem("role"),
-        name: localStorage.getItem("name"),
-        email: localStorage.getItem("email") 
-      }),
+      method: "GET",
+      headers: { 
+        "content-type": "application/json" ,
+        Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`
+      },
+      // body: JSON.stringify({
+      //   role: localStorage.getItem("role"),
+      //   name: localStorage.getItem("name"),
+      //   email: localStorage.getItem("email") 
+      // }),
     });
     if (res.status === 200) {
       token.value = await res.json();
@@ -158,60 +165,22 @@ export const useLogin = defineStore("Login", () => {
       setToken(token.value);
     if (localStorage.getItem("role") == "admin") {
       userPageIcon.value = true;
-    }
+    };
     userName.value = getNameToken();
     loginSuccessfully.value = true;
     logoutIcon.value = true; 
-    msLogoutIcon.value = true;
   }};
 
-  const msSignOut = () => {
-    // const logoutRequest = {
-    //   account: myMSALObj.getAccountByUsername(username),
-    // };
-    myMSALObj.logout();
-    delete_cookie("refresh_token");
-    delete_cookie("access_token");
-    resetToken();
+  const msSignOut = async () => {
+    myMSALObj.logout()
     logoutPopup.value = false;
     logoutIcon.value = false;
     userPageIcon.value = false;
     router.push({ name: "Login" });
+    delete_cookie("refresh_token");
+    delete_cookie("access_token");
+    resetToken();
   };
-
-//   const msHandleResponse = (response) => {
-//     console.log(response);
-
-//     if (response !== null) {
-//       resetToken();
-//       localStorage.setItem("name", response.account.name);
-//       localStorage.setItem("email", response.account.username);
-//       localStorage.setItem("role", response.account.idTokenClaims.roles[0]);  
-//       if (localStorage.getItem("role") == "admin") {
-//         userPageIcon.value = true;
-//       }
-//       loginSuccessfully.value = true;
-//       logoutIcon.value = true; 
-//       msLogoutIcon.value = true;
-//       console.log(response.account);
-//     } else {
-//       msSelectAccount();
-//     }
-//   };
-
-//   const msSelectAccount = () => {
-//     const currentAccounts = myMSALObj.getAllAccounts();
-
-//     if (!currentAccounts  || currentAccounts.length < 1) {
-//         return;
-//     } else if (currentAccounts.length > 1) {
-//         // Add your account choosing logic here
-//         console.warn("Multiple accounts detected.");
-//     } else if (currentAccounts.length === 1) {
-//         username = currentAccounts[0].username;
-//         // welcomeUser(username);
-//     }
-// }
 
   return {
     getRoleToken,

@@ -17,7 +17,7 @@ const asGuest = ref(false);
 
 onBeforeMount(async () => {
     await clinic.getClinics();
-    await event.getAllEventList();
+    // await event.getAllEventList();
     event.resetNewEvent();
     checkGuest.value = login.getRoleToken() == null ? true : false;
 });

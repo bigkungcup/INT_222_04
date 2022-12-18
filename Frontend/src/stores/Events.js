@@ -54,7 +54,12 @@ export const useEvents = defineStore("Events", () => {
   const getEventList = async (page = 0) => {
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/events?page=${page}`,
-      {
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+        }
+      }:{
         method: "GET",
       }
     );
@@ -76,7 +81,12 @@ export const useEvents = defineStore("Events", () => {
   const getAllEventList = async () => {
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/events/eventAll`,
-      {
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+        }
+      }:{
         method: "GET",
       }
     );
@@ -93,7 +103,11 @@ export const useEvents = defineStore("Events", () => {
   const getFilterEventList = async (clinicId = 0,time = 'all',page = 0) => {
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/events/filter/?eventCategoryId=${clinicId}&time=${time}&page=${page}`,
-      {
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`}
+      }:{
         method: "GET",
       }
     );
@@ -116,7 +130,13 @@ export const useEvents = defineStore("Events", () => {
 
   //get event detail
   const getEventDetail = async (id) => {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events/${id}`, {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events/${id}`, 
+    localStorage.getItem("msal.idtoken") != null ?{
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+      }
+    }:{
       method: "GET",
     });
     if (res.status === 200) {
@@ -134,7 +154,12 @@ export const useEvents = defineStore("Events", () => {
     const getDownloadFile = async (eventId,fileName) => {
       const res = await fetch(
         `${import.meta.env.VITE_BASE_URL}/files/${eventId}/${fileName}`,
-        {
+        localStorage.getItem("msal.idtoken") != null ?{
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+          }
+        }:{
           method: "GET",
         }
       );
@@ -174,7 +199,14 @@ export const useEvents = defineStore("Events", () => {
     formData.append('file',eventFile.value == null ? document.getElementById("file").setCustomValidity('') : eventFile.value)
     console.log(formData);
 
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events`, {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events`, 
+    localStorage.getItem("msal.idtoken") != null ?{
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+      },
+      body: formData
+    }:{
       method: "POST",
       body: formData
     });
@@ -219,7 +251,14 @@ export const useEvents = defineStore("Events", () => {
       formData.append('file',eventFile.value == null ? undefined : eventFile.value)
       console.log(formData);
 
-        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events/guest`, {
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events/guest`, 
+        localStorage.getItem("msal.idtoken") != null ? {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+          },
+          body: formData,
+        }:{
           method: "POST",
           body: formData,
         });
@@ -244,7 +283,12 @@ export const useEvents = defineStore("Events", () => {
   const removeEvent = async (selectClinic,selectTime,eventId) => {
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/events/${eventId}`,
-      {
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+        }
+      }:{
         method: "DELETE",
       }
     );
@@ -270,7 +314,12 @@ export const useEvents = defineStore("Events", () => {
   const removeFile = async (eventId) => {
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/files/${eventId}`,
-      {
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+        }
+      }:{
         method: "DELETE",
       }
     );
@@ -330,7 +379,13 @@ export const useEvents = defineStore("Events", () => {
 
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/events/${id}`,
-      {
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+        },
+        body: formData
+      }:{
         method: "PUT",
         body: formData
       }

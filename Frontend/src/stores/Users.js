@@ -74,7 +74,12 @@ export const useUsers = defineStore("Users", () => {
   const getUserList = async (page = 0) => {
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/users?page=${page}`,
-      {
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+        }
+      } : {
         method: "GET",
       }
     );
@@ -91,7 +96,13 @@ export const useUsers = defineStore("Users", () => {
 
   //Get All User
   const getUserAll = async () => {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/userAll`, {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/userAll`, 
+    localStorage.getItem("msal.idtoken") != null ? {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+      }
+    } : {
       method: "GET",
     });
     if (res.status === 200) {
@@ -107,7 +118,12 @@ export const useUsers = defineStore("Users", () => {
   const getUserDetail = async (userId) => {
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/users/${userId}`,
-      {
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+        }
+      } : {
         method: "GET",
       }
     );
@@ -122,7 +138,22 @@ export const useUsers = defineStore("Users", () => {
 
   //Create User
   const signUp = async () => {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/register`, {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/register`, 
+    localStorage.getItem("msal.idtoken") != null ? {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+      },
+      body: JSON.stringify({
+        name: newUser.value.name,
+        email: newUser.value.email.match(validEmail)
+          ? newUser.value.email
+          : null,
+        role: newUser.value.role,
+        password: newUser.value.password == confirmPassword.value ? newUser.value.password : null,
+      }),
+    }:{
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -160,7 +191,20 @@ export const useUsers = defineStore("Users", () => {
 
     //Edit User
     const saveUser = async (userId) => {
-      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/${userId}`, {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/${userId}`, 
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+        },
+        body: JSON.stringify({
+          name: editUser.value.name === "" ? displayUser.value.name : editUser.value.name,
+          email: editUser.value.email === "" ? displayUser.value.email : 
+                  editUser.value.email.match(validEmail) ? editUser.value.email : null,
+          role: editUser.value.role === "" ? displayUser.value.role : editUser.value.role
+        }),
+      } : {
         method: "PUT",
         headers: {
           "content-type": "application/json",
@@ -198,7 +242,13 @@ export const useUsers = defineStore("Users", () => {
       `${
         import.meta.env.VITE_BASE_URL
       }/users/register/${userId}/${lecturerClinicId}`,
-      {
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+        },
+      } : {
         method: "POST",
         headers: {
           "content-type": "application/json",
@@ -221,7 +271,12 @@ export const useUsers = defineStore("Users", () => {
       `${
         import.meta.env.VITE_BASE_URL
       }/users/${userId}/eventCategory/${userClinicId}`,
-      {
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+        }
+      } : {
         method: "DELETE",
       }
     );
@@ -241,7 +296,12 @@ export const useUsers = defineStore("Users", () => {
   const removeUser = async (userId) => {
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/users/${userId}`,
-      {
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+        }
+      } : {
         method: "DELETE",
       }
     );
@@ -265,7 +325,12 @@ export const useUsers = defineStore("Users", () => {
       const checkUserEvent = async (userId) => {
         const res = await fetch(
           `${import.meta.env.VITE_BASE_URL}/users/checkEvent/${userId}`,
-          {
+          localStorage.getItem("msal.idtoken") != null ? {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+            }
+          } : {
             method: "GET",
           }
         );

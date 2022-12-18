@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount } from "vue";
+import { ref, onBeforeMount, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import Logout from "../components/Logout.vue";
 import { formatDate, formatTime } from "../main.js";
@@ -10,10 +10,21 @@ const { params } = useRoute();
 const user = useUsers();
 const login = useLogin();
 
+const displayUser = ref({
+    name: localStorage.getItem("name"),
+    email: localStorage.getItem("email"),
+    role: localStorage.getItem("role"),
+});
+
+login.msLogoutIcon = localStorage.getItem("msal.idtoken") != null ? true : false;
 
 onBeforeMount(async () => {
     await user.getUserDetail(localStorage.getItem('id'));
+    displayUser.value = localStorage.getItem("msal.idtoken") != null ? displayUser.value : user.displayUser;
+    console.log(displayUser.value);
 });
+
+
 </script>
  
 <template>
@@ -25,15 +36,15 @@ onBeforeMount(async () => {
                 </svg></div>
 
             <div class="grid pt-8 pb-2 text-2xl font-bold text-Web-violet content-center">
-                <div class="mb-4"><span class="bg-Web-violet p-2 text-white rounded-xl -ml-2">{{ user.displayUser.role}}</span></div>
-                <p class="mb-4">{{ user.displayUser.name }}</p>
-                <p class="font-light mb-4">{{ user.displayUser.email }}</p>
+                <div class="mb-4"><span class="bg-Web-violet p-2 text-white rounded-xl -ml-2">{{ displayUser.role }}</span></div>
+                <p class="mb-4">{{ displayUser.name }}</p>
+                <p class="font-light mb-4">{{ displayUser.email }}</p>
 
-                <div class="mb-4" v-show="user.displayUser.role == 'lecturer'">
+                <div class="mb-4" v-show="displayUser.role == 'lecturer'">
                     <div>
                         <p class="mr-3">Clinics :</p>
                         <ul class="no-bullets font-light">
-                            <li v-for="clinic in user.displayUser.eventCategories" class="ml-28"
+                            <li v-for="clinic in displayUser.eventCategories" class="ml-28"
                                 v-show="!user.editUserField">
                                 <div class="flex">
                                     <p class="mt-1">
@@ -45,13 +56,13 @@ onBeforeMount(async () => {
                     </div>
                 </div>
 
-                <p class="flex mb-4">Created on :
-                <p class="font-light">{{formatDate(user.displayUser.createdOn)}} | {{
-                    formatTime(user.displayUser.createdOn) }}</p>
+                <p class="flex mb-4" v-if="!login.msLogoutIcon">Created on :
+                <p class="font-light">{{formatDate(displayUser.createdOn)}} | {{
+                    formatTime(displayUser.createdOn) }}</p>
                 </p>
-                <p class="flex mb-4">Updated on :
-                <p class="font-light">{{formatDate(user.displayUser.updatedOn)}} | {{
-                    formatTime(user.displayUser.updatedOn) }}</p>
+                <p class="flex mb-4" v-if="!login.msLogoutIcon">Updated on :
+                <p class="font-light">{{formatDate(displayUser.updatedOn)}} | {{
+                    formatTime(displayUser.updatedOn) }}</p>
                 </p>
                 <div class="grid mt-2 justify-items-end">
                 <button class="rounded-2xl bg-Web-pink py-2 w-1/6 text-white text-lg font-bold mx-14"
@@ -61,8 +72,11 @@ onBeforeMount(async () => {
             </div>
             </div>
         </div>
-        <div v-show="login.logoutPopup">
-            <Logout @toggle="login.logoutPopup = !login.logoutPopup" @logout="login.msLogoutIcon ? login.msSignOut() : login.logout()" />
+        <div v-show="login.logoutPopup && login.msLogoutIcon">
+            <Logout v-show="login.msLogoutIcon" @toggle="login.logoutPopup = !login.logoutPopup" @logout="login.msSignOut()" />
+        </div>
+        <div v-show="login.logoutPopup && !login.msLogoutIcon">
+            <Logout v-show="!login.msLogoutIcon" @toggle="login.logoutPopup = !login.logoutPopup" @logout="login.logout()" />
         </div>
     </div>
 </template>

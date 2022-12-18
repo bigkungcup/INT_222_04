@@ -8,7 +8,12 @@ export const useClinics = defineStore("Clinics", () => {
   const getClinics = async () => {
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/eventCategories`,
-      {
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+        }
+      }:{
         method: "GET",
       }
     );

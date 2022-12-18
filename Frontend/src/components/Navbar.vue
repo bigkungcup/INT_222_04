@@ -45,7 +45,7 @@ defineProps({
             </router-link>
         </div>
         <div class="grid place-content-center">
-            <router-link :to="{ name: 'Home' }">
+            <router-link :to="{ name: 'AboutUs' }">
                 <p class="hover:underline underline-offset-8">About Us</p>
             </router-link>
         </div>

@@ -17,7 +17,7 @@ const toggleNoAuthenticationPopup = () => {
   login.noAuthentication = !login.noAuthentication
 }
 
-
+console.log(login.noAuthorization);
 </script>
 
 <template>
