@@ -242,6 +242,7 @@ public class UserService implements UserDetailsService {
         if(user.getRole().toString().equals("guest")){
             user.setRole(Role.guest);
         }
+
         User detail = modelMapper.map(user, User.class);
         repository.saveAndFlush(detail);
         login(user, request, response);
