@@ -59,7 +59,7 @@ public class FileController {
     @DeleteMapping("/{eventId}")
     public ResponseEntity deleteFile(@PathVariable  Integer eventId) throws IOException {
         Event eventById = eventRepository.getById(eventId);
-        String userDir = eventById.getUser() != null ? "User/" + "User_" + eventById.getUser().getId() : "Guest";
+        String userDir = eventById.getBookingEmail() != null ? "User/" + "User_" + eventById.getBookingEmail() : "Guest";
         Path path = Paths.get(fileStorageProperties.getUploadDir() + "/" + userDir + "/" + "Event_" + eventById.getId());
         fileStorageService.deleteFile(path + "/" + Files.list(path).collect(Collectors.toList()).get(0).getFileName());
         return ResponseEntity.ok().build();
