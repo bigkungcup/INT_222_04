@@ -51,31 +51,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         } else {
             Cookie access_token = WebUtils.getCookie(request, "access_token");
             String authorizationHeader = request.getHeader(AUTHORIZATION);
-            if (access_token != null) {
-                try {
-                    Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
-                    JWTVerifier verifier = JWT.require(algorithm).build();
-                    DecodedJWT decodedJWT = verifier.verify(access_token.getValue());
-                    String username = decodedJWT.getSubject();
-                    String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
-                    Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-                    stream(roles).forEach(role -> {
-                        authorities.add(new SimpleGrantedAuthority(role));
-                    });
-                    UsernamePasswordAuthenticationToken authenticationToken =
-                            new UsernamePasswordAuthenticationToken(username, null, authorities);
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                    filterChain.doFilter(request, response);
-                } catch (Exception exception) {
-                    System.out.println("Error login in:" + exception.getMessage());
-                    response.setHeader("Error", exception.getMessage());
-                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                    Map<String, String> error = new HashMap<>();
-                    error.put("error_message", exception.getMessage());
-                    response.setContentType(APPLICATION_JSON_VALUE);
-                    new ObjectMapper().writeValue(response.getOutputStream(), error);
-                }
-            }else if(authorizationHeader != null){
+
+            if(authorizationHeader != null){
                 try{
                     String token = authorizationHeader.substring("Bearer ".length());
                     String[] chunks = token.split("\\.");
@@ -117,7 +94,31 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     response.setContentType(APPLICATION_JSON_VALUE);
                     new ObjectMapper().writeValue(response.getOutputStream(), error);
                 }
-            } else {
+            }else if (access_token != null) {
+                try {
+                    Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
+                    JWTVerifier verifier = JWT.require(algorithm).build();
+                    DecodedJWT decodedJWT = verifier.verify(access_token.getValue());
+                    String username = decodedJWT.getSubject();
+                    String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
+                    Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                    stream(roles).forEach(role -> {
+                        authorities.add(new SimpleGrantedAuthority(role));
+                    });
+                    UsernamePasswordAuthenticationToken authenticationToken =
+                            new UsernamePasswordAuthenticationToken(username, null, authorities);
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    filterChain.doFilter(request, response);
+                } catch (Exception exception) {
+                    System.out.println("Error login in:" + exception.getMessage());
+                    response.setHeader("Error", exception.getMessage());
+                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    Map<String, String> error = new HashMap<>();
+                    error.put("error_message", exception.getMessage());
+                    response.setContentType(APPLICATION_JSON_VALUE);
+                    new ObjectMapper().writeValue(response.getOutputStream(), error);
+                }
+            }  else {
                 HandleExceptionLogin errors;
                 Map<String, String> errorMap = new HashMap<>();
                 Timestamp timestamp = new Timestamp(System.currentTimeMillis());

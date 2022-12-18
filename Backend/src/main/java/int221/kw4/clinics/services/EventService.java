@@ -608,6 +608,7 @@ public class EventService {
 
     public String getEmail(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Authentication: " + authentication);
         String email =  authentication.getPrincipal().toString();
         return email;
     }

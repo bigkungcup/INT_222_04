@@ -12,6 +12,7 @@ import int221.kw4.clinics.entities.Role;
 import int221.kw4.clinics.entities.User;
 import int221.kw4.clinics.repositories.EventCategoryRepository;
 import int221.kw4.clinics.repositories.UserRepository;
+import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -32,6 +33,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -218,36 +221,62 @@ public class UserService implements UserDetailsService {
         return ResponseEntity.status(200).body(user);
     }
 
-    public ResponseEntity loginWithMicrosoft(UserPostMSDTO user, HttpServletRequest request, HttpServletResponse response) {
-        List<User> userList = repository.findAll();
-        User userDetail = repository.findByEmail(user.getEmail());
+    public ResponseEntity loginWithMicrosoft(HttpServletRequest request, HttpServletResponse response) {
+//        List<User> userList = repository.findAll();
+//        User userDetail = repository.findByEmail(user.getEmail());
 
-        if(userDetail != null){
-                if(!userDetail.getRole().toString().equals(user.getRole().toString())){
-                    userDetail.setRole(user.getRole());
-                    repository.saveAndFlush(userDetail);
-                }
+//        if(userDetail != null){
+//                if(!userDetail.getRole().toString().equals(user.getRole().toString())){
+//                    userDetail.setRole(user.getRole());
+//                    repository.saveAndFlush(userDetail);
+//                }
+//        }
+
+//        for (int i = 0; i < userList.size(); i++) {
+//            System.out.println(userList.get(i).getEmail());
+//            if (userList.get(i).getEmail().equals(user.getEmail())) {
+//                System.out.println("Login with Microsoft");
+//                login(user, request, response);
+//                return ResponseEntity.status(200).body(userDetail);
+//            }
+//        }
+
+//        System.out.println("Register with Microsoft");
+//        if(user.getRole().toString().equals("guest")){
+//            user.setRole(Role.guest);
+//        }
+
+//        User detail = modelMapper.map(user, User.class);
+//        repository.saveAndFlush(detail);
+//        login(user, request, response);
+
+        String authorizationHeader = request.getHeader(AUTHORIZATION);
+
+        String token = authorizationHeader.substring("Bearer ".length());
+        String[] chunks = token.split("\\.");
+
+        JSONObject header = new JSONObject(decode(chunks[0]));
+        JSONObject payload = new JSONObject(decode(chunks[1]));
+
+        String name = payload.getString("name");
+        String email = payload.getString("preferred_username");
+        String role;
+        try{
+            role = payload.getJSONArray("roles").getString(0);
+        }catch (Exception e){
+            role = "guest";
         }
 
-        for (int i = 0; i < userList.size(); i++) {
-            System.out.println(userList.get(i).getEmail());
-            if (userList.get(i).getEmail().equals(user.getEmail())) {
-                System.out.println("Login with Microsoft");
-                login(user, request, response);
-                return ResponseEntity.status(200).body(userDetail);
-            }
+        User user = repository.findByEmail(email);
+        if(user != null){
+            return ResponseEntity.status(200).body(user);
+        }else {
+            Map<String, String> map = new HashMap<>();
+            map.put("name", name);
+            map.put("email", email);
+            map.put("role", role);
+            return ResponseEntity.status(200).body(map);
         }
-
-        System.out.println("Register with Microsoft");
-        if(user.getRole().toString().equals("guest")){
-            user.setRole(Role.guest);
-        }
-
-        User detail = modelMapper.map(user, User.class);
-        repository.saveAndFlush(detail);
-        login(user, request, response);
-
-        return ResponseEntity.status(200).body(detail);
     }
 
     //AUTHENTICATION
@@ -298,4 +327,9 @@ public class UserService implements UserDetailsService {
         response.addCookie(createCookie("refresh_token", refresh_token, refreshExpirationDateInMs));
     }
 
+    public String decode(String chunks){
+        Base64.Decoder decoder = Base64.getUrlDecoder();
+        String decode = new String(decoder.decode(chunks));
+        return decode;
+    }
 }

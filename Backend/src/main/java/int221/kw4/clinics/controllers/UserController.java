@@ -73,10 +73,10 @@ public class UserController {
         return loginService.MatchPassword(login, request, httpStatus);
     }
 
-    @PostMapping("/loginWithMS")
+    @GetMapping("/loginWithMS")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity loginWithMicrosoft(@RequestBody UserPostMSDTO login, HttpServletRequest request, HttpServletResponse httpStatus) {
-       return service.loginWithMicrosoft(login, request, httpStatus);
+    public ResponseEntity loginWithMicrosoft(HttpServletRequest request, HttpServletResponse response) {
+        return service.loginWithMicrosoft(request, response);
     }
 
     @DeleteMapping("/{userId}")
