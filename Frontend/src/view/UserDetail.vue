@@ -82,7 +82,7 @@ onBeforeUpdate(async () => {
           </li>
         </ul></div>
 
-          <div class="flex" v-show="user.editUserField">
+          <div class="flex mt-6" v-show="user.editUserField">
           <p class="mr-3">Clinics :</p>
             <select class="rounded-lg h-10 w-9/12 font-bold text-white text-xl bg-Web-violet padding-select mr-1" v-model="user.newUserClinic">
             <option v-for="list in user.clinicList" :value="list.id">

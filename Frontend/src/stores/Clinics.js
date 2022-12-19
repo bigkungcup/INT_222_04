@@ -22,7 +22,7 @@ export const useClinics = defineStore("Clinics", () => {
       console.log("get clinic list successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
     } else if (res.status === 401 && login.logoutIcon == false) {
-    } else console.log("error, cannot get event clinics list");
+    } else console.log("error, cannot get clinic list");
   };
 
   const filterClinics = (allClinicList,userClinicList) => {

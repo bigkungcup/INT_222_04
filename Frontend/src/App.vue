@@ -1,14 +1,11 @@
 <script setup>
-import { onBeforeMount } from "vue";
 import Navbar from "./components/Navbar.vue";
 import { useLogin } from "./stores/Login.js";
-import Logout from "./components/Logout.vue";
 import NoAuthentication from "./components/NoAuthentication.vue";
 import NoAuthorization from "./components/NoAuthorization.vue";
 
 const login = useLogin();
 
-//เดี๋ยวก็ลบ
 const toggleNoAuthorizationPopup = () => {
   login.noAuthorization = !login.noAuthorization
 }
@@ -16,8 +13,6 @@ const toggleNoAuthorizationPopup = () => {
 const toggleNoAuthenticationPopup = () => {
   login.noAuthentication = !login.noAuthentication
 }
-
-console.log(login.noAuthorization);
 </script>
 
 <template>

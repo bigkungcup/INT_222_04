@@ -19,7 +19,8 @@ export const useUsers = defineStore("Users", () => {
   const userUnique = ref(true)
   const signUpSuccessfully = ref(false);
   const editUserSuccessfully = ref(false);
-  const checkEvent = ref(false)
+  const checkEvent = ref(false);
+  const undeletePopup = ref(false);
 
   const newUser = ref({
     name: "",
@@ -85,6 +86,8 @@ export const useUsers = defineStore("Users", () => {
     );
     if (res.status === 200) {
       userList.value = await res.json();
+      deletePopup.value = false;
+      undeletePopup.value = false;
       console.log("get user lists successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getUserList());
@@ -241,7 +244,7 @@ export const useUsers = defineStore("Users", () => {
     const res = fetch(
       `${
         import.meta.env.VITE_BASE_URL
-      }/users/register/${userId}/${lecturerClinicId}`,
+      }/users/registerCategory/${userId}/${lecturerClinicId}`,
       localStorage.getItem("msal.idtoken") != null ? {
         method: "POST",
         headers: {
@@ -285,7 +288,7 @@ export const useUsers = defineStore("Users", () => {
         (category) => category.eventCategoryId !== userClinicId
       );
       console.log("Delete category success");
-    } else if (res.status === 401 && login.logoutIcon == true) {
+      }else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(deleteLecturerClinic(userId, userClinicId));
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else console.log("Delete category not success");
@@ -309,12 +312,14 @@ export const useUsers = defineStore("Users", () => {
       userList.value.content = userList.value.content.filter(
         (user) => user.id !== userId
       );
+      getUserList(userList.value.pageNumber);
       console.log("deleteted succesfully");
-    } else if (res.status === 401 && login.logoutIcon == true) {
+    }else if(res.status === 400 && login.logoutIcon == true){
+      undeletePopup.value = true;
+  }  else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(removeUser(userId));
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else console.log("error, cannot delete");
-    getUserList(userList.value.pageNumber);
     if(userList.value.content.length == 0 && userList.value.pageNumber > 0){
       userList.value.pageNumber = userList.value.pageNumber-1;
       getUserList(userList.value.pageNumber);
@@ -336,6 +341,7 @@ export const useUsers = defineStore("Users", () => {
         );
         if (res.status === 200) {
           checkEvent.value = await res.json();
+          deletePopup.value = true;
           console.log(checkEvent.value);
           console.log("check user event succesfully");
         } else if (res.status === 401 && login.logoutIcon == true) {
@@ -402,7 +408,8 @@ export const useUsers = defineStore("Users", () => {
     editUserSuccessfully,
     deletePopup,
     editUserField,
-    checkEvent
+    checkEvent,
+    undeletePopup
   };
 });
 

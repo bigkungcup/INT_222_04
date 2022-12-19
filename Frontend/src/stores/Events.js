@@ -113,19 +113,17 @@ export const useEvents = defineStore("Events", () => {
     );
     if (res.status === 200) {
       eventList.value = await res.json();
-      console.log("get event lists successfully");
+      console.log("get event list successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getFilterEventList((page = 0)));
     } else if (res.status === 401 && login.logoutIcon == false) {
       login.noAuthentication = true;
     } 
 
-    //เดี๋ยวก็ลบ
     else if (res.status === 403 && login.logoutIcon == true) {
       login.noAuthorization = true;
     } 
     
-    console.log("error, cannot get event lists");
   };
 
   //get event detail
@@ -141,13 +139,12 @@ export const useEvents = defineStore("Events", () => {
     });
     if (res.status === 200) {
       displayEvent.value = await res.json();
-      console.log(displayEvent.value);
-      console.log("get successfully");
+      console.log("get event detail successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getEventDetail(id));
     } else if (res.status === 401 && login.logoutIcon == false) {
       login.noAuthentication = true;
-    } else console.log("error, cannot get event");
+    } else console.log("error, cannot get event detail");
   };
 
     //Download File

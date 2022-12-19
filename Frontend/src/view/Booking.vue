@@ -14,6 +14,7 @@ const event = useEvents();
 const login = useLogin();
 const checkGuest = ref(false);
 const asGuest = ref(false);
+event.newEvent.eventCategory = [];
 
 onBeforeMount(async () => {
     await clinic.getClinics();

@@ -41,7 +41,6 @@ onBeforeMount(async () => {
                 <p class="font-light mb-4">{{ displayUser.email }}</p>
 
                 <div class="mb-4" v-show="displayUser.role == 'lecturer'">
-                    <div>
                         <p class="mr-3">Clinics :</p>
                         <ul class="no-bullets font-light">
                             <li v-for="clinic in displayUser.eventCategories" class="ml-28"
@@ -53,7 +52,6 @@ onBeforeMount(async () => {
                                 </div>
                             </li>
                         </ul>
-                    </div>
                 </div>
 
                 <p class="flex mb-4" v-if="!login.msLogoutIcon">Created on :
