@@ -95,13 +95,13 @@ onBeforeMount(async () => {
                 <label for="3" class="ml-2">Admin</label>
             </div>
 
-            <div class="grid col-span-2 mt-4" v-show="user.newUser.role == 'lecturer'">
+            <!-- <div class="grid col-span-2 mt-4" v-show="user.newUser.role == 'lecturer'">
                 <select class="rounded-lg h-12 w-5/6 font-bold text-white text-xl bg-black/30 border-4 border-Web-pink padding-select" v-model="user.lecturerClinic">
                     <option v-for="list in clinic.clinicList" :value="list.id">
                         {{ list.eventCategoryName }}            
                     </option>
                 </select>
-            </div>
+            </div> -->
             </div>
             <div class="grid">
                 <button class="rounded-full bg-white font-bold text-Web-pink text-center text-xl py-2 w-2/5 " @click="user.resetNewUser()">
