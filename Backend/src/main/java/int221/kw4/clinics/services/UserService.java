@@ -34,6 +34,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
@@ -205,18 +207,13 @@ public class UserService implements UserDetailsService {
             return ResponseEntity.status(400).body("Cannot delete this category because category is not less than 1");
         }
 
-        user.getEventCategories().stream().map(EventCategory::getId).forEach(id -> {
-            if (id.equals(eventCategoryId)) {
-                user.getEventCategories().removeIf(eventCategory -> eventCategory.getId().equals(eventCategoryId));
-                repository.saveAndFlush(user);
-            } else {
-                try {
-                    throw new HandleExceptionBadRequest("Event Category ID: " + eventCategoryId + " does not exist !!!");
-                } catch (HandleExceptionBadRequest e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
+        if(categories.contains(eventCategoryId)){
+            user.getEventCategories().removeIf(eventCategory -> eventCategory.getId().equals(eventCategoryId));
+            repository.saveAndFlush(user);
+        }else{
+            throw new HandleExceptionBadRequest("Event Category ID: " + eventCategoryId + " does not exist !!!");
+        }
+
         UserLecteurDTO lecturer = modelMapper.map(user, UserLecteurDTO.class);
 //        emailService.sendSimpleMail(user.getEmail(), "Delete Category in User Successfully",
 //                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
