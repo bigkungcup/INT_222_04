@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeMount } from "vue";
+import { ref, onBeforeMount } from "vue";
 import { useRoute } from "vue-router";
 import { formatDate, formatTime } from "../main.js";
 import Datepicker from "@vuepic/vue-datepicker";
@@ -13,6 +13,7 @@ const setEditFileName = () => {
   event.editFileName = event.displayEvent.fileName
 }
 
+const lecturerRole = ref(localStorage.getItem('role') == 'lecturer' ? true : false);
 
 onBeforeMount(async () => {
   await event.getEventDetail(params.id)
@@ -85,7 +86,7 @@ onBeforeMount(async () => {
         <div class="grid place-items-end">
           <button
             class="rounded-2xl bg-Web-pink py-2 w-1/12 text-white font-bold hover:bg-Web-pink hover:text-white mx-14"
-            v-show="!event.editField"
+            v-show="!event.editField  && !lecturerRole"
             @click="event.editField = true"
           >
             Edit
@@ -114,7 +115,7 @@ onBeforeMount(async () => {
           <Datepicker @closed="event.setMinTime(event.editEvent.eventStartTime)" :minDate="new Date()" 
            class="ml-6" v-show="event.editTime" v-model="event.editEvent.eventStartTime"></Datepicker>
         </p>
-        <div v-show="!event.editTime" class="grid place-items-end">
+        <div v-show="!event.editTime && !lecturerRole" class="grid place-items-end">
         <button
             class="rounded-2xl bg-Web-pink py-2 w-1/6 text-white text-lg font-bold mx-14 my-6"
             @click="event.editTime = true"
@@ -167,7 +168,7 @@ onBeforeMount(async () => {
           </svg></button></div>
       </p>
       
-      <div class="grid place-items-end" v-show="!event.editFile" >
+      <div class="grid place-items-end" v-show="!event.editFile && !lecturerRole" >
         <button
             class="rounded-2xl bg-Web-pink py-2 w-1/6 text-white text-lg font-bold mx-14 my-7"
             @click="event.editFile = true"
