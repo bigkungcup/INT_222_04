@@ -158,6 +158,24 @@ public class UserService implements UserDetailsService {
                 () -> new HandleExceptionNotFound(
                         "User ID: " + userId + " does not exist !!!")
         );
+
+        List<User> allUser = repository.findAll();
+        ArrayList<Integer> categories = new ArrayList<>();
+        ArrayList<Integer> userCategories = new ArrayList<>();
+        for (User u : allUser){
+            u.getEventCategories().stream().map(EventCategory::getId).forEach(categories::add);
+        }
+
+        user.getEventCategories().stream().map(EventCategory::getId).forEach(userCategories::add);
+        System.out.println(categories);
+        System.out.println(userCategories);
+
+        for (Integer i : userCategories){
+            if (categories.stream().filter(id -> id.equals(i)).count() == 1){
+                return ResponseEntity.status(400).body("Cannot delete this category because category is not less than 1");
+            }
+        }
+
         repository.deleteById(userId);
 //        emailService.sendSimpleMail(user.getEmail(), "Delete User Successfully",
 //                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
