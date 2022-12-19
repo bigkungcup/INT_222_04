@@ -1,5 +1,6 @@
 package int221.kw4.clinics.controllers;
 
+import int221.kw4.clinics.advices.HandleExceptionBadRequest;
 import int221.kw4.clinics.advices.HandleExceptionForbidden;
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.advices.HandleExceptionUnique;
@@ -88,7 +89,7 @@ public class UserController {
     @DeleteMapping("/{userId}/eventCategory/{eventCategoryId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity deleteCategory(@PathVariable Integer userId, @PathVariable Integer eventCategoryId)
-            throws HandleExceptionNotFound, HandleExceptionForbidden {
+            throws HandleExceptionNotFound, HandleExceptionForbidden, HandleExceptionBadRequest {
         return service.deleteEventCategoryUser(userId, eventCategoryId);
     }
 

@@ -166,16 +166,32 @@ public class UserService implements UserDetailsService {
         return ResponseEntity.status(200).body("Delete UserID:" + userId);
     }
 
-    public ResponseEntity deleteEventCategoryUser(Integer userId, Integer eventCategoryId) throws HandleExceptionNotFound, HandleExceptionForbidden {
+    public ResponseEntity deleteEventCategoryUser(Integer userId, Integer eventCategoryId) throws HandleExceptionNotFound, HandleExceptionForbidden, HandleExceptionBadRequest {
         User user = repository.findById(userId).orElseThrow(
                 () -> new HandleExceptionNotFound(
                         "User ID: " + userId + " does not exist !!!")
         );
 
+        List<User> allUser = repository.findAll();
+        ArrayList<Integer> categories = new ArrayList<>();
+        for (User u : allUser){
+            u.getEventCategories().stream().map(EventCategory::getId).forEach(categories::add);
+        }
+
+        if (categories.stream().filter(id -> id.equals(eventCategoryId)).count() == 1){
+            return ResponseEntity.status(400).body("Cannot delete this category because category is not less than 1");
+        }
+
         user.getEventCategories().stream().map(EventCategory::getId).forEach(id -> {
             if (id.equals(eventCategoryId)) {
                 user.getEventCategories().removeIf(eventCategory -> eventCategory.getId().equals(eventCategoryId));
                 repository.saveAndFlush(user);
+            }else{
+                try {
+                    throw new HandleExceptionBadRequest("Event Category ID: " + eventCategoryId + " does not exist !!!");
+                } catch (HandleExceptionBadRequest e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
         UserLecteurDTO lecturer = modelMapper.map(user, UserLecteurDTO.class);
