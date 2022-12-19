@@ -441,7 +441,7 @@ public class EventService {
 //        User user = userRepository.findByEmail(auth.getPrincipal().toString());
         Event eventById = repository.getById(eventId);
 
-        String userDir = eventById.getUser() != null ? "User/" + "User_" + eventById.getUser().getId() : "Guest";
+        String userDir = eventById.getBookingEmail() != null ? "User/" + "User_" + eventById.getBookingEmail() : "Guest";
         Path path = Paths.get(fileStorageProperties.getUploadDir() + "/" + userDir + "/" + "Event_" + eventById.getId());
 
         if (getRole().equals("admin")) {
