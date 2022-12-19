@@ -71,7 +71,6 @@ public class UserService implements UserDetailsService {
 
     public UserDTO getUserById(Integer userId) throws HandleExceptionNotFound, HandleExceptionForbidden {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//        User user = repository.findByEmail(auth.getPrincipal().toString());
 
         if (getRole().equals("admin")) {
             Integer finalUserId = userId;
@@ -80,7 +79,17 @@ public class UserService implements UserDetailsService {
                             "User ID: " + finalUserId + " does not exist !!!"));
             return modelMapper.map(userById, UserDTO.class);
         } else {
-                throw new HandleExceptionForbidden("You don't have permission to access this resource");
+            User user = repository.findByEmail(auth.getPrincipal().toString());
+            if(user == null){
+                throw new HandleExceptionNotFound("User not found");
+            }else {
+                userId = user.getId();
+                if (user.getId() == userId) {
+                    return modelMapper.map(repository.findById(userId).orElseThrow(() -> new HandleExceptionNotFound("User not found")), UserDTO.class);
+                } else {
+                    throw new HandleExceptionForbidden("You don't have permission to access this resource");
+                }
+            }
         }
     }
 
