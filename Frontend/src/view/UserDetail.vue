@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onBeforeMount, onBeforeUpdate } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { onBeforeMount, onBeforeUpdate } from "vue";
+import { useRoute } from "vue-router";
 import { formatDate, formatTime } from "../main.js";
 import { useUsers } from "../stores/Users";
 import { useClinics } from "../stores/Clinics";
@@ -72,9 +72,6 @@ onBeforeUpdate(async () => {
               <ul class="no-bullets font-light">
               <li v-for="clinic in user.displayUser.eventCategories" class="ml-28" v-show="!user.editUserField">
                 <div class="flex">
-                  <!-- <button @click="user.deleteLecturerClinic(user.displayUser.id,clinic.id)" class="mr-4">
-                <svg width="40" viewBox="0 0 24 24"><path fill="#EB4C84" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z"/></svg>
-              </button> -->
               <p class="mt-1">
                 {{ clinic.eventCategoryName }}     
               </p>         
@@ -82,21 +79,13 @@ onBeforeUpdate(async () => {
           </li>
         </ul></div>
 
-          <div class="flex" v-show="user.editUserField">
+          <div class="flex mt-6" v-show="user.editUserField">
           <p class="mr-3">Clinics :</p>
             <select class="rounded-lg h-10 w-9/12 font-bold text-white text-xl bg-Web-violet padding-select mr-1" v-model="user.newUserClinic">
             <option v-for="list in user.clinicList" :value="list.id">
               {{ list.eventCategoryName }}            
             </option>
           </select>
-          <!-- <button @click="user.addLecturerClinic(user.displayUser.id,user.newUserClinic)" class="">
-          <svg width="50" viewBox="0 0 24 24" class="-mt-1">
-            <path
-              fill="#EB4C84"
-              d="M11 17h2v-4h4v-2h-4V7h-2v4H7v2h4Zm1 5q-2.075 0-3.9-.788q-1.825-.787-3.175-2.137q-1.35-1.35-2.137-3.175Q2 14.075 2 12t.788-3.9q.787-1.825 2.137-3.175q1.35-1.35 3.175-2.138Q9.925 2 12 2t3.9.787q1.825.788 3.175 2.138q1.35 1.35 2.137 3.175Q22 9.925 22 12t-.788 3.9q-.787 1.825-2.137 3.175q-1.35 1.35-3.175 2.137Q14.075 22 12 22Z"
-            />
-          </svg>
-        </button> -->
       </div>
       </div>
 
@@ -128,8 +117,8 @@ onBeforeUpdate(async () => {
  
 <style>
 ul.no-bullets {
-  list-style-type: none; /* Remove bullets */
-  padding: 0; /* Remove padding */
-  margin: 0; /* Remove margins */
+  list-style-type: none;
+  padding: 0;
+  margin: 0; 
 }
 </style>

@@ -5,8 +5,7 @@ import Clinics from "../view/Clinics.vue";
 import Events from "../view/Events.vue";
 import Booking from "../view/Booking.vue";
 import EventDetail from "../view/EventDetail.vue";
-// import CategoryDetail from "../view/CategoryDetail.vue"
-// import AboutUs from "../view/AboutUs.vue"
+import AboutUs from "../view/AboutUs.vue"
 import Users from "../view/Users.vue"
 import UserDetail from "../view/UserDetail.vue"
 import Login from "../view/Login.vue"
@@ -45,16 +44,11 @@ const routes = [
     name: "EventDetail",
     component: EventDetail,
   },
-  // {
-  //   path: "/category/:id",
-  //   name: "CategoryDetail",
-  //   component: CategoryDetail,
-  // },
-  // {
-  //   path: "/aboutUs",
-  //   name: "AboutUs",
-  //   component: AboutUs,
-  // },
+  {
+    path: "/aboutUs",
+    name: "AboutUs",
+    component: AboutUs,
+  },
   {
     path: "/users",
     name: "Users",

@@ -1,11 +1,10 @@
 <script setup>
-import { ref,onBeforeMount } from "vue";
+import { onBeforeMount } from "vue";
 import { useUsers } from "../stores/Users.js";
 import UserList from "../components/UserList.vue";
 import UserEmptyList from "../components/UserEmptyList.vue";
 
 const user = useUsers();
-const userId = ref();
 
 onBeforeMount(async () => {
     await user.getUserList();
@@ -20,8 +19,8 @@ onBeforeMount(async () => {
       <UserList
         :userList="user.userList"
         :deletePopUp="user.deletePopup"
-        :userId="userId"
         :checkEvent="user.checkEvent"
+        :undeletePopup="user.undeletePopup"
         @delete="user.removeUser"
         @check="user.checkUserEvent"
       />

@@ -1,5 +1,6 @@
 package int221.kw4.clinics.controllers;
 
+import int221.kw4.clinics.advices.HandleExceptionBadRequest;
 import int221.kw4.clinics.advices.HandleExceptionForbidden;
 import int221.kw4.clinics.advices.HandleExceptionNotFound;
 import int221.kw4.clinics.advices.HandleExceptionUnique;
@@ -61,7 +62,7 @@ public class UserController {
         return service.createUser(newUser);
     }
 
-    @PostMapping("/register/{userId}/{eventCategory}")
+    @PostMapping("/registerCategory/{userId}/{eventCategory}")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity createCategory(@PathVariable Integer userId, @PathVariable Integer eventCategory)
             throws HandleExceptionNotFound, HandleExceptionForbidden {
@@ -73,10 +74,10 @@ public class UserController {
         return loginService.MatchPassword(login, request, httpStatus);
     }
 
-    @PostMapping("/loginWithMS")
+    @GetMapping("/loginWithMS")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity loginWithMicrosoft(@RequestBody UserPostMSDTO login, HttpServletRequest request, HttpServletResponse httpStatus) {
-       return service.loginWithMicrosoft(login, request, httpStatus);
+    public ResponseEntity loginWithMicrosoft(HttpServletRequest request, HttpServletResponse response) {
+        return service.loginWithMicrosoft(request, response);
     }
 
     @DeleteMapping("/{userId}")
@@ -88,7 +89,7 @@ public class UserController {
     @DeleteMapping("/{userId}/eventCategory/{eventCategoryId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity deleteCategory(@PathVariable Integer userId, @PathVariable Integer eventCategoryId)
-            throws HandleExceptionNotFound, HandleExceptionForbidden {
+            throws HandleExceptionNotFound, HandleExceptionForbidden, HandleExceptionBadRequest {
         return service.deleteEventCategoryUser(userId, eventCategoryId);
     }
 

@@ -54,7 +54,12 @@ export const useEvents = defineStore("Events", () => {
   const getEventList = async (page = 0) => {
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/events?page=${page}`,
-      {
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+        }
+      }:{
         method: "GET",
       }
     );
@@ -76,7 +81,12 @@ export const useEvents = defineStore("Events", () => {
   const getAllEventList = async () => {
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/events/eventAll`,
-      {
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+        }
+      }:{
         method: "GET",
       }
     );
@@ -93,48 +103,60 @@ export const useEvents = defineStore("Events", () => {
   const getFilterEventList = async (clinicId = 0,time = 'all',page = 0) => {
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/events/filter/?eventCategoryId=${clinicId}&time=${time}&page=${page}`,
-      {
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`}
+      }:{
         method: "GET",
       }
     );
     if (res.status === 200) {
       eventList.value = await res.json();
-      console.log("get event lists successfully");
+      console.log("get event list successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getFilterEventList((page = 0)));
     } else if (res.status === 401 && login.logoutIcon == false) {
       login.noAuthentication = true;
     } 
 
-    //เดี๋ยวก็ลบ
     else if (res.status === 403 && login.logoutIcon == true) {
       login.noAuthorization = true;
     } 
     
-    console.log("error, cannot get event lists");
   };
 
   //get event detail
   const getEventDetail = async (id) => {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events/${id}`, {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events/${id}`, 
+    localStorage.getItem("msal.idtoken") != null ?{
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+      }
+    }:{
       method: "GET",
     });
     if (res.status === 200) {
       displayEvent.value = await res.json();
-      console.log(displayEvent.value);
-      console.log("get successfully");
+      console.log("get event detail successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getEventDetail(id));
     } else if (res.status === 401 && login.logoutIcon == false) {
       login.noAuthentication = true;
-    } else console.log("error, cannot get event");
+    } else console.log("error, cannot get event detail");
   };
 
     //Download File
     const getDownloadFile = async (eventId,fileName) => {
       const res = await fetch(
         `${import.meta.env.VITE_BASE_URL}/files/${eventId}/${fileName}`,
-        {
+        localStorage.getItem("msal.idtoken") != null ?{
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+          }
+        }:{
           method: "GET",
         }
       );
@@ -144,15 +166,11 @@ export const useEvents = defineStore("Events", () => {
       } else if (res.status === 401 && login.logoutIcon == true) {
         login.getRefresh(getDownloadFile(eventId,fileName));
       } else if (res.status === 401 && login.logoutIcon == false) {
-      } else console.log("error, cannot get all event list");
+      } else console.log("error, cannot download file");
     };
 
   //Create Event
   const createEvent = async () => {
-    console.log(getOverlapTime(
-      newEvent.value.eventStartTime,
-      newEvent.value.eventCategory.id
-    ));
     const event = {
         bookingName: newEvent.value.bookingName,
         bookingEmail: newEvent.value.bookingEmail.match(validEmail)
@@ -172,16 +190,20 @@ export const useEvents = defineStore("Events", () => {
     const formData = new FormData();
     formData.append('event',new Blob([JSON.stringify(event)],{ type: 'application/json' }))
     formData.append('file',eventFile.value == null ? document.getElementById("file").setCustomValidity('') : eventFile.value)
-    console.log(formData);
 
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events`, {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events`, 
+    localStorage.getItem("msal.idtoken") != null ?{
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+      },
+      body: formData
+    }:{
       method: "POST",
       body: formData
     });
     if (res.status === 201) {
       const addEvent = await res.json();
-      // eventListAll.value.push(addEvent);
-      // getAllEventList();
       bookingSeccessfully.value = true;
       console.log("created successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
@@ -217,16 +239,21 @@ export const useEvents = defineStore("Events", () => {
       const formData = new FormData();
       formData.append('event',new Blob([JSON.stringify(event)],{ type: 'application/json' }))
       formData.append('file',eventFile.value == null ? undefined : eventFile.value)
-      console.log(formData);
 
-        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events/guest`, {
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events/guest`, 
+        localStorage.getItem("msal.idtoken") != null ? {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+          },
+          body: formData,
+        }:{
           method: "POST",
           body: formData,
         });
         if (res.status === 201) {
           const addEvent = await res.json();
           bookingSeccessfully.value = true;
-          // listsNewEvent.value.push(addEvent);
           console.log("created successfully");
         }else if (res.status === 401 && login.logoutIcon == true) {
           login.getRefresh(createEventWithGuest());
@@ -244,7 +271,12 @@ export const useEvents = defineStore("Events", () => {
   const removeEvent = async (selectClinic,selectTime,eventId) => {
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/events/${eventId}`,
-      {
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+        }
+      }:{
         method: "DELETE",
       }
     );
@@ -258,36 +290,35 @@ export const useEvents = defineStore("Events", () => {
         eventList.value.pageNumber = eventList.value.pageNumber-1;
         getFilterEventList(selectClinic,selectTime,eventList.value.pageNumber);
       }
-      console.log("deleteted succesfully");
+      console.log("deleteted event succesfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(removeEvent(eventId));
     } else if (res.status === 401 && login.logoutIcon == false) {
       login.noAuthentication = true;
-    } else console.log("error, cannot delete");
+    } else console.log("error, cannot delete event");
   };
 
   //Delete File
   const removeFile = async (eventId) => {
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/files/${eventId}`,
-      {
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+        }
+      }:{
         method: "DELETE",
       }
     );
     if (res.status === 200) {
-      // eventList.value.content = eventList.value.content.filter(
-      //   (event) => event.id !== eventId
-      // );
-      // if (editEvent.eventStartTime !== "" || editEvent.eventNotes !== "") {
-      //   showEditPopUp();
-      // }
       await getEventDetail(eventId);
       editFile.value = false;
       resetEditFile();
       editValidate.value = true;
       deleteFileCheck.value = false;
       editFileName.value = displayEvent.value.fileName;
-      console.log("edit successfully");
+      console.log("Delete file successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(removeFile(eventId));
     } else if (res.status === 401 && login.logoutIcon == false) {
@@ -295,15 +326,13 @@ export const useEvents = defineStore("Events", () => {
     } else if (res.status === 400) {
       editValidate.value = false;
     }else {
-      console.log("error, cannot edit");
+      console.log("error, cannot delete file");
     }
   };
 
   //Edit Event
   const saveEvent = async (id) => {
     const event = {
-      // bookingName: displayEvent.value.bookingName,
-      // bookingEmail: displayEvent.value.bookingEmail,
       eventCategory: editEvent.value.eventCategory === {} ? displayEvent.value.eventCategory : editEvent.value.eventCategory,
       eventStartTime:
         editEvent.value.eventStartTime === ""
@@ -321,25 +350,25 @@ export const useEvents = defineStore("Events", () => {
       eventDuration: displayEvent.value.eventDuration,
     }
 
-    console.log(editEventFile.value);
     const formData = new FormData();
     formData.append('event',new Blob([JSON.stringify(event)],{ type: 'application/json' }))
     formData.append('file',editEventFile.value == null ? undefined : editEventFile.value)
-    console.log(editEventFile.value);
-    console.log(formData);
 
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/events/${id}`,
-      {
+      localStorage.getItem("msal.idtoken") != null ? {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`,
+        },
+        body: formData
+      }:{
         method: "PUT",
         body: formData
       }
     );
     if (res.status === 200) {
       let event = await res.json();
-      // if (editEvent.eventStartTime !== "" || editEvent.eventNotes !== "") {
-      //   showEditPopUp();
-      // }
       await getEventDetail(id);
       editFile.value = false;
       resetEditField();
@@ -347,7 +376,7 @@ export const useEvents = defineStore("Events", () => {
       resetEditFile();
       editValidate.value = true;
       editFileName.value = displayEvent.value.fileName;
-      console.log("edit successfully");
+      console.log("edit event successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(saveEvent(id));
     } else if (res.status === 401 && login.logoutIcon == false) {
@@ -355,7 +384,7 @@ export const useEvents = defineStore("Events", () => {
     } else if (res.status === 400) {
       editValidate.value = false;
     }else {
-      console.log("error, cannot edit");
+      console.log("error, cannot edit event");
     }
   };
 
@@ -447,7 +476,6 @@ export const useEvents = defineStore("Events", () => {
     )
       ? eventStartTime
       : "previous time";
-    console.log(newEvent.value.eventStartTime);
   };
 
   // Get Overlap Time
@@ -495,7 +523,6 @@ export const useEvents = defineStore("Events", () => {
     createEventWithGuest,
     chooseFile,
     chooseEditFile,
-    // createFileUrl,
     resetNewEvent,
     resetNewEventFile,
     resetEditField,

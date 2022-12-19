@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onBeforeMount } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { onBeforeMount } from "vue";
+import { useRoute } from "vue-router";
 import { formatDate, formatTime } from "../main.js";
 import Datepicker from "@vuepic/vue-datepicker";
 import { useEvents } from "../stores/Events.js";

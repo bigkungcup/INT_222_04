@@ -12,6 +12,8 @@ import int221.kw4.clinics.entities.Role;
 import int221.kw4.clinics.entities.User;
 import int221.kw4.clinics.repositories.EventCategoryRepository;
 import int221.kw4.clinics.repositories.UserRepository;
+import lombok.SneakyThrows;
+import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -32,6 +34,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -119,16 +125,16 @@ public class UserService implements UserDetailsService {
         repository.saveAndFlush(user);
         user.setPassword("**********");
 
-//        emailService.sendSimpleMail(user.getEmail(), "Welcome to Clinic",
-//                "Welcome User: " + user.getName() + "\n" + "Your email: " + user.getEmail() + "\n" +
-//                        "Your role: " + user.getRole() + "\n" + "Create at: " + user.getCreatedOn());
-
         return ResponseEntity.status(201).body(user);
     }
 
     public ResponseEntity addEventCategoryToUser(Integer userId, Integer eventCategoryId) throws HandleExceptionNotFound {
         User user = repository.findById(userId).orElseThrow(() -> new HandleExceptionNotFound("User not found"));
         EventCategory eventCategory = eventCategoryRepository.findById(eventCategoryId).orElseThrow(() -> new HandleExceptionNotFound("Event Category not found"));
+
+        if(user.getRole().toString().equals("student") || user.getRole().toString().equals("admin")){
+           return ResponseEntity.status(400).body("the owner must have lecturer role");
+        }
 
         user.getEventCategories().stream().map(EventCategory::getId).forEach(id -> {
             if (id.equals(eventCategoryId)) {
@@ -142,10 +148,6 @@ public class UserService implements UserDetailsService {
         user.getEventCategories().add(eventCategory);
         repository.saveAndFlush(user);
         UserLecteurDTO lecturer = modelMapper.map(user, UserLecteurDTO.class);
-//        emailService.sendSimpleMail(user.getEmail(), "Add Category To User Successfully",
-//                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
-//                        "Your email: " + user.getEmail() + "\n" + "Category: " + eventCategory.getEventCategoryName() + "\n" +
-//                        "Your role: " + user.getRole(), new Date());
         return ResponseEntity.status(201).body(lecturer);
     }
 
@@ -155,34 +157,57 @@ public class UserService implements UserDetailsService {
                 () -> new HandleExceptionNotFound(
                         "User ID: " + userId + " does not exist !!!")
         );
-        repository.deleteById(userId);
-//        emailService.sendSimpleMail(user.getEmail(), "Delete User Successfully",
-//                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
-//                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
 
+        List<User> allUser = repository.findAll();
+        ArrayList<Integer> categories = new ArrayList<>();
+        ArrayList<Integer> userCategories = new ArrayList<>();
+        for (User u : allUser) {
+            u.getEventCategories().stream().map(EventCategory::getId).forEach(categories::add);
+        }
+
+        user.getEventCategories().stream().map(EventCategory::getId).forEach(userCategories::add);
+        System.out.println(categories);
+        System.out.println(userCategories);
+
+        for (Integer i : userCategories) {
+            if (categories.stream().filter(id -> id.equals(i)).count() == 1) {
+                return ResponseEntity.status(400).body("Cannot delete this category because category is not less than 1");
+            }
+        }
+
+        repository.deleteById(userId);
         return ResponseEntity.status(200).body("Delete UserID:" + userId);
     }
 
-    public ResponseEntity deleteEventCategoryUser(Integer userId, Integer eventCategoryId) throws HandleExceptionNotFound, HandleExceptionForbidden {
+    public ResponseEntity deleteEventCategoryUser(Integer userId, Integer eventCategoryId) throws HandleExceptionNotFound, HandleExceptionForbidden, HandleExceptionBadRequest {
         User user = repository.findById(userId).orElseThrow(
                 () -> new HandleExceptionNotFound(
                         "User ID: " + userId + " does not exist !!!")
         );
 
-        user.getEventCategories().stream().map(EventCategory::getId).forEach(id -> {
-            if (id.equals(eventCategoryId)) {
-                user.getEventCategories().removeIf(eventCategory -> eventCategory.getId().equals(eventCategoryId));
-                repository.saveAndFlush(user);
-            }
-        });
+        List<User> allUser = repository.findAll();
+        ArrayList<Integer> categories = new ArrayList<>();
+        for (User u : allUser) {
+            u.getEventCategories().stream().map(EventCategory::getId).forEach(categories::add);
+        }
+
+        if (categories.stream().filter(id -> id.equals(eventCategoryId)).count() == 1) {
+            return ResponseEntity.status(400).body("Cannot delete this category because category is not less than 1");
+        }
+
+        if(categories.contains(eventCategoryId)){
+            user.getEventCategories().removeIf(eventCategory -> eventCategory.getId().equals(eventCategoryId));
+            repository.saveAndFlush(user);
+        }else{
+            throw new HandleExceptionBadRequest("Event Category ID: " + eventCategoryId + " does not exist !!!");
+        }
+
         UserLecteurDTO lecturer = modelMapper.map(user, UserLecteurDTO.class);
-//        emailService.sendSimpleMail(user.getEmail(), "Delete Category in User Successfully",
-//                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
-//                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
         return ResponseEntity.status(200).body(lecturer);
     }
 
     //UPDATE
+    @SneakyThrows
     public ResponseEntity updateUser(UserEditDTO updateUser, Integer userId) throws HandleExceptionUnique {
         List<UserDTO> userList = getAll();
 
@@ -212,41 +237,37 @@ public class UserService implements UserDetailsService {
 
         modelMapper.map(updateUser, user);
         repository.saveAndFlush(user);
-//        emailService.sendSimpleMail(user.getEmail(), "Update User Successfully",
-//                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
-//                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
         return ResponseEntity.status(200).body(user);
     }
 
-    public ResponseEntity loginWithMicrosoft(UserPostMSDTO user, HttpServletRequest request, HttpServletResponse response) {
-        List<User> userList = repository.findAll();
-        User userDetail = repository.findByEmail(user.getEmail());
+    public ResponseEntity loginWithMicrosoft(HttpServletRequest request, HttpServletResponse response) {
+        String authorizationHeader = request.getHeader(AUTHORIZATION);
 
-        if(userDetail != null){
-                if(!userDetail.getRole().toString().equals(user.getRole().toString())){
-                    userDetail.setRole(user.getRole());
-                    repository.saveAndFlush(userDetail);
-                }
+        String token = authorizationHeader.substring("Bearer ".length());
+        String[] chunks = token.split("\\.");
+
+        JSONObject header = new JSONObject(decode(chunks[0]));
+        JSONObject payload = new JSONObject(decode(chunks[1]));
+
+        String name = payload.getString("name");
+        String email = payload.getString("preferred_username");
+        String role;
+        try {
+            role = payload.getJSONArray("roles").getString(0);
+        } catch (Exception e) {
+            role = "guest";
         }
 
-        for (int i = 0; i < userList.size(); i++) {
-            System.out.println(userList.get(i).getEmail());
-            if (userList.get(i).getEmail().equals(user.getEmail())) {
-                System.out.println("Login with Microsoft");
-                login(user, request, response);
-                return ResponseEntity.status(200).body(userDetail);
-            }
+        User user = repository.findByEmail(email);
+        if (user != null) {
+            return ResponseEntity.status(200).body(user);
+        } else {
+            Map<String, String> map = new HashMap<>();
+            map.put("name", name);
+            map.put("email", email);
+            map.put("role", role);
+            return ResponseEntity.status(200).body(map);
         }
-
-        System.out.println("Register with Microsoft");
-        if(user.getRole().toString().equals("guest")){
-            user.setRole(Role.guest);
-        }
-        User detail = modelMapper.map(user, User.class);
-        repository.saveAndFlush(detail);
-        login(user, request, response);
-
-        return ResponseEntity.status(200).body(detail);
     }
 
     //AUTHENTICATION
@@ -264,37 +285,9 @@ public class UserService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
     }
 
-    public Cookie createCookie(String name, String value, Integer maxAge) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(maxAge);
-        cookie.setPath("/");
-        return cookie;
+    public String decode(String chunks) {
+        Base64.Decoder decoder = Base64.getUrlDecoder();
+        String decode = new String(decoder.decode(chunks));
+        return decode;
     }
-
-    public void login(UserPostMSDTO user, HttpServletRequest request, HttpServletResponse response) {
-        String secret = "secret";
-        Algorithm algorithm = Algorithm.HMAC256(secret.getBytes(StandardCharsets.UTF_8));
-        List<Object> roles = new ArrayList<>();
-        roles.add(user.getRole().toString());
-
-        Integer jwtExpirationInMs = 30 * 60 * 1000;
-        String access_token = JWT.create()
-                .withSubject(user.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + jwtExpirationInMs))
-                .withIssuer(request.getRequestURI())
-                .withClaim("roles", roles)
-                .sign(algorithm);
-
-        Integer refreshExpirationDateInMs = 24 * 60 * 60 * 1000;
-        String refresh_token = JWT.create()
-                .withSubject(user.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + refreshExpirationDateInMs))
-                .withIssuer(request.getRequestURI().toString())
-                .sign(algorithm);
-
-        response.addCookie(createCookie("access_token", access_token, jwtExpirationInMs));
-        response.addCookie(createCookie("refresh_token", refresh_token, refreshExpirationDateInMs));
-    }
-
 }

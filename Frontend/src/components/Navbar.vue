@@ -1,6 +1,4 @@
 <script setup>
-// import { useLogin } from "../stores/Login.js";
-// const login = useLogin();
 defineEmits(["logout","toggle"]);
 
 defineProps({
@@ -45,7 +43,7 @@ defineProps({
             </router-link>
         </div>
         <div class="grid place-content-center">
-            <router-link :to="{ name: 'Home' }">
+            <router-link :to="{ name: 'AboutUs' }">
                 <p class="hover:underline underline-offset-8">About Us</p>
             </router-link>
         </div>
@@ -60,8 +58,6 @@ defineProps({
                 Sign In
             </span>
             </router-link>
-            <!-- <button @click="login.msSignOut()">logout</button> -->
-            <!-- <button class="font-bold hover:underline underline-offset-8" v-show="logoutIcon" @click="$emit('toggle')">Log Out</button> -->
             <router-link :to="{ name: 'Profile' }" v-show="logoutIcon">
             <button class="rounded-full border-4 border-Web-pink px-4 font-bold hover:bg-Web-pink w-40">
                 <div class="flex">

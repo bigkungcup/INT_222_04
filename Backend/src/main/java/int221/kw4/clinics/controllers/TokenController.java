@@ -113,7 +113,7 @@ public class TokenController {
             for (Cookie cookie : cookies) {
                 cookie.setValue("");
                 cookie.setPath("/");
-//                cookie.setMaxAge(-1);
+                cookie.setMaxAge(0);
                 resp.addCookie(cookie);
             }
     }

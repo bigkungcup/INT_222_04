@@ -17,5 +17,4 @@ onBeforeMount(async () => {
 </template>
  
 <style>
-
 </style>
