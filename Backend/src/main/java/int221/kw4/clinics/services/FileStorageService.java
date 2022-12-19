@@ -45,7 +45,7 @@ public class FileStorageService {
     }
 
     public String storeFile(MultipartFile file, Event event) {
-        String userDir = event.getBookingEmail() != null ? "User/" + "User_" + event.getUser().getEmail() : "Guest";
+        String userDir = event.getBookingEmail() != null ? "User/" + "User_" + event.getBookingEmail() : "Guest";
         String eventDir = "Event_" + event.getId().toString();
         if (file == null || file.isEmpty()) {
             try {
@@ -83,7 +83,7 @@ public class FileStorageService {
     }
 
     public Resource loadFileAsResource(String fileName, Event event) throws HandleExceptionNotFound {
-        String userDir = event.getBookingEmail() != null ? "User/" + "User_" + event.getUser().getEmail() : "Guest";
+        String userDir = event.getBookingEmail() != null ? "User/" + "User_" + event.getBookingEmail() : "Guest";
         String eventDir = "Event_" + event.getId().toString();
         try {
             Path filePath = this.fileStorageLocation.resolve(userDir).resolve(eventDir).resolve(fileName).normalize();
@@ -102,7 +102,7 @@ public class FileStorageService {
 
     public Resource loadFileAsResource(String fileName, Integer id) throws HandleExceptionNotFound {
         Event event = eventRepository.findById(id).orElseThrow(() -> new MyFileNotFoundException("Event not found with id " + id));
-        String userDir = event.getBookingEmail() != null ? "User/" + "User_" + event.getUser().getEmail() : "Guest";
+        String userDir = event.getBookingEmail() != null ? "User/" + "User_" + event.getBookingEmail() : "Guest";
         String eventDir = "Event_" + event.getId().toString();
         try {
             Path filePath = this.fileStorageLocation.resolve(userDir).resolve(eventDir).resolve(fileName).normalize();
