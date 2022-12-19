@@ -125,10 +125,6 @@ public class UserService implements UserDetailsService {
         repository.saveAndFlush(user);
         user.setPassword("**********");
 
-//        emailService.sendSimpleMail(user.getEmail(), "Welcome to Clinic",
-//                "Welcome User: " + user.getName() + "\n" + "Your email: " + user.getEmail() + "\n" +
-//                        "Your role: " + user.getRole() + "\n" + "Create at: " + user.getCreatedOn());
-
         return ResponseEntity.status(201).body(user);
     }
 
@@ -152,10 +148,6 @@ public class UserService implements UserDetailsService {
         user.getEventCategories().add(eventCategory);
         repository.saveAndFlush(user);
         UserLecteurDTO lecturer = modelMapper.map(user, UserLecteurDTO.class);
-//        emailService.sendSimpleMail(user.getEmail(), "Add Category To User Successfully",
-//                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
-//                        "Your email: " + user.getEmail() + "\n" + "Category: " + eventCategory.getEventCategoryName() + "\n" +
-//                        "Your role: " + user.getRole(), new Date());
         return ResponseEntity.status(201).body(lecturer);
     }
 
@@ -184,10 +176,6 @@ public class UserService implements UserDetailsService {
         }
 
         repository.deleteById(userId);
-//        emailService.sendSimpleMail(user.getEmail(), "Delete User Successfully",
-//                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
-//                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
-
         return ResponseEntity.status(200).body("Delete UserID:" + userId);
     }
 
@@ -215,9 +203,6 @@ public class UserService implements UserDetailsService {
         }
 
         UserLecteurDTO lecturer = modelMapper.map(user, UserLecteurDTO.class);
-//        emailService.sendSimpleMail(user.getEmail(), "Delete Category in User Successfully",
-//                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
-//                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
         return ResponseEntity.status(200).body(lecturer);
     }
 
@@ -252,41 +237,10 @@ public class UserService implements UserDetailsService {
 
         modelMapper.map(updateUser, user);
         repository.saveAndFlush(user);
-//        emailService.sendSimpleMail(user.getEmail(), "Update User Successfully",
-//                "Time at: " + new Date() + "User: " + user.getName() + "\n" +
-//                        "Your email: " + user.getEmail() + "\n" + "Your role: " + user.getRole(), new Date());
         return ResponseEntity.status(200).body(user);
     }
 
     public ResponseEntity loginWithMicrosoft(HttpServletRequest request, HttpServletResponse response) {
-//        List<User> userList = repository.findAll();
-//        User userDetail = repository.findByEmail(user.getEmail());
-
-//        if(userDetail != null){
-//                if(!userDetail.getRole().toString().equals(user.getRole().toString())){
-//                    userDetail.setRole(user.getRole());
-//                    repository.saveAndFlush(userDetail);
-//                }
-//        }
-
-//        for (int i = 0; i < userList.size(); i++) {
-//            System.out.println(userList.get(i).getEmail());
-//            if (userList.get(i).getEmail().equals(user.getEmail())) {
-//                System.out.println("Login with Microsoft");
-//                login(user, request, response);
-//                return ResponseEntity.status(200).body(userDetail);
-//            }
-//        }
-
-//        System.out.println("Register with Microsoft");
-//        if(user.getRole().toString().equals("guest")){
-//            user.setRole(Role.guest);
-//        }
-
-//        User detail = modelMapper.map(user, User.class);
-//        repository.saveAndFlush(detail);
-//        login(user, request, response);
-
         String authorizationHeader = request.getHeader(AUTHORIZATION);
 
         String token = authorizationHeader.substring("Bearer ".length());
@@ -331,55 +285,9 @@ public class UserService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
     }
 
-    public Cookie createCookie(String name, String value, Integer maxAge) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(maxAge);
-        cookie.setPath("/");
-        return cookie;
-    }
-
-    public void login(UserPostMSDTO user, HttpServletRequest request, HttpServletResponse response) {
-        String secret = "secret";
-        Algorithm algorithm = Algorithm.HMAC256(secret.getBytes(StandardCharsets.UTF_8));
-        List<Object> roles = new ArrayList<>();
-        roles.add(user.getRole().toString());
-
-        Integer jwtExpirationInMs = 30 * 60 * 1000;
-        String access_token = JWT.create()
-                .withSubject(user.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + jwtExpirationInMs))
-                .withIssuer(request.getRequestURI())
-                .withClaim("roles", roles)
-                .sign(algorithm);
-
-        Integer refreshExpirationDateInMs = 24 * 60 * 60 * 1000;
-        String refresh_token = JWT.create()
-                .withSubject(user.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + refreshExpirationDateInMs))
-                .withIssuer(request.getRequestURI().toString())
-                .sign(algorithm);
-
-        response.addCookie(createCookie("access_token", access_token, jwtExpirationInMs));
-        response.addCookie(createCookie("refresh_token", refresh_token, refreshExpirationDateInMs));
-    }
-
     public String decode(String chunks) {
         Base64.Decoder decoder = Base64.getUrlDecoder();
         String decode = new String(decoder.decode(chunks));
         return decode;
-    }
-
-    public String getRole() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String role = authentication.getAuthorities().stream().findFirst().get().getAuthority();
-        return role;
-    }
-
-    public String getEmail() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Authentication: " + authentication);
-        String email = authentication.getPrincipal().toString();
-        return email;
     }
 }

@@ -96,7 +96,3 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 }
-//                .antMatchers(POST, "/api/users/match/**").hasAnyAuthority("admin")
-//                .antMatchers(DELETE, "/api/users/**").hasAnyAuthority("admin")
-//                .antMatchers(PUT, "/api/users/**").hasAnyAuthority("admin")
-//                .antMatchers(POST, "/api/users/**").hasAnyAuthority("admin");
