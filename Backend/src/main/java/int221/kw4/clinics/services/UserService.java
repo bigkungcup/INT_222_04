@@ -12,6 +12,7 @@ import int221.kw4.clinics.entities.Role;
 import int221.kw4.clinics.entities.User;
 import int221.kw4.clinics.repositories.EventCategoryRepository;
 import int221.kw4.clinics.repositories.UserRepository;
+import lombok.SneakyThrows;
 import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
@@ -133,6 +134,10 @@ public class UserService implements UserDetailsService {
         User user = repository.findById(userId).orElseThrow(() -> new HandleExceptionNotFound("User not found"));
         EventCategory eventCategory = eventCategoryRepository.findById(eventCategoryId).orElseThrow(() -> new HandleExceptionNotFound("Event Category not found"));
 
+        if(user.getRole().toString().equals("student") || user.getRole().toString().equals("admin")){
+           return ResponseEntity.status(400).body("the owner must have lecturer role");
+        }
+
         user.getEventCategories().stream().map(EventCategory::getId).forEach(id -> {
             if (id.equals(eventCategoryId)) {
                 try {
@@ -162,7 +167,7 @@ public class UserService implements UserDetailsService {
         List<User> allUser = repository.findAll();
         ArrayList<Integer> categories = new ArrayList<>();
         ArrayList<Integer> userCategories = new ArrayList<>();
-        for (User u : allUser){
+        for (User u : allUser) {
             u.getEventCategories().stream().map(EventCategory::getId).forEach(categories::add);
         }
 
@@ -170,8 +175,8 @@ public class UserService implements UserDetailsService {
         System.out.println(categories);
         System.out.println(userCategories);
 
-        for (Integer i : userCategories){
-            if (categories.stream().filter(id -> id.equals(i)).count() == 1){
+        for (Integer i : userCategories) {
+            if (categories.stream().filter(id -> id.equals(i)).count() == 1) {
                 return ResponseEntity.status(400).body("Cannot delete this category because category is not less than 1");
             }
         }
@@ -192,11 +197,11 @@ public class UserService implements UserDetailsService {
 
         List<User> allUser = repository.findAll();
         ArrayList<Integer> categories = new ArrayList<>();
-        for (User u : allUser){
+        for (User u : allUser) {
             u.getEventCategories().stream().map(EventCategory::getId).forEach(categories::add);
         }
 
-        if (categories.stream().filter(id -> id.equals(eventCategoryId)).count() == 1){
+        if (categories.stream().filter(id -> id.equals(eventCategoryId)).count() == 1) {
             return ResponseEntity.status(400).body("Cannot delete this category because category is not less than 1");
         }
 
@@ -204,7 +209,7 @@ public class UserService implements UserDetailsService {
             if (id.equals(eventCategoryId)) {
                 user.getEventCategories().removeIf(eventCategory -> eventCategory.getId().equals(eventCategoryId));
                 repository.saveAndFlush(user);
-            }else{
+            } else {
                 try {
                     throw new HandleExceptionBadRequest("Event Category ID: " + eventCategoryId + " does not exist !!!");
                 } catch (HandleExceptionBadRequest e) {
@@ -220,6 +225,7 @@ public class UserService implements UserDetailsService {
     }
 
     //UPDATE
+    @SneakyThrows
     public ResponseEntity updateUser(UserEditDTO updateUser, Integer userId) throws HandleExceptionUnique {
         List<UserDTO> userList = getAll();
 
@@ -295,16 +301,16 @@ public class UserService implements UserDetailsService {
         String name = payload.getString("name");
         String email = payload.getString("preferred_username");
         String role;
-        try{
+        try {
             role = payload.getJSONArray("roles").getString(0);
-        }catch (Exception e){
+        } catch (Exception e) {
             role = "guest";
         }
 
         User user = repository.findByEmail(email);
-        if(user != null){
+        if (user != null) {
             return ResponseEntity.status(200).body(user);
-        }else {
+        } else {
             Map<String, String> map = new HashMap<>();
             map.put("name", name);
             map.put("email", email);
@@ -361,9 +367,22 @@ public class UserService implements UserDetailsService {
         response.addCookie(createCookie("refresh_token", refresh_token, refreshExpirationDateInMs));
     }
 
-    public String decode(String chunks){
+    public String decode(String chunks) {
         Base64.Decoder decoder = Base64.getUrlDecoder();
         String decode = new String(decoder.decode(chunks));
         return decode;
+    }
+
+    public String getRole() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String role = authentication.getAuthorities().stream().findFirst().get().getAuthority();
+        return role;
+    }
+
+    public String getEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Authentication: " + authentication);
+        String email = authentication.getPrincipal().toString();
+        return email;
     }
 }
