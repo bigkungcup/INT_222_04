@@ -88,13 +88,13 @@ export const useUsers = defineStore("Users", () => {
       userList.value = await res.json();
       deletePopup.value = false;
       undeletePopup.value = false;
-      console.log("get user lists successfully");
+      console.log("get user list successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getUserList());
     } else if (res.status === 401 && login.logoutIcon == false) {
     }
     // else if (res.status === 403) {}
-    else console.log("error, cannot get user lists");
+    else console.log("error, cannot get user list");
   };
 
   //Get All User
@@ -110,11 +110,11 @@ export const useUsers = defineStore("Users", () => {
     });
     if (res.status === 200) {
       userListAll.value = await res.json();
-      console.log("get all user lists successfully");
+      console.log("get all user list successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getUserAll());
     } else if (res.status === 401 && login.logoutIcon == false) {
-    } else console.log("error, cannot get user lists");
+    } else console.log("error, cannot get all user list");
   };
 
   //Get User Detail
@@ -132,11 +132,11 @@ export const useUsers = defineStore("Users", () => {
     );
     if (res.status === 200) {
       displayUser.value = await res.json();
-      console.log("get successfully");
+      console.log("get user detail successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(getUserDetail(userId));
     } else if (res.status === 401 && login.logoutIcon == false) {
-    } else console.log("error, cannot get user");
+    } else console.log("error, cannot get user user detail");
   };
 
   //Create User
@@ -172,14 +172,12 @@ export const useUsers = defineStore("Users", () => {
     });
     if (res.status === 201) {
       const addUser = await res.json();
-      userList.value.push(addUser);
       if (newUser.value.role == "lecturer") {
         addLecturerClinic(addUser.id, lecturerClinic.value);
       }
       signUpSuccessfully.value = true;
       resetNewUser();
-      getUserAll();
-      console.log("created successfully");
+      console.log("created user successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(signUp());
     } else if (res.status === 400) {
@@ -188,7 +186,7 @@ export const useUsers = defineStore("Users", () => {
       userUnique.value = false;
     } 
     else {
-      console.log("error, cannot create");
+      console.log("error, cannot create user");
     }
   };
 
@@ -221,12 +219,11 @@ export const useUsers = defineStore("Users", () => {
       });
       if (res.status === 200) {
         displayUser.value = await res.json();
-        console.log(newUserClinic.value);
         if (displayUser.value.role == "lecturer" && newUserClinic.value != '') {
           addLecturerClinic(userId,newUserClinic.value);
         }
         editUserSuccessfully.value = true;
-        console.log("edit successfully");
+        console.log("edit user successfully");
       } else if (res.status === 401 && login.logoutIcon == true) {
         login.getRefresh(saveUser(userId));
       } else if(res.status === 401 && login.logoutIcon == false){
@@ -235,7 +232,7 @@ export const useUsers = defineStore("Users", () => {
       } else if (res.status === 500) {
         userUnique.value = false;
       } else {
-        console.log("error, cannot edit");
+        console.log("error, cannot edit user");
       }
     };
 
@@ -259,12 +256,12 @@ export const useUsers = defineStore("Users", () => {
       }
     );
     if (res.status === 200) {
-      console.log("created successfully");
+      console.log("created lecturer clinic successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(addLecturerClinic(userId,lecturerClinicId));
     } else if (res.status === 401 && login.logoutIcon == false) {
     } else {
-      console.log("error, cannot create");
+      console.log("error, cannot create lecturer clinic");
     }
   };
 
@@ -287,11 +284,11 @@ export const useUsers = defineStore("Users", () => {
       displayUser.value = displayUser.value.eventCategories.filter(
         (category) => category.eventCategoryId !== userClinicId
       );
-      console.log("Delete category success");
+      console.log("Delete lecturer category successfully");
       }else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(deleteLecturerClinic(userId, userClinicId));
     } else if (res.status === 401 && login.logoutIcon == false) {
-    } else console.log("Delete category not success");
+    } else console.log("error, cannot delete lecturer category");
   };
 
 
@@ -313,13 +310,13 @@ export const useUsers = defineStore("Users", () => {
         (user) => user.id !== userId
       );
       getUserList(userList.value.pageNumber);
-      console.log("deleteted succesfully");
+      console.log("deletet user succesfully");
     }else if(res.status === 400 && login.logoutIcon == true){
       undeletePopup.value = true;
   }  else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(removeUser(userId));
     } else if (res.status === 401 && login.logoutIcon == false) {
-    } else console.log("error, cannot delete");
+    } else console.log("error, cannot delete user");
     if(userList.value.content.length == 0 && userList.value.pageNumber > 0){
       userList.value.pageNumber = userList.value.pageNumber-1;
       getUserList(userList.value.pageNumber);
@@ -342,13 +339,11 @@ export const useUsers = defineStore("Users", () => {
         if (res.status === 200) {
           checkEvent.value = await res.json();
           deletePopup.value = true;
-          console.log(checkEvent.value);
           console.log("check user event succesfully");
         } else if (res.status === 401 && login.logoutIcon == true) {
           login.getRefresh(checkUserEvent(userId));
         } else if (res.status === 401 && login.logoutIcon == false) {
         }
-        // else if (res.status === 403) {}
         else console.log("error, cannot check user event");
       };
 

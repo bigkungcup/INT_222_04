@@ -166,15 +166,11 @@ export const useEvents = defineStore("Events", () => {
       } else if (res.status === 401 && login.logoutIcon == true) {
         login.getRefresh(getDownloadFile(eventId,fileName));
       } else if (res.status === 401 && login.logoutIcon == false) {
-      } else console.log("error, cannot get all event list");
+      } else console.log("error, cannot download file");
     };
 
   //Create Event
   const createEvent = async () => {
-    console.log(getOverlapTime(
-      newEvent.value.eventStartTime,
-      newEvent.value.eventCategory.id
-    ));
     const event = {
         bookingName: newEvent.value.bookingName,
         bookingEmail: newEvent.value.bookingEmail.match(validEmail)
@@ -194,7 +190,6 @@ export const useEvents = defineStore("Events", () => {
     const formData = new FormData();
     formData.append('event',new Blob([JSON.stringify(event)],{ type: 'application/json' }))
     formData.append('file',eventFile.value == null ? document.getElementById("file").setCustomValidity('') : eventFile.value)
-    console.log(formData);
 
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events`, 
     localStorage.getItem("msal.idtoken") != null ?{
@@ -209,8 +204,6 @@ export const useEvents = defineStore("Events", () => {
     });
     if (res.status === 201) {
       const addEvent = await res.json();
-      // eventListAll.value.push(addEvent);
-      // getAllEventList();
       bookingSeccessfully.value = true;
       console.log("created successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
@@ -246,7 +239,6 @@ export const useEvents = defineStore("Events", () => {
       const formData = new FormData();
       formData.append('event',new Blob([JSON.stringify(event)],{ type: 'application/json' }))
       formData.append('file',eventFile.value == null ? undefined : eventFile.value)
-      console.log(formData);
 
         const res = await fetch(`${import.meta.env.VITE_BASE_URL}/events/guest`, 
         localStorage.getItem("msal.idtoken") != null ? {
@@ -262,7 +254,6 @@ export const useEvents = defineStore("Events", () => {
         if (res.status === 201) {
           const addEvent = await res.json();
           bookingSeccessfully.value = true;
-          // listsNewEvent.value.push(addEvent);
           console.log("created successfully");
         }else if (res.status === 401 && login.logoutIcon == true) {
           login.getRefresh(createEventWithGuest());
@@ -299,12 +290,12 @@ export const useEvents = defineStore("Events", () => {
         eventList.value.pageNumber = eventList.value.pageNumber-1;
         getFilterEventList(selectClinic,selectTime,eventList.value.pageNumber);
       }
-      console.log("deleteted succesfully");
+      console.log("deleteted event succesfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(removeEvent(eventId));
     } else if (res.status === 401 && login.logoutIcon == false) {
       login.noAuthentication = true;
-    } else console.log("error, cannot delete");
+    } else console.log("error, cannot delete event");
   };
 
   //Delete File
@@ -321,19 +312,13 @@ export const useEvents = defineStore("Events", () => {
       }
     );
     if (res.status === 200) {
-      // eventList.value.content = eventList.value.content.filter(
-      //   (event) => event.id !== eventId
-      // );
-      // if (editEvent.eventStartTime !== "" || editEvent.eventNotes !== "") {
-      //   showEditPopUp();
-      // }
       await getEventDetail(eventId);
       editFile.value = false;
       resetEditFile();
       editValidate.value = true;
       deleteFileCheck.value = false;
       editFileName.value = displayEvent.value.fileName;
-      console.log("edit successfully");
+      console.log("Delete file successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(removeFile(eventId));
     } else if (res.status === 401 && login.logoutIcon == false) {
@@ -341,15 +326,13 @@ export const useEvents = defineStore("Events", () => {
     } else if (res.status === 400) {
       editValidate.value = false;
     }else {
-      console.log("error, cannot edit");
+      console.log("error, cannot delete file");
     }
   };
 
   //Edit Event
   const saveEvent = async (id) => {
     const event = {
-      // bookingName: displayEvent.value.bookingName,
-      // bookingEmail: displayEvent.value.bookingEmail,
       eventCategory: editEvent.value.eventCategory === {} ? displayEvent.value.eventCategory : editEvent.value.eventCategory,
       eventStartTime:
         editEvent.value.eventStartTime === ""
@@ -367,12 +350,9 @@ export const useEvents = defineStore("Events", () => {
       eventDuration: displayEvent.value.eventDuration,
     }
 
-    console.log(editEventFile.value);
     const formData = new FormData();
     formData.append('event',new Blob([JSON.stringify(event)],{ type: 'application/json' }))
     formData.append('file',editEventFile.value == null ? undefined : editEventFile.value)
-    console.log(editEventFile.value);
-    console.log(formData);
 
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/events/${id}`,
@@ -389,9 +369,6 @@ export const useEvents = defineStore("Events", () => {
     );
     if (res.status === 200) {
       let event = await res.json();
-      // if (editEvent.eventStartTime !== "" || editEvent.eventNotes !== "") {
-      //   showEditPopUp();
-      // }
       await getEventDetail(id);
       editFile.value = false;
       resetEditField();
@@ -399,7 +376,7 @@ export const useEvents = defineStore("Events", () => {
       resetEditFile();
       editValidate.value = true;
       editFileName.value = displayEvent.value.fileName;
-      console.log("edit successfully");
+      console.log("edit event successfully");
     } else if (res.status === 401 && login.logoutIcon == true) {
       login.getRefresh(saveEvent(id));
     } else if (res.status === 401 && login.logoutIcon == false) {
@@ -407,7 +384,7 @@ export const useEvents = defineStore("Events", () => {
     } else if (res.status === 400) {
       editValidate.value = false;
     }else {
-      console.log("error, cannot edit");
+      console.log("error, cannot edit event");
     }
   };
 
@@ -499,7 +476,6 @@ export const useEvents = defineStore("Events", () => {
     )
       ? eventStartTime
       : "previous time";
-    console.log(newEvent.value.eventStartTime);
   };
 
   // Get Overlap Time
@@ -547,7 +523,6 @@ export const useEvents = defineStore("Events", () => {
     createEventWithGuest,
     chooseFile,
     chooseEditFile,
-    // createFileUrl,
     resetNewEvent,
     resetNewEventFile,
     resetEditField,

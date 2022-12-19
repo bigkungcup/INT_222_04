@@ -1,12 +1,10 @@
 <script setup>
-import { ref, onBeforeMount, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { ref, onBeforeMount } from "vue";
 import Logout from "../components/Logout.vue";
 import { formatDate, formatTime } from "../main.js";
 import { useUsers } from "../stores/Users.js";
 import { useLogin } from "../stores/Login.js";
 
-const { params } = useRoute();
 const user = useUsers();
 const login = useLogin();
 
@@ -21,7 +19,6 @@ login.msLogoutIcon = localStorage.getItem("msal.idtoken") != null ? true : false
 onBeforeMount(async () => {
     await user.getUserDetail(localStorage.getItem('id'));
     displayUser.value = localStorage.getItem("msal.idtoken") != null ? displayUser.value : user.displayUser;
-    console.log(displayUser.value);
 });
 
 
@@ -82,10 +79,7 @@ onBeforeMount(async () => {
 <style>
 ul.no-bullets {
     list-style-type: none;
-    /* Remove bullets */
     padding: 0;
-    /* Remove padding */
     margin: 0;
-    /* Remove margins */
 }
 </style>

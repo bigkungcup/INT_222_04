@@ -17,7 +17,6 @@ export const useLogin = defineStore("Login", () => {
   const loginValidate = ref(true);
   const noAuthentication = ref(false);
   
-  //เดี๋ยวก็ลบ
   const noAuthorization = ref(false);
 
   const loginAccount = ref({
@@ -51,7 +50,6 @@ export const useLogin = defineStore("Login", () => {
 
 
   const setToken = (token) => {
-    // localStorage.setItem("id", token.id);
     localStorage.setItem("name", token.name);
     localStorage.setItem("email", token.email);
     localStorage.setItem("role", token.role);
@@ -61,7 +59,6 @@ export const useLogin = defineStore("Login", () => {
     localStorage.removeItem("role");
     localStorage.removeItem("email");
     localStorage.removeItem("name");
-    // localStorage.removeItem("id");
   };
 
   const delete_cookie = (name) => {
@@ -135,29 +132,19 @@ export const useLogin = defineStore("Login", () => {
       logoutIcon.value = false;
       userPageIcon.value = false;
       router.push({ name: "Login" });
-    } else console.log();
+    }
   };
 
   //Microsoft
   const msSignIn = async () => {
     let response = await myMSALObj.loginPopup(loginRequest);
-    console.log(response);
     resetToken();
-    // localStorage.setItem("name", response.account.name);
-    // localStorage.setItem("email", response.account.userName);
-    // localStorage.setItem("role", response.account.idTokenClaims.roles == undefined ? "guest" : response.account.idTokenClaims.roles[0] ); 
-    // console.log(localStorage.getItem("email"));
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/users/loginWithMS`, {
       method: "GET",
       headers: { 
         "content-type": "application/json" ,
         Authorization: `Bearer ${localStorage.getItem("msal.idtoken")}`
       },
-      // body: JSON.stringify({
-      //   role: localStorage.getItem("role"),
-      //   name: localStorage.getItem("name"),
-      //   email: localStorage.getItem("email") 
-      // }),
     });
     if (res.status === 200) {
       token.value = await res.json();

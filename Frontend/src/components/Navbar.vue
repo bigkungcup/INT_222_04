@@ -1,6 +1,4 @@
 <script setup>
-// import { useLogin } from "../stores/Login.js";
-// const login = useLogin();
 defineEmits(["logout","toggle"]);
 
 defineProps({
@@ -60,8 +58,6 @@ defineProps({
                 Sign In
             </span>
             </router-link>
-            <!-- <button @click="login.msSignOut()">logout</button> -->
-            <!-- <button class="font-bold hover:underline underline-offset-8" v-show="logoutIcon" @click="$emit('toggle')">Log Out</button> -->
             <router-link :to="{ name: 'Profile' }" v-show="logoutIcon">
             <button class="rounded-full border-4 border-Web-pink px-4 font-bold hover:bg-Web-pink w-40">
                 <div class="flex">

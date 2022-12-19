@@ -18,7 +18,6 @@ event.newEvent.eventCategory = [];
 
 onBeforeMount(async () => {
     await clinic.getClinics();
-    // await event.getAllEventList();
     event.resetNewEvent();
     checkGuest.value = login.getRoleToken() == null ? true : false;
 });
@@ -162,12 +161,5 @@ onBeforeMount(async () => {
 input[type="file"] {
     display: none;
 }
-
-/* .custom-file-upload {
-    border: 1px solid #ccc;
-    display: inline-block;
-    padding: 6px 12px;
-    cursor: pointer;
-} */
 
 </style>

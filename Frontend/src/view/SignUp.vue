@@ -1,5 +1,5 @@
 <script setup>
-import { ref,onBeforeMount } from "vue";
+import { onBeforeMount } from "vue";
 import { useClinics } from "../stores/Clinics.js";
 import { useUsers } from "../stores/Users";
 import SignUpSuccessfully from "../components/SignUpSuccessfully.vue";

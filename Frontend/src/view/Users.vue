@@ -1,5 +1,5 @@
 <script setup>
-import { ref,onBeforeMount } from "vue";
+import { onBeforeMount } from "vue";
 import { useUsers } from "../stores/Users.js";
 import UserList from "../components/UserList.vue";
 import UserEmptyList from "../components/UserEmptyList.vue";
