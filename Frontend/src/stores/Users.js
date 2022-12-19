@@ -172,9 +172,9 @@ export const useUsers = defineStore("Users", () => {
     });
     if (res.status === 201) {
       const addUser = await res.json();
-      if (newUser.value.role == "lecturer") {
-        addLecturerClinic(addUser.id, lecturerClinic.value);
-      }
+      // if (newUser.value.role == "lecturer") {
+      //   addLecturerClinic(addUser.id, lecturerClinic.value);
+      // }
       signUpSuccessfully.value = true;
       resetNewUser();
       console.log("created user successfully");

@@ -17,7 +17,9 @@ const displayUser = ref({
 login.msLogoutIcon = localStorage.getItem("msal.idtoken") != null ? true : false;
 
 onBeforeMount(async () => {
-    await user.getUserDetail(localStorage.getItem('id'));
+    if(login.msLogoutIcon == false){
+        await user.getUserDetail(localStorage.getItem('id'));
+    };
     displayUser.value = localStorage.getItem("msal.idtoken") != null ? displayUser.value : user.displayUser;
 });
 
