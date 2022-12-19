@@ -52,8 +52,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             Cookie access_token = WebUtils.getCookie(request, "access_token");
             String authorizationHeader = request.getHeader(AUTHORIZATION);
 
-            if(authorizationHeader != null){
-                try{
+            if (authorizationHeader != null) {
+                try {
                     String token = authorizationHeader.substring("Bearer ".length());
                     String[] chunks = token.split("\\.");
 
@@ -64,7 +64,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     System.out.println("Header: " + header);
                     System.out.println("Payload: " + payload);
 
-                    if(payload.getString("iss").equals("https://login.microsoftonline.com/6f4432dc-20d2-441d-b1db-ac3380ba633d/v2.0")){
+                    if (payload.getString("iss").equals("https://login.microsoftonline.com/6f4432dc-20d2-441d-b1db-ac3380ba633d/v2.0")) {
                         DecodedJWT decodedJWT = JWT.decode(token);
                         JwkProvider provider = new UrlJwkProvider(new URL("https://login.microsoftonline.com/6f4432dc-20d2-441d-b1db-ac3380ba633d/discovery/v2.0/keys"));
                         Jwk jwk = provider.get(decodedJWT.getKeyId());
@@ -74,9 +74,9 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
                     String username = payload.getString("preferred_username");
                     String role;
-                    try{
+                    try {
                         role = payload.getJSONArray("roles").getString(0);
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         role = "guest";
                     }
                     System.out.println("Role: " + role);
@@ -85,7 +85,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                     filterChain.doFilter(request, response);
-                }catch (Exception exception){
+                } catch (Exception exception) {
                     System.out.println("Error login in:" + exception.getMessage());
                     response.setHeader("Error", exception.getMessage());
                     response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -94,7 +94,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     response.setContentType(APPLICATION_JSON_VALUE);
                     new ObjectMapper().writeValue(response.getOutputStream(), error);
                 }
-            }else if (access_token != null) {
+            } else if (access_token != null) {
                 try {
                     Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
                     JWTVerifier verifier = JWT.require(algorithm).build();
@@ -118,7 +118,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     response.setContentType(APPLICATION_JSON_VALUE);
                     new ObjectMapper().writeValue(response.getOutputStream(), error);
                 }
-            }  else {
+            } else {
                 HandleExceptionLogin errors;
                 Map<String, String> errorMap = new HashMap<>();
                 Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -134,7 +134,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         }
     }
 
-    public String decode(String chunks){
+    public String decode(String chunks) {
         Base64.Decoder decoder = Base64.getUrlDecoder();
         String decode = new String(decoder.decode(chunks));
         return decode;

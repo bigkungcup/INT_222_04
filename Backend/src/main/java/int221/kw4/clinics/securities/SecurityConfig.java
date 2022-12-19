@@ -85,7 +85,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers(POST, "/api/events/**").hasAnyAuthority("student", "admin", "guest")
                 .antMatchers(PUT, "/api/events/**").hasAnyAuthority("student", "admin")
                 .antMatchers(DELETE, "/api/events/**").hasAnyAuthority("student", "admin")
-                .antMatchers(GET, "/api/files/**").hasAnyAuthority("student", "admin");
+                .antMatchers(DELETE, "/api/files/**").hasAnyAuthority("student", "admin")
+                .antMatchers(GET,"/api/files/**").permitAll();
 
         http.authorizeRequests().antMatchers("/api/eventCategories/**").permitAll()
                 .anyRequest().authenticated();

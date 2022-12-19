@@ -73,7 +73,7 @@ onBeforeUpdate(async () => {
               <li v-for="clinic in user.displayUser.eventCategories" class="ml-28" v-show="!user.editUserField">
                 <div class="flex">
               <p class="mt-1">
-                {{ clinic.eventCategoryName }} <button class="bg-Web-pink">1</button> 
+                {{ clinic.eventCategoryName }} 
               </p>         
           </div>
           </li>
