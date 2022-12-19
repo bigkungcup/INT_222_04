@@ -252,17 +252,21 @@ public class EventService {
                     }
                 } else if (getRole().equals("lecturer")) {
                     User user = userRepository.findByEmail(getEmail());
-                    List<Integer> categoryIds = user.getEventCategories().stream().map(EventCategory::getId).collect(Collectors.toList());
-                    if (eventCategoryId != 0) {
-                        if (categoryIds.contains(eventCategoryId)) {
-                            return modelMapper.map(repository.findAllByEventCategory_Id(eventCategoryId,
-                                    PageRequest.of(page, pageSize)), EventPageDTO.class);
+                    if(user != null){
+                        List<Integer> categoryIds = user.getEventCategories().stream().map(EventCategory::getId).collect(Collectors.toList());
+                        if (eventCategoryId != 0) {
+                            if (categoryIds.contains(eventCategoryId)) {
+                                return modelMapper.map(repository.findAllByEventCategory_Id(eventCategoryId,
+                                        PageRequest.of(page, pageSize)), EventPageDTO.class);
+                            } else {
+                                throw new HandleExceptionForbidden("The event category is not the same as lecturer's category");
+                            }
                         } else {
-                            throw new HandleExceptionForbidden("The event category is not the same as lecturer's category");
+                            return modelMapper.map(repository.findAllByEventCategory_IdIn(categoryIds,
+                                    PageRequest.of(page, pageSize)), EventPageDTO.class);
                         }
-                    } else {
-                        return modelMapper.map(repository.findAllByEventCategory_IdIn(categoryIds,
-                                PageRequest.of(page, pageSize)), EventPageDTO.class);
+                    }else {
+                        throw new HandleExceptionForbidden("The event category is not the same as lecturer's category");
                     }
                 }
                 break;
