@@ -85,6 +85,9 @@ public class FileStorageService {
     public Resource loadFileAsResource(String fileName, Event event) throws HandleExceptionNotFound {
         String userDir = event.getBookingEmail() != null ? "User/" + "User_" + event.getBookingEmail() : "Guest";
         String eventDir = "Event_" + event.getId().toString();
+
+        System.out.println("userDir: " + userDir);
+        System.out.println("eventDir: " + eventDir);
         try {
             Path filePath = this.fileStorageLocation.resolve(userDir).resolve(eventDir).resolve(fileName).normalize();
             Resource resource = new UrlResource(filePath.toUri());
@@ -104,6 +107,10 @@ public class FileStorageService {
         Event event = eventRepository.findById(id).orElseThrow(() -> new MyFileNotFoundException("Event not found with id " + id));
         String userDir = event.getBookingEmail() != null ? "User/" + "User_" + event.getBookingEmail() : "Guest";
         String eventDir = "Event_" + event.getId().toString();
+
+        System.out.println("userDir: " + userDir);
+        System.out.println("eventDir: " + eventDir);
+
         try {
             Path filePath = this.fileStorageLocation.resolve(userDir).resolve(eventDir).resolve(fileName).normalize();
             Resource resource = new UrlResource(filePath.toUri());

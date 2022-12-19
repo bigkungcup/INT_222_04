@@ -100,7 +100,7 @@ public class EventService {
 
         Event event = repository.getById(eventId);
 
-        String userDir = event.getUser() != null ? "User/" + "User_" + event.getUser().getEmail() : "Guest";
+        String userDir = event.getBookingEmail() != null ? "User/" + "User_" + event.getBookingEmail(): "Guest";
         Path path = Paths.get(fileStorageProperties.getUploadDir() + "/" + userDir + "/" + "Event_" + event.getId());
         System.out.println("Path: " + path);
 
